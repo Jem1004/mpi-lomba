@@ -1,0 +1,365 @@
+// Terminal Component - Media Pembelajaran Interaktif
+
+.terminal-session {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $terminal-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+  padding: $spacing-lg;
+
+  @include respond-to('mobile') {
+    padding: $spacing-md;
+  }
+}
+
+.terminal-container {
+  width: 100%;
+  max-width: 800px;
+  height: 500px;
+  background: $terminal-bg;
+  border: 1px solid #333;
+  border-radius: $radius-md;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include respond-to('mobile') {
+    height: 400px;
+    max-width: 95%;
+  }
+}
+
+.terminal-header {
+  background: #2a2a2a;
+  padding: $spacing-sm $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #333;
+
+  .terminal-controls {
+    display: flex;
+    gap: $spacing-sm;
+
+    .control {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+
+      &.close {
+        background: #ff5f56;
+      }
+
+      &.minimize {
+        background: #ffbd2e;
+      }
+
+      &.maximize {
+        background: #27c93f;
+      }
+    }
+  }
+
+  .terminal-title {
+    color: #999;
+    font-family: $font-family-mono;
+    font-size: $font-size-sm;
+  }
+}
+
+.terminal-body {
+  flex: 1;
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: $spacing-md;
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+
+  @include scan-lines;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba($color-primary, 0.3);
+    border-radius: $radius-sm;
+
+    &:hover {
+      background: rgba($color-primary, 0.5);
+    }
+  }
+}
+
+.terminal-line {
+  margin-bottom: $spacing-xs;
+  color: $terminal-text;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  &.success {
+    color: $color-success;
+    text-shadow: 0 0 5px rgba($color-success, 0.8);
+  }
+
+  &.error {
+    color: $color-danger;
+    text-shadow: 0 0 5px rgba($color-danger, 0.8);
+  }
+
+  &.warning {
+    color: $color-warning;
+    text-shadow: 0 0 5px rgba($color-warning, 0.8);
+  }
+
+  .highlight {
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+    text-shadow: 0 0 5px rgba($color-primary, 0.8);
+  }
+}
+
+.terminal-input-line {
+  display: flex;
+  align-items: center;
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  color: $terminal-text;
+
+  .terminal-prompt {
+    margin-right: $spacing-sm;
+    color: #999;
+  }
+
+  .terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: $terminal-text;
+    font-family: $font-family-mono;
+    font-size: $font-size-sm;
+    outline: none;
+    caret-color: transparent;
+
+    &::placeholder {
+      color: #666;
+    }
+  }
+
+  .terminal-cursor {
+    color: $terminal-cursor;
+    animation: cursorBlink 1s infinite;
+    margin-left: 2px;
+  }
+}
+
+// Loading screen variations
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $terminal-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+  @include scan-lines;
+
+  .loading-content {
+    text-align: center;
+    font-family: $font-family-mono;
+  }
+
+  .loading-text {
+    color: $terminal-text;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-lg;
+    text-shadow: 0 0 10px rgba($color-primary, 0.8);
+  }
+
+  .loading-dots {
+    display: flex;
+    gap: $spacing-xs;
+    justify-content: center;
+
+    span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: $color-primary;
+      border-radius: 50%;
+      animation: loadingDots 1.4s infinite ease-in-out both;
+
+      &:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+
+      &:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 0;
+      }
+    }
+  }
+}
+
+// Terminal animations
+@keyframes terminalLineAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.terminal-line {
+  animation: terminalLineAppear 0.3s ease-out;
+}
+
+// Matrix rain effect (optional enhancement)
+.matrix-rain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+
+  .matrix-column {
+    position: absolute;
+    top: -100%;
+    font-family: $font-family-mono;
+    font-size: $font-size-xs;
+    color: rgba($color-primary, 0.8);
+    animation: matrixRain linear infinite;
+    text-shadow: 0 0 5px rgba($color-primary, 0.8);
+  }
+}
+
+// Terminal theme variations
+.terminal-dark {
+  background: #000000;
+  border-color: #222;
+
+  .terminal-header {
+    background: #1a1a1a;
+  }
+
+  .terminal-text {
+    color: #00ff00;
+  }
+}
+
+.terminal-cyber {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
+  border-color: $color-secondary;
+
+  .terminal-header {
+    background: linear-gradient(135deg, #2a1a2a 0%, #1a2a2a 100%);
+  }
+
+  .terminal-text {
+    color: $color-secondary;
+  }
+
+  .terminal-cursor {
+    color: $color-secondary;
+  }
+}
+
+.terminal-hacker {
+  background: #000000;
+  border-color: $color-success;
+
+  .terminal-header {
+    background: #0a1a0a;
+  }
+
+  .terminal-text {
+    color: #00ff41;
+    font-weight: $font-weight-medium;
+  }
+
+  .terminal-cursor {
+    color: #00ff41;
+    animation: cursorBlink 0.8s infinite;
+  }
+}
+
+// Terminal size variations
+.terminal-small {
+  .terminal-container {
+    height: 300px;
+    max-width: 600px;
+  }
+}
+
+.terminal-large {
+  .terminal-container {
+    height: 600px;
+    max-width: 1000px;
+  }
+}
+
+.terminal-fullscreen {
+  .terminal-container {
+    height: 100vh;
+    max-width: 100vw;
+    border-radius: 0;
+    border: none;
+  }
+}
+
+// Terminal accessibility
+@media (prefers-reduced-motion: reduce) {
+  .terminal-cursor {
+    animation: none;
+    opacity: 1;
+  }
+
+  .loading-dots span {
+    animation: none;
+    opacity: 1;
+  }
+
+  .terminal-line {
+    animation: none;
+  }
+}
+
+// Terminal print styles
+@media print {
+  .terminal-session,
+  .loading-screen {
+    display: none;
+  }
+}

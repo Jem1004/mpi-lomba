@@ -1,0 +1,242 @@
+// Materials Page - Media Pembelajaran Interaktif
+
+.materials-page {
+  .page-content {
+    .materials-content {
+      max-width: $container-xl;
+      margin: 0 auto;
+    }
+
+    .materials-navigation {
+      display: flex;
+      gap: $spacing-sm;
+      margin-bottom: $spacing-xl;
+      flex-wrap: wrap;
+
+      .nav-button {
+        @include button-style(transparent, $color-light-dimmed, 1);
+        padding: $spacing-sm $spacing-md;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        transition: $transition-base;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: $color-primary;
+        }
+
+        &.active {
+          background: rgba($color-primary, 0.1);
+          border-color: $color-primary;
+          color: $color-primary;
+        }
+      }
+    }
+
+    .materials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: $spacing-lg;
+      margin-bottom: $spacing-xl;
+    }
+
+    .material-card {
+      @include card-style(0.05, 8px);
+      padding: $spacing-lg;
+      cursor: pointer;
+
+      .material-header {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        margin-bottom: $spacing-lg;
+
+        .material-icon {
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, $color-primary, $color-secondary);
+          border-radius: $radius-md;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: $color-dark;
+
+          svg {
+            width: 30px;
+            height: 30px;
+            fill: currentColor;
+          }
+        }
+
+        .material-title {
+          font-family: $font-family-secondary;
+          font-size: $font-size-lg;
+          font-weight: $font-weight-semibold;
+          color: $color-light;
+          margin: 0;
+        }
+      }
+
+      .material-description {
+        color: $color-light-dimmed;
+        line-height: $line-height-relaxed;
+        margin-bottom: $spacing-lg;
+      }
+
+      .material-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: $font-size-sm;
+        color: $color-gray;
+
+        .material-duration {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+
+          svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+          }
+        }
+
+        .material-progress {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+
+          .progress-bar {
+            width: 60px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: $radius-full;
+            overflow: hidden;
+
+            .progress-fill {
+              height: 100%;
+              background: $color-success;
+              border-radius: $radius-full;
+            }
+          }
+        }
+      }
+    }
+
+    .materials-detail {
+      @include glass-effect(0.05, 10px);
+      border-radius: $radius-lg;
+      padding: $spacing-xl;
+      margin-bottom: $spacing-xl;
+
+      .detail-header {
+        margin-bottom: $spacing-xl;
+
+        .detail-title {
+          font-family: $font-family-secondary;
+          font-size: $font-size-2xl;
+          font-weight: $font-weight-bold;
+          color: $color-light;
+          margin-bottom: $spacing-md;
+        }
+
+        .breadcrumb {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          font-size: $font-size-sm;
+          color: $color-light-dimmed;
+
+          .breadcrumb-separator {
+            color: $color-gray;
+          }
+        }
+      }
+
+      .detail-content {
+        .content-section {
+          margin-bottom: $spacing-2xl;
+
+          .section-title {
+            font-family: $font-family-secondary;
+            font-size: $font-size-xl;
+            font-weight: $font-weight-semibold;
+            color: $color-light;
+            margin-bottom: $spacing-md;
+          }
+
+          .section-content {
+            color: $color-light-dimmed;
+            line-height: $line-height-relaxed;
+
+            p {
+              margin-bottom: $spacing-md;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+
+            ul, ol {
+              margin-left: $spacing-lg;
+              margin-bottom: $spacing-md;
+
+              li {
+                margin-bottom: $spacing-xs;
+              }
+            }
+          }
+        }
+
+        .interactive-lab {
+          background: rgba($color-primary, 0.05);
+          border: 1px solid rgba($color-primary, 0.2);
+          border-radius: $radius-lg;
+          padding: $spacing-xl;
+          margin-top: $spacing-xl;
+
+          .lab-title {
+            font-family: $font-family-secondary;
+            font-size: $font-size-lg;
+            font-weight: $font-weight-semibold;
+            color: $color-primary;
+            margin-bottom: $spacing-lg;
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+
+            svg {
+              width: 24px;
+              height: 24px;
+              fill: currentColor;
+            }
+          }
+
+          .lab-content {
+            min-height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: $radius-md;
+            padding: $spacing-lg;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $color-light-dimmed;
+            text-align: center;
+
+            .lab-placeholder {
+              svg {
+                width: 60px;
+                height: 60px;
+                fill: currentColor;
+                margin-bottom: $spacing-md;
+                opacity: 0.5;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

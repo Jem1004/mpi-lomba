@@ -1,0 +1,392 @@
+{
+  "tujuan_pembelajaran": [
+    {
+      "id": 1,
+      "kategori": "Pemahaman Konsep Dasar Jaringan",
+      "deskripsi": "Mahasiswa memahami konsep dasar jaringan komputer dan model OSI",
+      "indikator": [
+        {
+          "id": 1.1,
+          "tujuan": "Menjelaskan pengertian jaringan komputer",
+          "dicapai": false,
+          "syarat": "Membaca materi pengantar jaringan komputer"
+        },
+        {
+          "id": 1.2,
+          "tujuan": "Mengidentifikasi keuntungan menggunakan jaringan komputer",
+          "dicapai": false,
+          "syarat": "Menyelesaikan test pengetahuan bab 1"
+        },
+        {
+          "id": 1.3,
+          "tujuan": "Menjelaskan tujuan dan pentingnya OSI model",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi pengantar OSI model"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "kategori": "Model OSI Layer - Upper Layers",
+      "deskripsi": "Mahasiswa memahami struktur dan fungsi Layer 7, 6, dan 5 OSI Model",
+      "indikator": [
+        {
+          "id": 2.1,
+          "tujuan": "Menjelaskan fungsi Application Layer (Layer 7)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi Application Layer"
+        },
+        {
+          "id": 2.2,
+          "tujuan": "Mengidentifikasi protokol-protokol pada Application Layer",
+          "dicapai": false,
+          "syarat": "Menyelesaikan protocol exploration Application Layer"
+        },
+        {
+          "id": 2.3,
+          "tujuan": "Menjelaskan fungsi Presentation Layer (Layer 6)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi Presentation Layer"
+        },
+        {
+          "id": 2.4,
+          "tujuan": "Memahami proses encryption dan compression data",
+          "dicapai": false,
+          "syarat": "Menyelesaikan interactive lab encryption simulation"
+        },
+        {
+          "id": 2.5,
+          "tujuan": "Menjelaskan fungsi Session Layer (Layer 5)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi Session Layer"
+        },
+        {
+          "id": 2.6,
+          "tujuan": "Memahami konsep dialog control dan session management",
+          "dicapai": false,
+          "syarat": "Menyelesaikan test pengetahuan bab Upper Layers"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "kategori": "Model OSI Layer - Transport Layer",
+      "deskripsi": "Mahasiswa memahami struktur dan fungsi Transport Layer (Layer 4)",
+      "indikator": [
+        {
+          "id": 3.1,
+          "tujuan": "Menjelaskan fungsi utama Transport Layer",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi Transport Layer"
+        },
+        {
+          "id": 3.2,
+          "tujuan": "Membedakan karakteristik TCP dan UDP",
+          "dicapai": false,
+          "syarat": "Menyelesaikan perbandingan TCP vs UDP"
+        },
+        {
+          "id": 3.3,
+          "tujuan": "Memahami proses three-way handshake TCP",
+          "dicapai": false,
+          "syarat": "Menyelesaikan interactive lab TCP handshake simulation"
+        },
+        {
+          "id": 3.4,
+          "tujuan": "Mengidentifikasi port numbers dan fungsinya",
+          "dicapai": false,
+          "syarat": "Menyelesaikan port number exercise"
+        },
+        {
+          "id": 3.5,
+          "tujuan": "Memahami konsep flow control dan error recovery",
+          "dicapai": false,
+          "syarat": "Menyelesaikan test pengetahuan bab Transport Layer"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "kategori": "Model OSI Layer - Lower Layers",
+      "deskripsi": "Mahasiswa memahami struktur dan fungsi Layer 3, 2, dan 1 OSI Model",
+      "indikator": [
+        {
+          "id": 4.1,
+          "tujuan": "Menjelaskan fungsi Network Layer (Layer 3)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi Network Layer"
+        },
+        {
+          "id": 4.2,
+          "tujuan": "Memahami konsep logical addressing (IP addresses)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan IP addressing exercise"
+        },
+        {
+          "id": 4.3,
+          "tujuan": "Mengidentifikasi routing protocols dan fungsinya",
+          "dicapai": false,
+          "syarat": "Menyelesaikan routing protocols exploration"
+        },
+        {
+          "id": 4.4,
+          "tujuan": "Menjelaskan fungsi Data Link Layer (Layer 2)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi Data Link Layer"
+        },
+        {
+          "id": 4.5,
+          "tujuan": "Memahami format MAC address dan penggunaannya",
+          "dicapai": false,
+          "syarat": "Menyelesaikan MAC address exercise"
+        },
+        {
+          "id": 4.6,
+          "tujuan": "Menjelaskan fungsi Physical Layer (Layer 1)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi Physical Layer"
+        },
+        {
+          "id": 4.7,
+          "tujuan": "Mengidentifikasi media transmisi jaringan",
+          "dicapai": false,
+          "syarat": "Menyelesaikan media transmisi exploration"
+        },
+        {
+          "id": 4.8,
+          "tujuan": "Memahami proses data encapsulation OSI",
+          "dicapai": false,
+          "syarat": "Menyelesaikan interactive lab encapsulation simulator"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "kategori": "IP Addressing - IPv4 Structure",
+      "deskripsi": "Mahasiswa mampu memahami dan mengimplementasikan IPv4 addressing",
+      "indikator": [
+        {
+          "id": 5.1,
+          "tujuan": "Menjelaskan struktur dan format IPv4 address",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi IPv4 structure"
+        },
+        {
+          "id": 5.2,
+          "tujuan": "Membedakan kelas-kelas IP address (A, B, C, D, E)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan IP class identification exercise"
+        },
+        {
+          "id": 5.3,
+          "tujuan": "Mengidentifikasi private vs public IP addresses",
+          "dicapai": false,
+          "syarat": "Menyelesaikan private vs public IP exercise"
+        },
+        {
+          "id": 5.4,
+          "tujuan": "Memahami special IP addresses (loopback, broadcast, APIPA)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan special addresses exercise"
+        },
+        {
+          "id": 5.5,
+          "tujuan": "Mengkonversi IP address antara decimal dan binary",
+          "dicapai": false,
+          "syarat": "Menyelesaikan binary conversion exercise"
+        },
+        {
+          "id": 5.6,
+          "tujuan": "Menyelesaikan test pengetahuan bab IP Addressing",
+          "dicapai": false,
+          "syarat": "Test pengetahuan dengan skor minimal 70"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "kategori": "IP Subnetting - Basic Concepts",
+      "deskripsi": "Mahasiswa mampu melakukan subnetting jaringan dasar",
+      "indikator": [
+        {
+          "id": 6.1,
+          "tujuan": "Menjelaskan konsep dan tujuan subnetting",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi subnetting concepts"
+        },
+        {
+          "id": 6.2,
+          "tujuan": "Memahami struktur subnet mask",
+          "dicapai": false,
+          "syarat": "Menyelesaikan subnet mask exercise"
+        },
+        {
+          "id": 6.3,
+          "tujuan": "Menghitung jumlah subnet dan host per subnet",
+          "dicapai": false,
+          "syarat": "Menyelesaikan subnet host calculation exercise"
+        },
+        {
+          "id": 6.4,
+          "tujuan": "Menentukan network ID dan broadcast address",
+          "dicapai": false,
+          "syarat": "Menyelesaikan network ID dan broadcast calculation"
+        },
+        {
+          "id": 6.5,
+          "tujuan": "Mengidentifikasi usable host range",
+          "dicapai": false,
+          "syarat": "Menyelesaikan usable range exercise"
+        },
+        {
+          "id": 6.6,
+          "tujuan": "Menggunakan CIDR notation",
+          "dicapai": false,
+          "syarat": "Menyelesaikan CIDR notation exercise"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "kategori": "IP Subnetting - Advanced Techniques",
+      "deskripsi": "Mahasiswa mampu melakukan subnetting lanjutan dan VLSM",
+      "indikator": [
+        {
+          "id": 7.1,
+          "tujuan": "Melakukan subnetting untuk berbagai kebutuhan host",
+          "dicapai": false,
+          "syarat": "Menyelesaikan various subnetting requirements exercise"
+        },
+        {
+          "id": 7.2,
+          "tujuan": "Memahami konsep VLSM (Variable Length Subnet Mask)",
+          "dicapai": false,
+          "syarat": "Menyelesaikan materi VLSM concepts"
+        },
+        {
+          "id": 7.3,
+          "tujuan": "Merancang network dengan VLSM",
+          "dicapai": false,
+          "syarat": "Menyelesaikan VLSM design exercise"
+        },
+        {
+          "id": 7.4,
+          "tujuan": "Memecahkan kasus subnetting kompleks",
+          "dicapai": false,
+          "syarat": "Menyelesaikan complex subnetting scenarios"
+        },
+        {
+          "id": 7.5,
+          "tujuan": "Melakukan subnetting untuk berbagai kelas IP",
+          "dicapai": false,
+          "syarat": "Menyelesaikan multi-class subnetting exercise"
+        },
+        {
+          "id": 7.6,
+          "tujuan": "Troubleshooting subnetting errors",
+          "dicapai": false,
+          "syarat": "Menyelesaikan subnetting troubleshooting exercise"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "kategori": "Practical Application & Lab",
+      "deskripsi": "Mahasiswa mampu menerapkan konsep dalam praktikum",
+      "indikator": [
+        {
+          "id": 8.1,
+          "tujuan": "Menggunakan OSI Layer Interactive Explorer",
+          "dicapai": false,
+          "syarat": "Menyelesaikan semua OSI layer exploration activities"
+        },
+        {
+          "id": 8.2,
+          "tujuan": "Menggunakan Advanced Subnetting Calculator",
+          "dicapai": false,
+          "syarat": "Menyelesaikan berbagai subnetting calculation scenarios"
+        },
+        {
+          "id": 8.3,
+          "tujuan": "Merancang network addressing scheme",
+          "dicapai": false,
+          "syarat": "Menyelesaikan network addressing planner exercise"
+        },
+        {
+          "id": 8.4,
+          "tujuan": "Mendokumentasikan network design",
+          "dicapai": false,
+          "syarat": "Menyelesaikan network documentation exercise"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "kategori": "Evaluasi Akhir",
+      "deskripsi": "Mahasiswa mampu menguji pemahaman keseluruhan materi",
+      "indikator": [
+        {
+          "id": 9.1,
+          "tujuan": "Mengerjakan kuis akhir dengan skor minimal 70",
+          "dicapai": false,
+          "syarat": "Menyelesaikan kuis akhir"
+        },
+        {
+          "id": 9.2,
+          "tujuan": "Mendapatkan sertifikat penyelesaian",
+          "dicapai": false,
+          "syarat": "Kuis skor minimal 70 dan semua materi selesai"
+        }
+      ]
+    }
+  ],
+  "gelar_pencapaian": [
+    {
+      "nama": "Network Architect",
+      "min_skor": 90,
+      "deskripsi": "Master dalam jaringan komputer dengan pemahaman OSI dan subnetting yang mendalam"
+    },
+    {
+      "nama": "Network Engineer",
+      "min_skor": 80,
+      "deskripsi": "Ahli dalam implementasi dan manajemen jaringan dengan kemampuan subnetting expert"
+    },
+    {
+      "nama": "Network Technician",
+      "min_skor": 70,
+      "deskripsi": "Teknisi jaringan dengan kemampuan subnetting dan OSI yang solid"
+    },
+    {
+      "nama": "Network Learner",
+      "min_skor": 60,
+      "deskripsi": "Pemula yang memahami konsep dasar OSI dan subnetting"
+    }
+  ],
+  "kompetensi_inti": [
+    "Pemahaman mendalam OSI Model dan implementasi praktis",
+    "Kemampuan subnetting dan VLSM untuk network design",
+    "Troubleshooting jaringan berbasis OSI layers",
+    "Perencanaan network addressing yang efisien",
+    "Analisis dan optimasi network performance"
+  ],
+  "capaian_pembelajaran": {
+    "knowledge": [
+      "Menjelaskan 7 layer OSI model dan fungsinya",
+      "Memahami konsep IP addressing dan subnetting",
+      "Mengidentifikasi protokol-protokol jaringan",
+      "Memahami konsep VLSM dan network design"
+    ],
+    "skills": [
+      "Melakukan subnetting untuk berbagai skenario",
+      "Menggunakan tools network calculation",
+      "Merancang network addressing scheme",
+      "Troubleshooting masalah jaringan dasar"
+    ],
+    "attitude": [
+      "Berfikir sistematis dalam network design",
+      "Teliti dalam perhitungan subnetting",
+      "Problem solving dalam troubleshooting",
+      "Documentation yang baik dan terstruktur"
+    ]
+  }
+}

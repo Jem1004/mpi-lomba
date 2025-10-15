@@ -1,0 +1,1203 @@
+{
+  "materi": [
+    {
+      "id": 1,
+      "judul": "Model OSI Layer",
+      "deskripsi": "Pembahasan mendalam mengenai 7 layer OSI Model, fungsi, protokol, dan implementasi praktis",
+      "durasi": "60 menit",
+      "icon": "layers",
+      "konten": {
+        "pengantar": {
+          "definisi": "Open Systems Interconnection (OSI) model adalah kerangka kerja konseptual yang mendefinisikan standar komunikasi antar sistem komputer. Model ini dikembangkan oleh ISO (International Organization for Standardization) pada tahun 1984.",
+          "tujuan_model": [
+            "Menyediakan standar universal untuk komunikasi data",
+            "Memfasilitasi interoperabilitas antar vendor berbeda",
+            "Membantu troubleshooting masalah jaringan",
+            "Mempermudah pembelajaran konsep jaringan secara terstruktur"
+          ],
+          "analogi": "OSI Layer seperti surat yang dikirim melalui pos: Application Layer (penulis surat), Presentation Layer (penerjemah), Session Layer (sekretaris), Transport Layer (kurir internal), Network Layer (kantor pos pusat), Data Link Layer (pengantar lokal), Physical Layer (kendaraan pengantar)"
+        },
+        "layers": [
+          {
+            "layer": 7,
+            "nama": "Application Layer",
+            "fungsi_utama": "Menyediakan antarmuka antara aplikasi user dan jaringan",
+            "fungsi_detail": [
+              "Menyediakan layanan aplikasi untuk user",
+              "Resource sharing dan device access",
+              "File transfer dan remote access",
+              "Email services dan web browsing"
+            ],
+            "protokol_utama": [
+              {
+                "nama": "HTTP/HTTPS",
+                "deskripsi": "Hypertext Transfer Protocol untuk web browsing",
+                "port": "80/443"
+              },
+              {
+                "nama": "FTP",
+                "deskripsi": "File Transfer Protocol untuk transfer file",
+                "port": "21"
+              },
+              {
+                "nama": "SMTP",
+                "deskripsi": "Simple Mail Transfer Protocol untuk email",
+                "port": "25"
+              },
+              {
+                "nama": "DNS",
+                "deskripsi": "Domain Name System untuk resolving nama domain",
+                "port": "53"
+              },
+              {
+                "nama": "Telnet",
+                "deskripsi": "Remote login dan terminal access",
+                "port": "23"
+              },
+              {
+                "nama": "SSH",
+                "deskripsi": "Secure Shell untuk remote access yang aman",
+                "port": "22"
+              }
+            ],
+            "contoh_aplikasi": ["Web Browser", "Email Client", "FTP Client", "SSH Client"],
+            "data_unit": "Data",
+            "contoh_praktis": "Ketika Anda membuka website www.google.com, browser menggunakan HTTP untuk mengirim request ke server Google"
+          },
+          {
+            "layer": 6,
+            "nama": "Presentation Layer",
+            "fungsi_utama": "Translation, encryption, dan compression data",
+            "fungsi_detail": [
+              "Data formatting dan syntax conversion",
+              "Encryption dan decryption data",
+              "Compression dan decompression",
+              "Character encoding translation (ASCII, EBCDIC, UTF-8)"
+            ],
+            "protokol_utama": [
+              {
+                "nama": "SSL/TLS",
+                "deskripsi": "Secure Sockets Layer/Transport Layer Security untuk encryption"
+              },
+              {
+                "nama": "JPEG/MPEG/GIF",
+                "deskripsi": "Format compression untuk gambar dan video"
+              },
+              {
+                "nama": "ASCII/EBCDIC",
+                "deskripsi": "Character encoding standards"
+              }
+            ],
+            "contoh_aplikasi": ["Encryption Software", "Codecs", "Data Compression Tools"],
+            "data_unit": "Data",
+            "contoh_praktis": "Ketika Anda mengirim email terenkripsi, data di-encrypt di layer ini sebelum dikirim"
+          },
+          {
+            "layer": 5,
+            "nama": "Session Layer",
+            "fungsi_utama": "Mengelola sesi komunikasi antar aplikasi",
+            "fungsi_detail": [
+              "Session establishment dan termination",
+              "Session synchronization dan recovery",
+              "Dialog control (simplex, half-duplex, full-duplex)",
+              "Token management untuk distributed systems"
+            ],
+            "protokol_utama": [
+              {
+                "nama": "NetBIOS",
+                "deskripsi": "Network Basic Input/Output System untuk LAN communication"
+              },
+              {
+                "nama": "RPC",
+                "deskripsi": "Remote Procedure Call untuk distributed computing"
+              },
+              {
+                "nama": "SQL sessions",
+                "deskripsi": "Database session management"
+              }
+            ],
+            "contoh_aplikasi": ["Session Management Software", "Database Connection Managers"],
+            "data_unit": "Data",
+            "contoh_praktis": "Ketika Anda login ke banking application, session layer mengelola session Anda selama transaksi"
+          },
+          {
+            "layer": 4,
+            "nama": "Transport Layer",
+            "fungsi_utama": "End-to-end communication dan reliability",
+            "fungsi_detail": [
+              "Segmentation dan reassembly data",
+              "Flow control dan error recovery",
+              "Connection-oriented dan connectionless communication",
+              "Multiplexing dan demultiplexing",
+              "Congestion control"
+            ],
+            "protokol_utama": [
+              {
+                "nama": "TCP",
+                "deskripsi": "Transmission Control Protocol, connection-oriented, reliable",
+                "fitur": ["Three-way handshake", "Sequencing", "Acknowledgments", "Flow control"]
+              },
+              {
+                "nama": "UDP",
+                "deskripsi": "User Datagram Protocol, connectionless, fast",
+                "fitur": ["No handshake", "No sequencing", "No error recovery", "Low overhead"]
+              },
+              {
+                "nama": "SCTP",
+                "deskripsi": "Stream Control Transmission Protocol, reliable multi-streaming"
+              }
+            ],
+            "contoh_aplikasi": ["Firewall", "Load Balancer", "Proxy Server"],
+            "data_unit": "Segment (TCP) / Datagram (UDP)",
+            "port_penting": [
+              {"port": "20/21", "protocol": "FTP", "deskripsi": "File Transfer"},
+              {"port": "22", "protocol": "SSH", "deskripsi": "Secure Shell"},
+              {"port": "23", "protocol": "Telnet", "deskripsi": "Remote Terminal"},
+              {"port": "25", "protocol": "SMTP", "deskripsi": "Email Sending"},
+              {"port": "53", "protocol": "DNS", "deskripsi": "Domain Resolution"},
+              {"port": "80", "protocol": "HTTP", "deskripsi": "Web"},
+              {"port": "443", "protocol": "HTTPS", "deskripsi": "Secure Web"},
+              {"port": "3389", "protocol": "RDP", "deskripsi": "Remote Desktop"}
+            ],
+            "contoh_praktis": "Ketika streaming video, TCP memastikan semua packet sampai dengan urutan yang benar, sementara UDP lebih cepat tapi tidak reliable"
+          },
+          {
+            "layer": 3,
+            "nama": "Network Layer",
+            "fungsi_utama": "Routing packet antar jaringan",
+            "fungsi_detail": [
+              "Logical addressing (IP addresses)",
+              "Routing packet selection",
+              "Packet forwarding dan switching",
+              "Fragmentation dan reassembly",
+              "Error handling dan diagnostics"
+            ],
+            "protokol_utama": [
+              {
+                "nama": "IPv4",
+                "deskripsi": "Internet Protocol version 4, 32-bit addressing",
+                "format": "A.B.C.D (contoh: 192.168.1.1)"
+              },
+              {
+                "nama": "IPv6",
+                "deskripsi": "Internet Protocol version 6, 128-bit addressing",
+                "format": "Hexadecimal separated by colons"
+              },
+              {
+                "nama": "ICMP",
+                "deskripsi": "Internet Control Message Protocol untuk error reporting"
+              },
+              {
+                "nama": "ARP",
+                "deskripsi": "Address Resolution Protocol, IP to MAC address resolution"
+              },
+              {
+                "nama": "RARP",
+                "deskripsi": "Reverse Address Resolution Protocol, MAC to IP resolution"
+              }
+            ],
+            "contoh_aplikasi": ["Router", "Layer 3 Switch"],
+            "data_unit": "Packet",
+            "routing_protocols": [
+              {"nama": "OSPF", "tipe": "Link-state", "deskripsi": "Open Shortest Path First"},
+              {"nama": "RIP", "tipe": "Distance-vector", "deskripsi": "Routing Information Protocol"},
+              {"nama": "EIGRP", "tipe": "Advanced distance-vector", "deskripsi": "Enhanced Interior Gateway Routing Protocol"},
+              {"nama": "BGP", "tipe": "Path-vector", "deskripsi": "Border Gateway Protocol"}
+            ],
+            "contoh_praktis": "Ketika Anda mengakses website di luar negeri, router menggunakan routing tables untuk menentukan jalur terbaik"
+          },
+          {
+            "layer": 2,
+            "nama": "Data Link Layer",
+            "fungsi_utama": "Frame transmission dan error detection",
+            "fungsi_detail": [
+              "Physical addressing (MAC addresses)",
+              "Frame formatting dan delimiting",
+              "Error detection dan correction",
+              "Flow control pada link level",
+              "Media access control (CSMA/CD, CSMA/CA)"
+            ],
+            "protokol_utama": [
+              {
+                "nama": "Ethernet",
+                "deskripsi": "Most common LAN protocol, uses CSMA/CD",
+                "mac_format": "XX:XX:XX:XX:XX:XX (48-bit)"
+              },
+              {
+                "nama": "PPP",
+                "deskripsi": "Point-to-Point Protocol untuk dial-up connections"
+              },
+              {
+                "nama": "HDLC",
+                "deskripsi": "High-Level Data Link Control untuk serial connections"
+              },
+              {
+                "nama": "Frame Relay",
+                "deskripsi": "Packet-switched WAN protocol"
+              },
+              {
+                "nama": "ATM",
+                "deskripsi": "Asynchronous Transfer Mode untuk high-speed networking"
+              }
+            ],
+            "contoh_aplikasi": ["Switch", "Bridge", "Network Interface Card (NIC)"],
+            "data_unit": "Frame",
+            "mac_address_info": {
+              "format": "6 bytes hexadecimal",
+              "structure": "OUI (3 bytes) + Device ID (3 bytes)",
+              "contoh": "00:1A:2B:3C:4D:5E"
+            },
+            "ethernet_standards": [
+              {"nama": "10BASE-T", "speed": "10 Mbps", "media": "Twisted Pair"},
+              {"nama": "100BASE-TX", "speed": "100 Mbps", "media": "Twisted Pair"},
+              {"nama": "1000BASE-T", "speed": "1 Gbps", "media": "Twisted Pair"},
+              {"nama": "10GBASE-T", "speed": "10 Gbps", "media": "Twisted Pair"}
+            ],
+            "contoh_praktis": "Ketika dua komputer dalam LAN yang sama berkomunikasi, switch menggunakan MAC address table untuk mengirim frame hanya ke tujuan"
+          },
+          {
+            "layer": 1,
+            "nama": "Physical Layer",
+            "fungsi_utama": "Transmisi bit melalui media fisik",
+            "fungsi_detail": [
+              "Bit stream transmission",
+              "Physical media specifications",
+              "Signal encoding dan modulation",
+              "Data rate control",
+              "Physical topology definition"
+            ],
+            "protokol_standards": [
+              {
+                "nama": "Ethernet Physical Layer",
+                "standards": ["10BASE-T", "100BASE-TX", "1000BASE-T", "10GBASE-T"]
+              },
+              {
+                "nama": "Wireless Standards",
+                "standards": ["802.11a/b/g/n/ac/ax"]
+              },
+              {
+                "nama": "Serial Standards",
+                "standards": ["RS-232", "V.35", "X.21"]
+              }
+            ],
+            "contoh_aplikasi": ["Hub", "Repeater", "Cables", "Transceivers"],
+            "data_unit": "Bit",
+            "media_transmisi": [
+              {
+                "tipe": "Wired",
+                "contoh": [
+                  {"nama": "UTP", "deskripsi": "Unshielded Twisted Pair, kategori Cat5e/Cat6"},
+                  {"nama": "STP", "deskripsi": "Shielded Twisted Pair, lebih tahan interference"},
+                  {"nama": "Fiber Optic", "deskripsi": "Single-mode dan Multi-mode untuk high-speed"},
+                  {"nama": "Coaxial", "deskripsi": "Untuk broadband dan cable TV"}
+                ]
+              },
+              {
+                "tipe": "Wireless",
+                "contoh": [
+                  {"nama": "Radio", "deskripsi": "WiFi, Bluetooth, Cellular"},
+                  {"nama": "Infrared", "deskripsi": "Line-of-sight communication"},
+                  {"nama": "Microwave", "deskripsi": "Point-to-point links"}
+                ]
+              }
+            ],
+            "signal_types": [
+              {"nama": "Digital", "contoh": "Manchester encoding, NRZ"},
+              {"nama": "Analog", "contoh": "Amplitude modulation, Frequency modulation"}
+            ],
+            "contoh_praktis": "Ketika Anda menghubungkan laptop ke switch dengan kabel Ethernet, electrical signals travel through kabel sebagai bit stream"
+          }
+        ],
+        "encapsulation_process": {
+          "deskripsi": "Proses pembungkusan data saat turun melalui OSI layers",
+          "steps": [
+            {"layer": "Application", "data": "Data", "action": "Application data"},
+            {"layer": "Presentation", "data": "Data", "action": "Encryption/Compression"},
+            {"layer": "Session", "data": "Data", "action": "Session info added"},
+            {"layer": "Transport", "data": "Segment", "action": "Port numbers added"},
+            {"layer": "Network", "data": "Packet", "action": "IP addresses added"},
+            {"layer": "Data Link", "data": "Frame", "action": "MAC addresses added"},
+            {"layer": "Physical", "data": "Bits", "action": "Converted to signals"}
+          ]
+        },
+        "interactive_simulations": {
+          "data_flow_simulation": {
+            "judul": "Simulasi Aliran Data HTTP Request",
+            "deskripsi": "Simulasi lengkap bagaimana HTTP request mengalami encapsulation dan transmission melalui OSI layers",
+            "scenario": "User mengakses https://www.google.com",
+            "steps": [
+              {
+                "layer": "Application",
+                "protocol": "HTTPS/TLS",
+                "data": "GET / HTTP/1.1\\nHost: www.google.com\\nUser-Agent: Mozilla/5.0",
+                "header_added": "HTTP Request Header",
+                "port_info": {
+                  "source": "54321 (random ephemeral port)",
+                  "destination": "443 (HTTPS)"
+                }
+              },
+              {
+                "layer": "Presentation",
+                "encryption": "TLS Handshake completed",
+                "data_compressed": "HTTP request encrypted dengan TLS 1.3",
+                "encoding": "Binary data format"
+              },
+              {
+                "layer": "Session",
+                "session_id": "TLS Session ID: 0x1234ABCD",
+                "sync_info": "Sequence number: 1",
+                "dialogue_control": "Full-duplex communication established"
+              },
+              {
+                "layer": "Transport",
+                "segmentation": "Data dibagi menjadi segments",
+                "tcp_header": {
+                  "source_port": "54321",
+                  "dest_port": "443",
+                  "seq_num": "1001",
+                  "ack_num": "0",
+                  "flags": "SYN=1, ACK=0",
+                  "window": "65535",
+                  "checksum": "0x7F2A"
+                }
+              },
+              {
+                "layer": "Network",
+                "ip_header": {
+                  "version": "IPv4",
+                  "src_ip": "192.168.1.100",
+                  "dst_ip": "142.250.191.14",
+                  "ttl": "64",
+                  "protocol": "TCP (6)",
+                  "checksum": "0x8B3C"
+                }
+              },
+              {
+                "layer": "Data Link",
+                "ethernet_frame": {
+                  "src_mac": "00:1A:2B:3C:4D:5E",
+                  "dst_mac": "AA:BB:CC:DD:EE:FF (Gateway MAC)",
+                  "ether_type": "0x0800 (IPv4)",
+                  "fcs": "Frame Check Sequence"
+                }
+              },
+              {
+                "layer": "Physical",
+                "signal_encoding": "Manchester encoding",
+                "transmission": "Electrical signals melalui UTP cable",
+                "bit_pattern": "10110100 11001011 ..."
+              }
+            ]
+          },
+          "troubleshooting_scenarios": {
+            "judul": "OSI Layer Troubleshooting Scenarios",
+            "deskripsi": "Kasus-kasus troubleshooting nyata dengan analisis berdasarkan OSI layers",
+            "scenarios": [
+              {
+                "kasus": "Tidak bisa akses internet tapi ping ke gateway berhasil",
+                "layer_terdampak": "Network Layer ke atas",
+                "analisis": {
+                  "layer_1": "Physical: OK (kabel terhubung, link up)",
+                  "layer_2": "Data Link: OK (bisa ping gateway)",
+                  "layer_3": "Network: Issue (DNS resolution gagal)",
+                  "layer_4_plus": "Transport ke Application: Terdampak karena tidak ada konektivitas"
+                },
+                "solusi": [
+                  "Check DNS configuration",
+                  "Verify default gateway setting",
+                  "Test DNS resolution dengan nslookup",
+                  "Check firewall rules"
+                ],
+                "commands": [
+                  "ping 8.8.8.8",
+                  "nslookup google.com",
+                  "ipconfig /flushdns",
+                  "netstat -rn"
+                ]
+              },
+              {
+                "kasus": "WiFi connected tapi tidak dapat IP address",
+                "layer_terdampak": "Network Layer",
+                "analisis": {
+                  "layer_1": "Physical: OK (WiFi connected)",
+                  "layer_2": "Data Link: OK (WiFi association successful)",
+                  "layer_3": "Network: Issue (DHCP client gagal)",
+                  "layer_4_plus": "Terdampak karena tidak ada IP address"
+                },
+                "solusi": [
+                  "Check DHCP server availability",
+                  "Verify DHCP scope tidak penuh",
+                  "Check DHCP client configuration",
+                  "Restart DHCP client service"
+                ],
+                "commands": [
+                  "ipconfig /renew",
+                  "ipconfig /release",
+                  "netsh interface ip set address \"Wi-Fi\" dhcp",
+                  "ping 255.255.255.255"
+                ]
+              }
+            ]
+          }
+        },
+        "practical_exercises": {
+          "protocol_identification": {
+            "judul": "Identifikasi Protocol Berdasarkan Port Number",
+            "deskripsi": "Latihan mengenali protocol berdasarkan port number yang digunakan",
+            "exercises": [
+              {
+                "pertanyaan": "Port 80 digunakan untuk protocol apa?",
+                "jawaban": "HTTP",
+                "penjelasan": "Port 80 adalah standard port untuk HTTP (Hypertext Transfer Protocol)"
+              },
+              {
+                "pertanyaan": "Jika melihat traffic di port 443, protocol apa yang kemungkinan digunakan?",
+                "jawaban": "HTTPS/TLS",
+                "penjelasan": "Port 443 adalah standard port untuk HTTPS dengan TLS encryption"
+              },
+              {
+                "pertanyaan": "Port 22 digunakan untuk apa?",
+                "jawaban": "SSH (Secure Shell)",
+                "penjelasan": "Port 22 untuk secure remote access dan file transfer"
+              }
+            ]
+          },
+          "layer_mapping": {
+            "judul": "Mapping Device dan Protocol ke OSI Layer",
+            "deskripsi": "Latihan memetakan perangkat jaringan dan protocol ke OSI layer yang tepat",
+            "exercises": [
+              {
+                "item": "Router",
+                "layer": "Network Layer (Layer 3)",
+                "alasan": "Router membuat keputusan routing berdasarkan IP address"
+              },
+              {
+                "item": "Switch",
+                "layer": "Data Link Layer (Layer 2)",
+                "alasan": "Switch memforward frame berdasarkan MAC address"
+              },
+              {
+                "item": "Hub",
+                "layer": "Physical Layer (Layer 1)",
+                "alasan": "Hub hanya memperkuat dan mendistribusikan signals"
+              },
+              {
+                "item": "Firewall",
+                "layers": "Network Layer, Transport Layer, Application Layer",
+                "alasan": "Modern firewall bisa inspect traffic di multiple layers"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "judul": "IP Addressing & Subnetting",
+      "deskripsi": "Konsep lengkap IP addressing, kelas IP, subnetting, dan VLSM untuk desain jaringan",
+      "durasi": "90 menit",
+      "icon": "subnet",
+      "konten": {
+        "pengantar": {
+          "definisi": "IP Address adalah alamat numerik unik yang diberikan kepada setiap perangkat dalam jaringan untuk identifikasi dan komunikasi. IP addressing fundamental dalam infrastruktur jaringan modern.",
+          "versi_ip": [
+            {
+              "versi": "IPv4",
+              "deskripsi": "32-bit addressing, ~4.3 miliar addresses",
+              "format": "Dotted decimal notation (xxx.xxx.xxx.xxx)",
+              "contoh": "192.168.1.1"
+            },
+            {
+              "versi": "IPv6",
+              "deskripsi": "128-bit addressing, 340 undecillion addresses",
+              "format": "Hexadecimal notation",
+              "contoh": "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+            }
+          ],
+          "importansi": [
+            "Identifikasi unik perangkat dalam jaringan",
+            "Routing dan forwarding packet",
+            "Network segmentation dan security",
+            "Resource management dan troubleshooting"
+          ]
+        },
+        "ipv4_addressing": {
+          "struktur": {
+            "total_bits": 32,
+            "format": "4 octets (8 bits each)",
+            "contoh": "11000000.10101000.00000001.00000001 = 192.168.1.1",
+            "octet_range": "0-255 per octet"
+          },
+          "kelas_ip": [
+            {
+              "kelas": "Class A",
+              "oktet_pertama": "1-126",
+              "binary_prefix": "0xxxxxxx",
+              "subnet_mask": "255.0.0.0 (/8)",
+              "network_bits": 8,
+              "host_bits": 24,
+              "jumlah_network": 126,
+              "jumlah_host_per_network": "16,777,214 (2^24 - 2)",
+              "penggunaan": "Organisasi besar dengan jaringan yang sangat besar",
+              "contoh": ["10.0.0.1", "125.255.255.254"],
+              "private_range": "10.0.0.0 - 10.255.255.255"
+            },
+            {
+              "kelas": "Class B",
+              "oktet_pertama": "128-191",
+              "binary_prefix": "10xxxxxx",
+              "subnet_mask": "255.255.0.0 (/16)",
+              "network_bits": 16,
+              "host_bits": 16,
+              "jumlah_network": 16,384,
+              "jumlah_host_per_network": "65,534 (2^16 - 2)",
+              "penggunaan": "Organisasi menengah dengan jaringan sedang",
+              "contoh": ["172.16.0.1", "190.255.255.254"],
+              "private_range": "172.16.0.0 - 172.31.255.255"
+            },
+            {
+              "kelas": "Class C",
+              "oktet_pertama": "192-223",
+              "binary_prefix": "110xxxxx",
+              "subnet_mask": "255.255.255.0 (/24)",
+              "network_bits": 24,
+              "host_bits": 8,
+              "jumlah_network": 2,097,152,
+              "jumlah_host_per_network": "254 (2^8 - 2)",
+              "penggunaan": "Organisasi kecil dengan jaringan kecil",
+              "contoh": ["192.168.1.1", "223.255.255.254"],
+              "private_range": "192.168.0.0 - 192.168.255.255"
+            },
+            {
+              "kelas": "Class D",
+              "oktet_pertama": "224-239",
+              "binary_prefix": "1110xxxx",
+              "penggunaan": "Multicast addressing",
+              "contoh": "224.0.0.1 (all systems on this subnet)"
+            },
+            {
+              "kelas": "Class E",
+              "oktet_pertama": "240-255",
+              "binary_prefix": "1111xxxx",
+              "penggunaan": "Experimental dan reserved",
+              "contoh": "240.0.0.1"
+            }
+          ],
+          "special_addresses": [
+            {"alamat": "0.0.0.0", "deskripsi": "Default route, all networks"},
+            {"alamat": "127.0.0.1", "deskripsi": "Loopback address, localhost"},
+            {"alamat": "255.255.255.255", "deskripsi": "Limited broadcast"},
+            {"alamat": "169.254.0.0/16", "deskripsi": "APIPA (Automatic Private IP Addressing)"}
+          ]
+        },
+        "subnetting_konsep": {
+          "definisi": "Subnetting adalah proses membagi network IP besar menjadi beberapa subnet yang lebih kecil untuk efisiensi penggunaan alamat IP dan peningkatan performa jaringan.",
+          "tujuan_subnetting": [
+            "Menghemat penggunaan IP address",
+            "Meningkatkan keamanan jaringan dengan segmentation",
+            "Mempermudah manajemen jaringan",
+            "Mengurangi broadcast traffic",
+            "Optimalisasi performa jaringan",
+            "Facilitate hierarchical network design"
+          ],
+          "konsep_dasar": {
+            "network_address": "Alamat pertama dalam subnet, tidak dapat digunakan untuk host",
+            "broadcast_address": "Alamat terakhir dalam subnet, tidak dapat digunakan untuk host",
+            "usable_hosts": "Alamat antara network dan broadcast address",
+            "subnet_mask": "Menentukan bagian network dan host dari IP address"
+          },
+          "rumus_subnetting": {
+            "jumlah_subnet": "2^n (dimana n = jumlah bits yang dipinjam)",
+            "jumlah_host_per_subnet": "2^h - 2 (dimana h = sisa host bits)",
+            "block_size": "256 - subnet_mask_octet",
+            "increment": "Block size untuk subnet berikutnya"
+          }
+        },
+        "subnetting_praktis": {
+          "metode_sistematis": [
+            {
+              "step": 1,
+              "aksi": "Tentukan kebutuhan host atau subnet",
+              "contoh": "Dibutuhkan 30 host per subnet"
+            },
+            {
+              "step": 2,
+              "aksi": "Cari pangkat 2 terdekat ≥ kebutuhan",
+              "contoh": "2^5 = 32 (cukup untuk 30 host)"
+            },
+            {
+              "step": 3,
+              "aksi": "Hitung host bits yang diperlukan",
+              "contoh": "5 host bits needed"
+            },
+            {
+              "step": 4,
+              "aksi": "Tentukan subnet mask baru",
+              "contoh": "/27 (255.255.255.224)"
+            },
+            {
+              "step": 5,
+              "aksi": "Hitung block size dan subnet list",
+              "contoh": "Block size = 32"
+            }
+          ],
+          "contoh_detailed": [
+            {
+              "soal": "Dari network 192.168.10.0/24, buat 4 subnet dengan kebutuhan masing-masing 50 host",
+              "analisis": {
+                "network_original": "192.168.10.0/24",
+                "kebutuhan": "4 subnet × 50 host",
+                "total_hosts": "200 host (dari 254 available)"
+              },
+              "solusi": {
+                "host_bits_needed": "6 (2^6 = 64 hosts)",
+                "subnet_mask": "/26 atau 255.255.255.192",
+                "bits_pinjam": "2 bits dari host portion",
+                "jumlah_subnet": "2^2 = 4 subnet",
+                "block_size": "256 - 192 = 64"
+              },
+              "hasil_subnet": [
+                {
+                  "subnet": "192.168.10.0/26",
+                  "network_id": "192.168.10.0",
+                  "broadcast": "192.168.10.63",
+                  "usable_range": "192.168.10.1 - 192.168.10.62",
+                  "jumlah_host": 62
+                },
+                {
+                  "subnet": "192.168.10.64/26",
+                  "network_id": "192.168.10.64",
+                  "broadcast": "192.168.10.127",
+                  "usable_range": "192.168.10.65 - 192.168.10.126",
+                  "jumlah_host": 62
+                },
+                {
+                  "subnet": "192.168.10.128/26",
+                  "network_id": "192.168.10.128",
+                  "broadcast": "192.168.10.191",
+                  "usable_range": "192.168.10.129 - 192.168.10.190",
+                  "jumlah_host": 62
+                },
+                {
+                  "subnet": "192.168.10.192/26",
+                  "network_id": "192.168.10.192",
+                  "broadcast": "192.168.10.255",
+                  "usable_range": "192.168.10.193 - 192.168.10.254",
+                  "jumlah_host": 62
+                }
+              ]
+            }
+          ]
+        },
+        "vlsm_vlsm": {
+          "definisi": "Variable Length Subnet Mask (VLSM) adalah teknik subnetting yang menggunakan subnet mask dengan panjang berbeda untuk subnet yang berbeda dalam satu network yang sama.",
+          "keuntungan_vlsm": [
+            "IP address utilization yang lebih efisien",
+            "Mengurangi pemborosan IP addresses",
+            "Support hierarchical network design",
+            "Scalability untuk jaringan besar"
+          ],
+          "contoh_vlsm": {
+            "kasus": "Network 192.168.0.0/24 dengan kebutuhan: LAN1=60 hosts, LAN2=30 hosts, LAN3=10 hosts, WAN links=2 hosts",
+            "solusi": [
+              {
+                "kebutuhan": "LAN1 (60 hosts)",
+                "subnet_mask": "/26 (255.255.255.192)",
+                "network": "192.168.0.0/26",
+                "hosts": "62 usable"
+              },
+              {
+                "kebutuhan": "LAN2 (30 hosts)",
+                "subnet_mask": "/27 (255.255.255.224)",
+                "network": "192.168.0.64/27",
+                "hosts": "30 usable"
+              },
+              {
+                "kebutuhan": "LAN3 (10 hosts)",
+                "subnet_mask": "/28 (255.255.255.240)",
+                "network": "192.168.0.96/28",
+                "hosts": "14 usable"
+              },
+              {
+                "kebutuhan": "WAN (2 hosts)",
+                "subnet_mask": "/30 (255.255.255.252)",
+                "network": "192.168.0.112/30",
+                "hosts": "2 usable"
+              }
+            ]
+          }
+        },
+        "subnetting_kelas_berbeda": {
+          "class_a_example": {
+            "network": "10.0.0.0/8",
+            "kebutuhan": "100 subnet each dengan 500 hosts",
+            "solusi": "/23 (255.255.254.0)",
+            "hasil": "256 subnet dengan 510 hosts per subnet"
+          },
+          "class_b_example": {
+            "network": "172.16.0.0/16",
+            "kebutuhan": "50 subnet each dengan 100 hosts",
+            "solusi": "/25 (255.255.255.128)",
+            "hasil": "2048 subnet dengan 126 hosts per subnet"
+          }
+        },
+        "troubleshooting_subnetting": {
+          "common_mistakes": [
+            "Menggunakan network atau broadcast address untuk host",
+            "Salah menghitung block size",
+            "Overlap antar subnet",
+            "Lupa mengurangi 2 untuk network dan broadcast"
+          ],
+          "validation_steps": [
+            "Verify semua subnet memiliki ukuran yang benar",
+            "Check tidak ada overlap antar subnet",
+            "Confirm network dan broadcast addresses tidak digunakan",
+            "Validate subnet mask consistency"
+          ]
+        },
+        "advanced_concepts": {
+          "supernetting": {
+            "definisi": "Supernetting (route aggregation) adalah proses menggabungkan multiple subnet menjadi satu network yang lebih besar untuk mengurangi ukuran routing table",
+            "manfaat": [
+              "Mengurangi routing table size",
+              "Meningkatkan routing efficiency",
+              "Menghemat memory pada router",
+              "Mempercepat lookup process"
+            ],
+            "contoh": {
+              "networks": [
+                "192.168.0.0/24",
+                "192.168.1.0/24",
+                "192.168.2.0/24",
+                "192.168.3.0/24"
+              ],
+              "supernet": "192.168.0.0/22",
+              "subnet_mask": "255.255.252.0",
+              "binary_analysis": {
+                "192.168.0.0": "11000000.10101000.00000000.00000000",
+                "192.168.3.0": "11000000.10101000.00000011.00000000",
+                "common_bits": "11000000.10101000.000000",
+                "summary_route": "192.168.0.0/22"
+              }
+            }
+          },
+          "cidr_notation": {
+            "definisi": "Classless Inter-Domain Routing (CIDR) adalah metode routing yang menggunakan subnet mask flexible tanpa terikat pada kelas IP",
+            "format": "IP_ADDRESS/PREFIX_LENGTH",
+            "contoh_konversi": [
+              {"cidr": "192.168.1.0/24", "subnet_mask": "255.255.255.0", "binary": "11111111.11111111.11111111.00000000"},
+              {"cidr": "10.0.0.0/8", "subnet_mask": "255.0.0.0", "binary": "11111111.00000000.00000000.00000000"},
+              {"cidr": "172.16.0.0/12", "subnet_mask": "255.240.0.0", "binary": "11111111.11110000.00000000.00000000"}
+            ],
+            "prefix_lengths": {
+              "host_ranges": [
+                {"/30": "4 addresses, 2 usable hosts"},
+                {"/29": "8 addresses, 6 usable hosts"},
+                {"/28": "16 addresses, 14 usable hosts"},
+                {"/27": "32 addresses, 30 usable hosts"},
+                {"/26": "64 addresses, 62 usable hosts"},
+                {"/25": "128 addresses, 126 usable hosts"},
+                {"/24": "256 addresses, 254 usable hosts"}
+              ]
+            }
+          },
+          "ipv6_fundamentals": {
+            "definisi": "Internet Protocol version 6 adalah next generation protocol dengan 128-bit addressing untuk mengatasi kekurangan IPv4",
+            "alamat_format": {
+              "hexadecimal": "8 groups of 4 hex digits",
+              "separator": ":",
+              "contoh": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+              "shortening": [
+                "Leading zeros can be omitted: 2001:db8:85a3:0:0:8a2e:370:7334",
+                "Consecutive zero groups: 2001:db8:85a3::8a2e:370:7334"
+              ]
+            },
+            "address_types": [
+              {
+                "tipe": "Unicast",
+                "deskripsi": "Single destination address",
+                "contoh": "2001:db8::1"
+              },
+              {
+                "tipe": "Multicast",
+                "deskripsi": "Multiple destinations",
+                "prefix": "FF00::/8",
+                "contoh": "FF02::1 (all nodes)"
+              },
+              {
+                "tipe": "Anycast",
+                "deskripsi": "Nearest of multiple destinations",
+                "contoh": "2001:db8::/48 anycast"
+              }
+            ],
+            "transition_mechanisms": [
+              {
+                "mekanisme": "Dual Stack",
+                "deskripsi": "Running both IPv4 and IPv6 simultaneously"
+              },
+              {
+                "mekanisme": "Tunneling",
+                "deskripsi": "Encapsulating IPv6 packets in IPv4"
+              },
+              {
+                "mekanisme": "Translation",
+                "deskripsi": "Converting between IPv4 and IPv6"
+              }
+            ]
+          }
+        },
+        "practical_scenarios": {
+          "network_design_case": {
+            "judul": "Kasus: Desain Network untuk Small Office",
+            "requirement": "Design network untuk company dengan 50 employees, 3 departments, dan remote access needs",
+            "analysis": {
+              "total_users": 50,
+              "departments": ["Sales (20 users)", "IT (10 users)", "Admin (20 users)"],
+              "growth_factor": "20%",
+              "servers": "5 servers",
+              "wifi_guests": "10 concurrent guests",
+              "wan_links": "2 point-to-point connections"
+            },
+            "solution": {
+              "main_network": "192.168.0.0/23",
+              "vlsm_design": [
+                {
+                  "department": "Sales",
+                  "network": "192.168.0.0/26",
+                  "hosts": "62 usable",
+                  "description": "Enough for 20 users + growth"
+                },
+                {
+                  "department": "IT",
+                  "network": "192.168.0.64/27",
+                  "hosts": "30 usable",
+                  "description": "Enough for 10 users + servers"
+                },
+                {
+                  "department": "Admin",
+                  "network": "192.168.0.96/26",
+                  "hosts": "62 usable",
+                  "description": "Enough for 20 users + growth"
+                },
+                {
+                  "department": "Guest WiFi",
+                  "network": "192.168.0.160/27",
+                  "hosts": "30 usable",
+                  "description": "For guest wireless access"
+                },
+                {
+                  "department": "WAN Link 1",
+                  "network": "192.168.0.192/30",
+                  "hosts": "2 usable",
+                  "description": "Point-to-point connection"
+                },
+                {
+                  "department": "WAN Link 2",
+                  "network": "192.168.0.196/30",
+                  "hosts": "2 usable",
+                  "description": "Backup point-to-point"
+                }
+              ]
+            }
+          },
+          "isp_addressing_plan": {
+            "judul": "Kasus: ISP Address Allocation Planning",
+            "scenario": "ISP received 203.0.113.0/24 block dan perlu mengalokasikan ke berbagai customer types",
+            "allocation_table": [
+              {
+                "customer_type": "Large Enterprise",
+                "allocation": "/28",
+                "hosts": "14 usable",
+                "monthly_rate": "$100",
+                "quantity": 10
+              },
+              {
+                "customer_type": "Medium Business",
+                "allocation": "/29",
+                "hosts": "6 usable",
+                "monthly_rate": "$50",
+                "quantity": 20
+              },
+              {
+                "customer_type": "Small Business",
+                "allocation": "/30",
+                "hosts": "2 usable",
+                "monthly_rate": "$25",
+                "quantity": 50
+              }
+            ],
+            "utilization_calculation": {
+              "total_allocated": "240 addresses",
+              "remaining": "16 addresses for infrastructure",
+              "efficiency": "93.75%"
+            }
+          }
+        },
+        "interactive_exercises": {
+          "subnetting_worksheet": {
+            "judul": "Interactive Subnetting Worksheet",
+            "problems": [
+              {
+                "id": 1,
+                "network": "192.168.10.0/24",
+                "requirement": "6 subnet dengan masing-masing 25 host",
+                "hint": "Cari prefix length yang memberikan minimal 25 usable hosts",
+                "solution": {
+                  "subnet_mask": "/27 (255.255.255.224)",
+                  "block_size": 32,
+                  "subnets": [
+                    "192.168.10.0/27 (.1-.30)",
+                    "192.168.10.32/27 (.33-.62)",
+                    "192.168.10.64/27 (.65-.94)",
+                    "192.168.10.96/27 (.97-.126)",
+                    "192.168.10.128/27 (.129-.158)",
+                    "192.168.10.160/27 (.161-.190)"
+                  ]
+                }
+              },
+              {
+                "id": 2,
+                "network": "10.0.0.0/8",
+                "requirement": "1000 subnet dengan masing-masing 100 host",
+                "hint": "Ini membutuhkan VLSM untuk efisiensi",
+                "solution": {
+                  "primary_mask": "/25 (255.255.255.128)",
+                  "hosts_per_subnet": "126 usable",
+                  "total_possible": "131,072 subnet",
+                  "efficiency": "Cukup untuk requirement"
+                }
+              }
+            ]
+          },
+          "ip_calculator_simulation": {
+            "judul": "IP Address Calculator Simulation",
+            "features": [
+              "Binary to decimal conversion",
+              "Network and broadcast identification",
+              "First and last host calculation",
+              "Subnet mask calculator",
+              "VLSM optimization assistant"
+            ],
+            "practice_mode": {
+              "random_problems": true,
+              "difficulty_levels": ["Beginner", "Intermediate", "Advanced"],
+              "time_challenges": true,
+              "score_tracking": true
+            }
+          }
+        }
+      }
+    }
+  ],
+  "interactive_lab": {
+    "osi_layer_explorer": {
+      "judul": "OSI Layer Interactive Explorer",
+      "deskripsi": "Eksplorasi mendalam setiap layer OSI dengan simulasi data flow",
+      "fitur": [
+        "Clickable layers untuk detail informasi",
+        "Data encapsulation simulation",
+        "Protocol mapping per layer",
+        "Real-world examples"
+      ],
+      "komponen": [
+        {
+          "nama": "Layer Visualizer",
+          "deskripsi": "Visual representation dari OSI layers dengan animasi data flow"
+        },
+        {
+          "nama": "Protocol Explorer",
+          "deskripsi": "Interactive protocol database dengan filter per layer"
+        },
+        {
+          "nama": "Encapsulation Simulator",
+          "deskripsi": "Simulasi proses pembungkusan data melalui layers"
+        }
+      ]
+    },
+    "advanced_subnet_calculator": {
+      "judul": "Advanced Subnetting Calculator",
+      "deskripsi": "Kalkulator subnetting lengkap dengan VLSM support",
+      "fitur": [
+        "Subnet calculation otomatis",
+        "VLSM design assistant",
+        "Subnet visualization",
+        "IP address validation"
+      ],
+      "modes": [
+        {
+          "nama": "Basic Subnetting",
+          "input": ["Network address", "Required hosts", "Required subnets"],
+          "output": ["Subnet mask", "Subnet list", "IP ranges", "Broadcast addresses"]
+        },
+        {
+          "nama": "VLSM Designer",
+          "input": ["Network address", "Multiple host requirements"],
+          "output": ["Optimal VLSM design", "Subnet allocation table", "IP utilization report"]
+        },
+        {
+          "nama": "Subnet Merger",
+          "input": ["Multiple subnets", "Target network"],
+          "output": ["Supernetting result", "Summarized routes"]
+        }
+      ]
+    },
+    "addressing_planner": {
+      "judul": "Network Addressing Planner",
+      "deskripsi": "Tools untuk perencanaan addressing skala besar",
+      "fitur": [
+        "Network topology design",
+        "IP address scheme planning",
+        "Documentation generation",
+        "Validation tools"
+      ],
+      "templates": [
+        "Small Office Network",
+        "Enterprise Network",
+        "Data Center Network",
+        "ISP Network"
+      ]
+    },
+    "osi_layer_interactive": {
+      "judul": "OSI Layer Interactive Explorer",
+      "deskripsi": "Interactive visualization dari OSI layers dengan real-world scenarios",
+      "components": [
+        {
+          "type": "layer_visualizer",
+          "name": "7-Layer Stack Visualizer",
+          "description": "Click-through exploration setiap layer dengan animasi data flow",
+          "features": [
+            "Interactive layer selection",
+            "Real-time protocol mapping",
+            "Data transformation visualization",
+            "Device association per layer"
+          ]
+        },
+        {
+          "type": "encapsulation_simulator",
+          "name": "Packet Encapsulation Simulator",
+          "description": "Simulasi lengkap proses encapsulation dari Application ke Physical",
+          "features": [
+            "Step-by-step encapsulation",
+            "Header field visualization",
+            "Binary representation",
+            "Size calculation"
+          ]
+        },
+        {
+          "type": "troubleshooting_game",
+          "name": "Network Troubleshooting Challenge",
+          "description": "Game-based troubleshooting dengan OSI layer methodology",
+          "features": [
+            "Scenario-based problems",
+            "Layer-by-layer diagnosis",
+            "Tool selection simulation",
+            "Performance scoring"
+          ]
+        }
+      ]
+    },
+    "subnetting_interactive_lab": {
+      "judul": "Advanced Subnetting Laboratory",
+      "deskripsi": "Interactive lab untuk subnetting dengan real-world scenarios",
+      "modules": [
+        {
+          "module_id": "subnet_calculator_pro",
+          "name": "Professional Subnet Calculator",
+          "features": [
+            "VLSM optimization algorithm",
+            "Visual subnet mapping",
+            "Conflict detection",
+            "IP utilization analysis",
+            "Documentation export"
+          ],
+          "calculations": [
+            "Basic subnetting",
+            "VLSM design",
+            "Route summarization",
+            "IPv6 subnetting",
+            "Supernetting"
+          ]
+        },
+        {
+          "module_id": "network_designer",
+          "name": "Network Topology Designer",
+          "features": [
+            "Drag-and-drop topology builder",
+            "Automatic IP assignment",
+            "Requirement analysis",
+            "Cost optimization",
+            "Scalability planning"
+          ],
+          "templates": [
+            "Small Office (10-50 users)",
+            "Medium Business (50-200 users)",
+            "Enterprise (200+ users)",
+            "Service Provider",
+            "Data Center"
+          ]
+        },
+        {
+          "module_id": "ipv6_migrator",
+          "name": "IPv6 Migration Planner",
+          "features": [
+            "Dual-stack planning",
+            "Tunneling design",
+            "Translation configuration",
+            "Address assignment strategy",
+            "Compatibility checking"
+          ]
+        }
+      ]
+    },
+    "practical_assessments": {
+      "judul": "Practical Skills Assessment",
+      "description": "Hands-on assessment untuk menguji pemahaman praktis",
+      "assessments": [
+        {
+          "id": "osi_hands_on",
+          "name": "OSI Layer Hands-on Assessment",
+          "duration": "45 minutes",
+          "tasks": [
+            {
+              "task": "Protocol Identification",
+              "description": "Identify protocols berdasarkan port number dan functionality",
+              "scoring": "Automatic validation dengan feedback"
+            },
+            {
+              "task": "Layer Troubleshooting",
+              "description": "Diagnostic masalah jaringan dengan OSI methodology",
+              "scoring": "Step-by-step analysis evaluation"
+            },
+            {
+              "task": "Device Mapping",
+              "description": "Map network devices ke OSI layers yang tepat",
+              "scoring": "Accuracy dan justification assessment"
+            }
+          ]
+        },
+        {
+          "id": "subnetting_master",
+          "name": "Subnetting Master Assessment",
+          "duration": "60 minutes",
+          "tasks": [
+            {
+              "task": "VLSM Design Challenge",
+              "description": "Design optimal VLSM untuk complex requirements",
+              "scoring": "Efficiency dan accuracy metrics"
+            },
+            {
+              "task": "Network Planning",
+              "description": "Create complete IP addressing scheme",
+              "scoring": "Comprehensive planning evaluation"
+            },
+            {
+              "task": "Troubleshooting Scenarios",
+              "description": "Identify dan fix subnetting issues",
+              "scoring": "Problem-solving assessment"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

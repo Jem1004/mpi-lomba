@@ -1,0 +1,525 @@
+// Transitions - Media Pembelajaran Interaktif
+
+// Transition Effect Container
+.transition-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-black;
+  z-index: $z-index-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+// Glitch Effect
+.glitch-overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-black;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+  }
+
+  &::before {
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba($color-primary, 0.1) 50%,
+      transparent 70%
+    );
+    animation: glitch-slide 0.3s infinite;
+  }
+
+  &::after {
+    background: linear-gradient(
+      -45deg,
+      transparent 30%,
+      rgba($color-secondary, 0.1) 50%,
+      transparent 70%
+    );
+    animation: glitch-slide 0.3s infinite reverse;
+  }
+}
+
+.glitch-text {
+  font-family: $font-family-mono;
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  position: relative;
+  text-shadow:
+    0 0 10px rgba($color-primary, 0.8),
+    0 0 20px rgba($color-primary, 0.6),
+    0 0 30px rgba($color-primary, 0.4);
+
+  @include glitch-effect;
+  animation: glitch-pulse 0.3s infinite;
+
+  @include respond-to('mobile') {
+    font-size: $font-size-2xl;
+  }
+}
+
+// Glitch Animations
+@keyframes glitch-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes glitch-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+// Scan Lines Transition
+.scanlines-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-black;
+  z-index: $z-index-modal;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      0deg,
+      transparent 50%,
+      rgba(255, 255, 255, 0.03) 50%
+    );
+    background-size: 100% 4px;
+    animation: scanlines-move 1s linear infinite;
+  }
+
+  .transition-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+  }
+}
+
+@keyframes scanlines-move {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+// Fade Transition
+.fade-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    $color-dark 0%,
+    $color-darker 50%,
+    $color-dark 100%
+  );
+  z-index: $z-index-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .fade-content {
+    text-align: center;
+    animation: fade-scale $animation-duration-slow ease-out;
+  }
+
+  &.fade-out {
+    animation: fade-out $animation-duration-normal ease-in forwards;
+  }
+}
+
+@keyframes fade-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+// Circuit Board Transition
+.circuit-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-darker;
+  z-index: $z-index-modal;
+  overflow: hidden;
+
+  .circuit-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.3;
+
+    svg {
+      width: 100%;
+      height: 100%;
+
+      .circuit-line {
+        fill: none;
+        stroke: $color-primary;
+        stroke-width: 1;
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: circuit-draw $animation-duration-slower ease-out forwards;
+      }
+
+      .circuit-node {
+        fill: $color-secondary;
+        opacity: 0;
+        animation: node-appear $animation-duration-slow ease-out forwards;
+      }
+    }
+  }
+
+  .transition-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: $font-family-mono;
+    font-size: $font-size-3xl;
+    color: $color-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    animation: text-appear $animation-duration-normal ease-out $animation-duration-slow forwards;
+  }
+}
+
+@keyframes circuit-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes node-appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes text-appear {
+  to {
+    opacity: 1;
+  }
+}
+
+// Matrix Rain Transition
+.matrix-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-black;
+  z-index: $z-index-modal;
+  overflow: hidden;
+
+  .matrix-columns {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    .matrix-column {
+      position: absolute;
+      top: -100%;
+      font-family: $font-family-mono;
+      font-size: $font-size-xs;
+      color: rgba($color-primary, 0.8);
+      animation: matrix-fall linear infinite;
+      white-space: nowrap;
+      text-shadow: 0 0 5px rgba($color-primary, 0.8);
+    }
+  }
+
+  .transition-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: $font-family-mono;
+    font-size: $font-size-3xl;
+    color: $color-success;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 20px rgba($color-success, 0.8);
+    z-index: 1;
+  }
+}
+
+@keyframes matrix-fall {
+  to {
+    transform: translateY(200vh);
+  }
+}
+
+// Page Transition Classes
+.page-transition-enter {
+  opacity: 0;
+  transform: translateX(100px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity $animation-duration-normal ease-out,
+              transform $animation-duration-normal ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: opacity $animation-duration-normal ease-in,
+              transform $animation-duration-normal ease-in;
+}
+
+// Slide Transitions
+.slide-up-enter {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.slide-up-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity $animation-duration-normal ease-out,
+              transform $animation-duration-normal ease-out;
+}
+
+.slide-down-enter {
+  opacity: 0;
+  transform: translateY(-50px);
+}
+
+.slide-down-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity $animation-duration-normal ease-out,
+              transform $animation-duration-normal ease-out;
+}
+
+// Zoom Transitions
+.zoom-enter {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.zoom-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity $animation-duration-normal ease-out,
+              transform $animation-duration-normal ease-out;
+}
+
+// Flip Transitions
+.flip-enter {
+  opacity: 0;
+  transform: perspective(1000px) rotateY(90deg);
+}
+
+.flip-enter-active {
+  opacity: 1;
+  transform: perspective(1000px) rotateY(0);
+  transition: opacity $animation-duration-normal ease-out,
+              transform $animation-duration-normal ease-out;
+}
+
+// Loading Transitions
+.loading-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($color-dark, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: $z-index-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .loading-content {
+    text-align: center;
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba($color-primary, 0.1);
+      border-top: 3px solid $color-primary;
+      border-radius: 50%;
+      margin: 0 auto $spacing-lg;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      font-family: $font-family-mono;
+      color: $color-primary;
+      font-size: $font-size-lg;
+      animation: pulse 2s infinite;
+    }
+  }
+}
+
+// Transition Utilities
+.transition-all {
+  transition: $transition-base;
+}
+
+.transition-colors {
+  transition: $transition-colors;
+}
+
+.transition-opacity {
+  transition: $transition-opacity;
+}
+
+.transition-transform {
+  transition: $transition-transform;
+}
+
+.transition-shadow {
+  transition: $transition-shadow;
+}
+
+// Duration utilities
+.duration-fast {
+  transition-duration: $transition-fast;
+}
+
+.duration-normal {
+  transition-duration: $transition-normal;
+}
+
+.duration-slow {
+  transition-duration: $transition-slow;
+}
+
+// Easing utilities
+.ease-in {
+  transition-timing-function: $ease-in;
+}
+
+.ease-out {
+  transition-timing-function: $ease-out;
+}
+
+.ease-in-out {
+  transition-timing-function: $ease-in-out;
+}
+
+.ease-bounce {
+  transition-timing-function: $ease-bounce;
+}
+
+// Accessibility
+@media (prefers-reduced-motion: reduce) {
+  .transition-effect,
+  .glitch-overlay,
+  .scanlines-transition,
+  .fade-transition,
+  .circuit-transition,
+  .matrix-transition,
+  .loading-transition {
+    transition: none !important;
+    animation: none !important;
+
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+  }
+
+  .glitch-text {
+    animation: none !important;
+    text-shadow: none !important;
+
+    &::before,
+    &::after {
+      display: none !important;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .transition-effect,
+  .glitch-overlay,
+  .scanlines-transition,
+  .fade-transition,
+  .circuit-transition,
+  .matrix-transition,
+  .loading-transition {
+    display: none !important;
+  }
+}

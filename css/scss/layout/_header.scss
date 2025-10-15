@@ -1,0 +1,180 @@
+// Header Layout - Media Pembelajaran Interaktif
+
+// Main Header
+.header {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $spacing-lg 0;
+  position: sticky;
+  top: 0;
+  z-index: $z-index-sticky;
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-family: $font-family-secondary;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-light;
+    text-decoration: none;
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, $color-primary, $color-secondary);
+      border-radius: $radius-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $color-dark;
+
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+
+    .nav-link {
+      color: $color-light-dimmed;
+      text-decoration: none;
+      font-weight: $font-weight-medium;
+      transition: $transition-colors;
+
+      &:hover {
+        color: $color-primary;
+      }
+
+      &.active {
+        color: $color-primary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+}
+
+// Page Header
+.page-header {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $spacing-xl 0;
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+
+  .page-title {
+    font-family: $font-family-secondary;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $color-light;
+    margin: 0;
+
+    @include respond-to('mobile') {
+      font-size: $font-size-2xl;
+    }
+  }
+
+  .page-meta {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    color: $color-light-dimmed;
+    font-size: $font-size-sm;
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+
+    .meta-icon {
+      width: 16px;
+      height: 16px;
+      color: $color-primary;
+    }
+  }
+
+  .page-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+}
+
+// Responsive Header
+@include respond-to('mobile') {
+  .header {
+    padding: $spacing-md 0;
+
+    .container {
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: $font-size-lg;
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    .nav {
+      display: none;
+    }
+  }
+
+  .page-header {
+    padding: $spacing-lg 0;
+
+    .container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-md;
+    }
+
+    .page-meta {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .page-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}

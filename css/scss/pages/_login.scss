@@ -1,0 +1,143 @@
+// Login Page - Media Pembelajaran Interaktif
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba($color-primary, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba($color-secondary, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .login-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 500px;
+    padding: $spacing-lg;
+
+    .login-card {
+      @include glass-effect(0.05, 15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: $radius-xl;
+      padding: $spacing-2xl;
+      text-align: center;
+
+      .login-header {
+        margin-bottom: $spacing-2xl;
+
+        .login-logo {
+          width: 80px;
+          height: 80px;
+          margin: 0 auto $spacing-lg;
+          background: linear-gradient(135deg, $color-primary, $color-secondary);
+          border-radius: $radius-lg;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: $color-dark;
+          font-size: $font-size-2xl;
+          font-weight: $font-weight-bold;
+        }
+
+        .login-title {
+          font-family: $font-family-secondary;
+          font-size: $font-size-2xl;
+          font-weight: $font-weight-bold;
+          color: $color-light;
+          margin-bottom: $spacing-sm;
+        }
+
+        .login-subtitle {
+          color: $color-light-dimmed;
+          font-size: $font-size-base;
+        }
+      }
+
+      .login-form {
+        .form-group {
+          margin-bottom: $spacing-lg;
+          text-align: left;
+
+          .form-label {
+            display: block;
+            font-weight: $font-weight-medium;
+            color: $color-light;
+            margin-bottom: $spacing-sm;
+          }
+
+          .form-input {
+            width: 100%;
+            padding: $spacing-md;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: $radius-md;
+            color: $color-light;
+            font-size: $font-size-base;
+            transition: $transition-base;
+
+            &:focus {
+              outline: none;
+              border-color: $color-primary;
+              box-shadow: 0 0 0 2px rgba($color-primary, 0.2);
+            }
+
+            &::placeholder {
+              color: $color-gray;
+            }
+          }
+
+          .form-error {
+            color: $color-danger;
+            font-size: $font-size-sm;
+            margin-top: $spacing-xs;
+          }
+        }
+
+        .login-button {
+          width: 100%;
+          @include button-style($color-primary, $color-dark, 1.05);
+          font-weight: $font-weight-bold;
+          padding: $spacing-md;
+          margin-top: $spacing-lg;
+        }
+      }
+
+      .login-footer {
+        margin-top: $spacing-xl;
+        padding-top: $spacing-xl;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        .login-links {
+          display: flex;
+          justify-content: center;
+          gap: $spacing-lg;
+
+          .login-link {
+            color: $color-light-dimmed;
+            text-decoration: none;
+            font-size: $font-size-sm;
+            transition: $transition-colors;
+
+            &:hover {
+              color: $color-primary;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,135 @@
+// Sidebar Layout - Media Pembelajaran Interaktif
+
+.sidebar {
+  width: 300px;
+  background: rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $spacing-lg;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: $z-index-fixed;
+  overflow-y: auto;
+  transform: translateX(0);
+  transition: transform $transition-normal;
+
+  &.sidebar-closed {
+    transform: translateX(-100%);
+  }
+
+  .sidebar-header {
+    margin-bottom: $spacing-xl;
+
+    .sidebar-title {
+      font-family: $font-family-secondary;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $color-light;
+      margin-bottom: $spacing-sm;
+    }
+
+    .sidebar-subtitle {
+      color: $color-light-dimmed;
+      font-size: $font-size-sm;
+    }
+  }
+
+  .sidebar-nav {
+    list-style: none;
+
+    .nav-item {
+      margin-bottom: $spacing-sm;
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        padding: $spacing-sm $spacing-md;
+        color: $color-light-dimmed;
+        text-decoration: none;
+        border-radius: $radius-md;
+        transition: $transition-base;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: $color-primary;
+        }
+
+        &.active {
+          background: rgba($color-primary, 0.1);
+          color: $color-primary;
+        }
+
+        .nav-icon {
+          width: 20px;
+          height: 20px;
+          fill: currentColor;
+        }
+      }
+    }
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: $spacing-lg;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Mobile sidebar toggle
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: $spacing-lg;
+  left: $spacing-lg;
+  z-index: $z-index-fixed + 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+  color: $color-light;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+// Overlay for mobile
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: $z-index-fixed;
+  opacity: 0;
+  transition: opacity $transition-normal;
+
+  &.active {
+    opacity: 1;
+  }
+}
+
+// Responsive sidebar
+@include respond-to('mobile') {
+  .sidebar {
+    width: 280px;
+    transform: translateX(-100%);
+
+    &.sidebar-open {
+      transform: translateX(0);
+    }
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+}

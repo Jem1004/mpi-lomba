@@ -1,0 +1,626 @@
+{
+  "test_pengetahuan": [
+    {
+      "id": 1,
+      "bab": "Model OSI Layer - Introduction",
+      "pertanyaan": "Apa tujuan utama dari OSI model?",
+      "options": [
+        "Menstandarisasi protokol jaringan",
+        "Mendefinisikan standar komunikasi antar sistem",
+        "Menggantikan semua protokol yang ada",
+        "Mempercepat transmisi data"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "OSI model dikembangkan untuk menyediakan standar komunikasi universal yang memfasilitasi interoperabilitas antar vendor berbeda dan membantu dalam troubleshooting."
+    },
+    {
+      "id": 2,
+      "bab": "Model OSI Layer - Application Layer",
+      "pertanyaan": "Manakah yang BUKAN termasuk fungsi Application Layer?",
+      "options": [
+        "File transfer",
+        "Resource sharing",
+        "Physical addressing",
+        "Email services"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "Physical addressing dilakukan pada Data Link Layer (MAC address) dan Network Layer (IP address), bukan pada Application Layer."
+    },
+    {
+      "id": 3,
+      "bab": "Model OSI Layer - Presentation Layer",
+      "pertanyaan": "Apa fungsi utama dari SSL/TLS dalam OSI model?",
+      "options": [
+        "Routing packets",
+        "Data compression",
+        "Encryption dan decryption",
+        "Frame formatting"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "SSL/TLS (Secure Sockets Layer/Transport Layer Security) berfungsi untuk encryption dan decryption data, yang merupakan tanggung jawab Presentation Layer."
+    },
+    {
+      "id": 4,
+      "bab": "Model OSI Layer - Session Layer",
+      "pertanyaan": "Protokol manakah yang berfungsi untuk session management?",
+      "options": [
+        "HTTP",
+        "TCP",
+        "NetBIOS",
+        "IP"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "NetBIOS (Network Basic Input/Output System) adalah protokol yang berfungsi untuk session management pada Session Layer OSI."
+    },
+    {
+      "id": 5,
+      "bab": "Model OSI Layer - Transport Layer",
+      "pertanyaan": "Perbedaan utama antara TCP dan UDP adalah:",
+      "options": [
+        "TCP lebih cepat dari UDP",
+        "TCP connection-oriented, UDP connectionless",
+        "UDP lebih reliable dari TCP",
+        "TCP menggunakan IP address, UDP tidak"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "TCP (Transmission Control Protocol) adalah connection-oriented dengan three-way handshake, sequencing, dan error recovery. UDP (User Datagram Protocol) adalah connectionless dan lebih cepat tapi tidak reliable."
+    },
+    {
+      "id": 6,
+      "bab": "Model OSI Layer - Network Layer",
+      "pertanyaan": "Protokol apa yang digunakan untuk IP address resolution?",
+      "options": [
+        "ICMP",
+        "ARP",
+        "RARP",
+        "DNS"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "ARP (Address Resolution Protocol) digunakan untuk mengkonversi IP address ke MAC address pada Network Layer."
+    },
+    {
+      "id": 7,
+      "bab": "Model OSI Layer - Data Link Layer",
+      "pertanyaan": "Berapa format MAC address yang benar?",
+      "options": [
+        "192.168.1.1",
+        "00:1A:2B:3C:4D:5E",
+        "2001:0db8:85a3::",
+        "www.example.com"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "MAC address memiliki format 6 bytes hexadecimal yang dipisahkan dengan titik dua (contoh: 00:1A:2B:3C:4D:5E)."
+    },
+    {
+      "id": 8,
+      "bab": "Model OSI Layer - Physical Layer",
+      "pertanyaan": "Manakah yang BUKAN termasuk media transmisi Physical Layer?",
+      "options": [
+        "UTP Cable",
+        "Fiber Optic",
+        "WiFi",
+        "IP Address"
+      ],
+      "jawaban_benar": 3,
+      "penjelasan": "IP Address adalah logical address pada Network Layer, bukan physical media. UTP, Fiber Optic, dan WiFi adalah media transmisi Physical Layer."
+    },
+    {
+      "id": 9,
+      "bab": "IP Addressing - IPv4 Structure",
+      "pertanyaan": "Berapa total bits dalam IPv4 address?",
+      "options": [
+        "16 bits",
+        "32 bits",
+        "64 bits",
+        "128 bits"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "IPv4 address terdiri dari 32 bits yang dibagi menjadi 4 octets (8 bits setiap octets)."
+    },
+    {
+      "id": 10,
+      "bab": "IP Addressing - IP Classes",
+      "pertanyaan": "IP address 172.16.5.1 termasuk dalam kelas:",
+      "options": [
+        "Class A",
+        "Class B",
+        "Class C",
+        "Class D"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "IP address dengan octet pertama 172 (128-191) termasuk Class B dengan subnet mask default 255.255.0.0."
+    },
+    {
+      "id": 11,
+      "bab": "IP Addressing - Private Addresses",
+      "pertanyaan": "Manakah yang BUKAN termasuk private IP address?",
+      "options": [
+        "10.0.0.1",
+        "172.16.0.1",
+        "192.168.1.1",
+        "192.169.1.1"
+      ],
+      "jawaban_benar": 3,
+      "penjelasan": "192.169.1.1 adalah public IP address. Private IP addresses adalah: 10.0.0.0-10.255.255.255, 172.16.0.0-172.31.255.255, dan 192.168.0.0-192.168.255.255."
+    },
+    {
+      "id": 12,
+      "bab": "IP Subnetting - Basic Concepts",
+      "pertanyaan": "Apa tujuan utama subnetting?",
+      "options": [
+        "Meningkatkan kecepatan internet",
+        "Membagi jaringan besar menjadi subnet kecil",
+        "Mengganti IP address",
+        "Memperbanyak jumlah host"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "Subnetting adalah proses membagi network IP besar menjadi beberapa subnet yang lebih kecil untuk efisiensi penggunaan IP dan manajemen jaringan."
+    },
+    {
+      "id": 13,
+      "bab": "IP Subnetting - Subnet Masks",
+      "pertanyaan": "Subnet mask 255.255.255.224 setara dengan CIDR:",
+      "options": [
+        "/24",
+        "/25",
+        "/26",
+        "/27"
+      ],
+      "jawaban_benar": 3,
+      "penjelasan": "255.255.255.224 dalam binary adalah 11111111.11111111.11111111.11100000, yang memiliki 27 bits untuk network, sehingga setara dengan /27."
+    },
+    {
+      "id": 14,
+      "bab": "IP Subnetting - Host Calculation",
+      "pertanyaan": "Berapa jumlah usable hosts dalam network 192.168.1.0/28?",
+      "options": [
+        "14 hosts",
+        "16 hosts",
+        "30 hosts",
+        "254 hosts"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "/28 berarti 28 bits network dan 4 bits host. Jumlah hosts = 2^4 - 2 = 16 - 2 = 14 usable hosts (dikurangi network dan broadcast address)."
+    },
+    {
+      "id": 15,
+      "bab": "IP Subnetting - Network ID",
+      "pertanyaan": "Dari IP address 192.168.10.45 dengan subnet mask 255.255.255.240, berapa network ID-nya?",
+      "options": [
+        "192.168.10.32",
+        "192.168.10.40",
+        "192.168.10.48",
+        "192.168.10.0"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "Subnet mask 255.255.255.240 (/28) memiliki block size 16. Network ID adalah kelipatan block size terdekat: 192.168.10.32 (32 adalah kelipatan 16 yang ≤ 45)."
+    }
+  ],
+  "quiz_akhir": [
+    {
+      "id": 101,
+      "pertanyaan": "Data unit pada Data Link Layer disebut:",
+      "options": [
+        "Segment",
+        "Packet",
+        "Frame",
+        "Bit"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "Data unit pada Data Link Layer disebut Frame. Setiap layer memiliki data unit yang berbeda: Physical (Bit), Data Link (Frame), Network (Packet), Transport (Segment/Datagram)."
+    },
+    {
+      "id": 102,
+      "pertanyaan": "Protokol yang menggunakan three-way handshake adalah:",
+      "options": [
+        "UDP",
+        "TCP",
+        "ICMP",
+        "ARP"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "TCP menggunakan three-way handshake (SYN, SYN-ACK, ACK) untuk membuka koneksi sebelum pengiriman data, menjamin reliable communication."
+    },
+    {
+      "id": 103,
+      "pertanyaan": "Berapa jumlah maksimum subnet yang dapat dibuat dari network 10.0.0.0/8 dengan /16?",
+      "options": [
+        "256 subnet",
+        "512 subnet",
+        "1024 subnet",
+        "65536 subnet"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "Network 10.0.0.0/8 memiliki 8 bits network. Dengan /16, kita meminjam 8 bits untuk subnet. Jumlah subnet = 2^8 = 256 subnet."
+    },
+    {
+      "id": 104,
+      "pertanyaan": "OSI Layer yang bertanggung jawab untuk routing adalah:",
+      "options": [
+        "Layer 2 (Data Link)",
+        "Layer 3 (Network)",
+        "Layer 4 (Transport)",
+        "Layer 5 (Session)"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "Layer 3 (Network Layer) bertanggung jawab untuk routing packet antar jaringan menggunakan logical addressing (IP addresses)."
+    },
+    {
+      "id": 105,
+      "pertanyaan": "VLSM (Variable Length Subnet Mask) memberikan keuntungan:",
+      "options": [
+        "Meningkatkan kecepatan jaringan",
+        "Menghemat penggunaan IP address",
+        "Memperbanyak jumlah broadcast",
+        "Menyederhanakan konfigurasi"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "VLSM memungkinkan penggunaan subnet mask dengan panjang berbeda untuk subnet yang berbeda, sehingga IP address utilization lebih efisien dan mengurangi pemborosan."
+    },
+    {
+      "id": 106,
+      "pertanyaan": "Berapa broadcast address dari network 192.168.5.64/27?",
+      "options": [
+        "192.168.5.63",
+        "192.168.5.95",
+        "192.168.5.127",
+        "192.168.5.255"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "/27 memiliki block size 32. Network 192.168.5.64, maka subnet berikutnya adalah 192.168.5.96. Broadcast address = 192.168.5.95 (satu sebelum subnet berikutnya)."
+    },
+    {
+      "id": 107,
+      "pertanyaan": "Protokol yang berfungsi untuk error reporting pada Network Layer adalah:",
+      "options": [
+        "TCP",
+        "UDP",
+        "ICMP",
+        "ARP"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "ICMP (Internet Control Message Protocol) digunakan untuk error reporting dan diagnostics, seperti dalam perintah ping dan traceroute."
+    },
+    {
+      "id": 108,
+      "pertanyaan": "Berapa jumlah usable IP addresses dalam Class B network?",
+      "options": [
+        "65,534",
+        "65,536",
+        "16,777,214",
+        "254"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "Class B memiliki 16 bits untuk host. Jumlah usable hosts = 2^16 - 2 = 65,536 - 2 = 65,534 (dikurangi network dan broadcast address)."
+    },
+    {
+      "id": 109,
+      "pertanyaan": "Ethernet menggunakan algoritma MAC untuk:",
+      "options": [
+        "IP address resolution",
+        "Collision detection",
+        "Data encryption",
+        "Route selection"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "Ethernet menggunakan CSMA/CD (Carrier Sense Multiple Access with Collision Detection) untuk mendeteksi dan menangani collision pada shared media."
+    },
+    {
+      "id": 110,
+      "pertanyaan": "Diketahui kebutuhan: 3 LAN masing-masing 60 hosts, 2 WAN links masing-masing 2 hosts. Dari network 192.168.100.0/24, subnet mask yang optimal untuk LAN adalah:",
+      "options": [
+        "/24",
+        "/25",
+        "/26",
+        "/27"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "Untuk 60 hosts, kita membutuhkan 6 host bits (2^6 = 64). Subnet mask = 32 - 6 = 26, atau /26 (255.255.255.192) yang menyediakan 62 usable hosts."
+    },
+    {
+      "id": 111,
+      "pertanyaan": "Proses mengubah data format antar sistem disebut:",
+      "options": [
+        "Fragmentation",
+        "Translation",
+        "Segmentation",
+        "Encapsulation"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "Translation adalah proses mengubah format data (character encoding, data representation) yang dilakukan pada Presentation Layer OSI."
+    },
+    {
+      "id": 112,
+      "pertanyaan": "Berapa block size dari subnet mask 255.255.255.128?",
+      "options": [
+        "32",
+        "64",
+        "128",
+        "256"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "Block size = 256 - nilai octet yang tidak 255. 256 - 128 = 128. Subnet mask 255.255.255.128 (/25) memiliki block size 128."
+    },
+    {
+      "id": 113,
+      "pertanyaan": "Layer yang mengelola dialog control (simplex, half-duplex, full-duplex) adalah:",
+      "options": [
+        "Transport Layer",
+        "Session Layer",
+        "Presentation Layer",
+        "Application Layer"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "Session Layer bertanggung jawab untuk dialog control yang menentukan mode komunikasi: simplex, half-duplex, atau full-duplex."
+    },
+    {
+      "id": 114,
+      "pertanyaan": "IP address 127.0.0.1 digunakan untuk:",
+      "options": [
+        "Broadcast address",
+        "Network address",
+        "Loopback address",
+        "Gateway address"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "127.0.0.1 adalah loopback address yang merujuk pada localhost itu sendiri, digunakan untuk testing network stack pada komputer lokal."
+    },
+    {
+      "id": 115,
+      "pertanyaan": "VLAN (Virtual Local Area Network) bekerja pada OSI Layer:",
+      "options": [
+        "Layer 1",
+        "Layer 2",
+        "Layer 3",
+        "Layer 4"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "VLAN bekerja pada Data Link Layer (Layer 2) dengan membagi physical network menjadi logical broadcast domains menggunakan IEEE 802.1Q tagging."
+    }
+  ],
+  "soal_komprehensif": [
+    {
+      "id": 201,
+      "kategori": "OSI Model - Advanced",
+      "pertanyaan": "Sebuah packet traveling dari source ke destination melalui 7 routers. Berapa kali encapsulation dan decapsulation terjadi?",
+      "options": [
+        "7 kali encapsulation, 7 kali decapsulation",
+        "1 kali encapsulation, 1 kali decapsulation",
+        "7 kali encapsulation, 1 kali decapsulation",
+        "1 kali encapsulation, 7 kali decapsulation"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "Setiap router melakukan decapsulation untuk membaca Network Layer, kemudian encapsulation kembali untuk forwarding. Dengan 7 routers, terjadi 7 kali decapsulation dan 7 kali encapsulation.",
+      "difficulty": "Hard"
+    },
+    {
+      "id": 202,
+      "kategori": "OSI Model - Protocol Analysis",
+      "pertanyaan": "HTTPS encryption terjadi pada layer berapa?",
+      "options": [
+        "Layer 4 (Transport)",
+        "Layer 5 (Session)",
+        "Layer 6 (Presentation)",
+        "Layer 7 (Application)"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "SSL/TLS encryption untuk HTTPS terjadi pada Presentation Layer (Layer 6), yang bertanggung jawab untuk encryption, compression, dan data format translation.",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 203,
+      "kategori": "OSI Model - Device Function",
+      "pertanyaan": "Perangkat yang dapat membaca header dari Layer 2 sampai Layer 7 adalah:",
+      "options": [
+        "Hub",
+        "Switch",
+        "Router",
+        "Firewall"
+      ],
+      "jawaban_benar": 3,
+      "penjelasan": "Modern firewall (Next-Generation Firewall) dapat inspect traffic dari Layer 2 (Data Link) sampai Layer 7 (Application) untuk security policy enforcement.",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 204,
+      "kategori": "Subnetting - Complex VLSM",
+      "pertanyaan": "Dari network 172.16.0.0/16, desain VLSM untuk: HQ=200 hosts, Branch1=80 hosts, Branch2=40 hosts, WAN links=3 links×2 hosts. Manakah subnet yang TIDAK efisien?",
+      "options": [
+        "HQ: 172.16.0.0/24",
+        "Branch1: 172.16.1.0/25",
+        "Branch2: 172.16.1.128/26",
+        "WAN: 172.16.1.192/30"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "Branch1 butuh 80 hosts, /25 hanya menyediakan 126 hosts - ini over-allocation. /25 seharusnya digunakan untuk HQ yang butuh 200 hosts (tidak cukup), sedangkan Branch1 bisa menggunakan /26 untuk 62 hosts (juga tidak cukup). Desain yang benar: HQ /24 (254 hosts), Branch1 /25 (126 hosts), Branch2 /26 (62 hosts), WAN /30 untuk 3 links.",
+      "difficulty": "Hard"
+    },
+    {
+      "id": 205,
+      "kategori": "Subnetting - Route Summarization",
+      "pertanyaan": "Network berikut yang dapat di-summarize menjadi single route yang paling spesifik adalah:",
+      "options": [
+        "192.168.0.0/24, 192.168.1.0/24, 192.168.2.0/24, 192.168.3.0/24",
+        "192.168.0.0/25, 192.168.0.128/25, 192.168.1.0/25, 192.168.1.128/25",
+        "192.168.0.0/26, 192.168.0.64/26, 192.168.0.128/26, 192.168.0.192/26",
+        "Semua dapat di-summarize dengan efisien"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "Option C dapat di-summarize menjadi 192.168.0.0/24 yang merupakan single route yang paling efisien. Option A menjadi /22, Option B menjadi /24, Option C menjadi /24 (sudah contiguous).",
+      "difficulty": "Hard"
+    },
+    {
+      "id": 206,
+      "kategori": "IPv6 - Fundamentals",
+      "pertanyaan": "IPv6 address 2001:0db8:85a3:0000:0000:8a2e:0370:7334 dapat disingkat menjadi:",
+      "options": [
+        "2001:db8:85a3::8a2e:370:7334",
+        "2001:db8:85a3:0:0:8a2e:370:7334",
+        "2001:db8:85a3::8a2e:37:7334",
+        "2001:db8:85a3:0::8a2e:370:7334"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "Leading zeros dapat dihilangkan dan consecutive zero groups (hanya satu kali) dapat diganti dengan ::. Hasil: 2001:0db8:85a3:0000:0000:8a2e:0370:7334 → 2001:db8:85a3::8a2e:370:7334",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 207,
+      "kategori": "Network Design - Case Study",
+      "pertanyaan": "Sebuah campus network dengan 5 gedung, setiap gedung butuh 200 host, 30 VLAN per gedung, dan redundancy. Network design yang paling efisien menggunakan:",
+      "options": [
+        "Class A /8 dengan VLSM",
+        "Class B /16 dengan VLSM",
+        "172.16.0.0/12 dengan hierarchical addressing",
+        "10.0.0.0/8 dengan flat addressing"
+      ],
+      "jawaban_benar": 2,
+      "penjelasan": "172.16.0.0/12 (172.16.0.0 - 172.31.255.255) menyediakan 1,048,576 addresses, cukup untuk hierarchical design: /16 per gedung (5×65,534 hosts), /24 per VLAN (5×30×254 hosts = 38,100 hosts digunakan), sisa untuk WAN links dan growth.",
+      "difficulty": "Hard"
+    },
+    {
+      "id": 208,
+      "kategori": "Troubleshooting - OSI Layer Analysis",
+      "pertanyaan": "Symptom: Ping ke loopback (127.0.0.1) berhasil, ping ke local IP berhasil, ping ke gateway gagal. Masalah kemungkinan besar pada:",
+      "options": [
+        "Layer 1 (Physical)",
+        "Layer 2 (Data Link)",
+        "Layer 3 (Network)",
+        "Layer 4+ (Transport ke Application)"
+      ],
+      "jawaban_benar": 1,
+      "penjelasan": "Loopback dan local IP berhasil berarti Layer 1-3 local berfungsi. Gagal ping ke gateway menunjukkan masalah pada Data Link Layer (Layer 2) - kemungkinan ARP resolution gagal atau switch port issue.",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 209,
+      "kategori": "Advanced Subnetting - Binary Analysis",
+      "pertanyaan": "IP address 192.168.45.67 dengan subnet mask 255.255.255.240. Network address dalam binary adalah:",
+      "options": [
+        "11000000.10101000.00101101.01000000",
+        "11000000.10101000.00101101.00110000",
+        "11000000.10101000.00101101.01010000",
+        "11000000.10101000.00101101.01100000"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "IP: 192.168.45.67 = 11000000.10101000.00101101.01000011. Subnet mask: 255.255.255.240 = 11111111.11111111.11111111.11110000. Network address = 11000000.10101000.00101101.01000000 = 192.168.45.64.",
+      "difficulty": "Hard"
+    },
+    {
+      "id": 210,
+      "kategori": "CIDR and Supernetting",
+      "pertanyaan": "ISP ingin mengalokasikan 2048 IP addresses ke customer. Subnet mask yang paling efisien adalah:",
+      "options": [
+        "/21",
+        "/22",
+        "/23",
+        "/24"
+      ],
+      "jawaban_benar": 0,
+      "penjelasan": "2048 = 2^11. Untuk 2048 addresses, butuh 11 bits untuk host. Prefix length = 32 - 11 = 21. /21 menyediakan 2048 addresses (2046 usable hosts).",
+      "difficulty": "Medium"
+    }
+  ],
+  "practical_exercises": [
+    {
+      "id": 301,
+      "tipe": "Lab Simulation - OSI Layers",
+      "judul": "Packet Tracing Simulation",
+      "scenario": "Simulasikan HTTP request dari client ke server melalui multiple network devices",
+      "tasks": [
+        "Identify protocols pada setiap layer",
+        "Trace encapsulation process",
+        "Analyze header fields pada setiap layer",
+        "Troubleshoot simulated network issues"
+      ],
+      "evaluasi": [
+        {
+          "kriteria": "Protocol Identification",
+          "bobot": 25,
+          "deskripsi": "Kemampuan mengidentifikasi protocol yang benar untuk setiap layer"
+        },
+        {
+          "kriteria": "Encapsulation Understanding",
+          "bobot": 25,
+          "deskripsi": "Pemahaman proses pembungkusan data melalui layers"
+        },
+        {
+          "kriteria": "Header Analysis",
+          "bobot": 25,
+          "deskripsi": "Kemampuan menganalisis field-field penting dalam header"
+        },
+        {
+          "kriteria": "Troubleshooting Logic",
+          "bobot": 25,
+          "deskripsi": "Logika dalam mengidentifikasi dan menyelesaikan masalah"
+        }
+      ]
+    },
+    {
+      "id": 302,
+      "tipe": "Network Design Challenge",
+      "judul": "Enterprise Network Design",
+      "scenario": "Design network infrastructure untuk perusahaan dengan 300 employees, 4 departments, remote offices, dan data center requirements",
+      "requirements": {
+        "headquarters": "200 employees, 5 servers, WiFi guests",
+        "branch_offices": "2 offices masing-masing 50 employees",
+        "wan_connectivity": "Redundant links dengan failover",
+        "growth_planning": "50% expansion dalam 2 tahun",
+        "security": "VLAN segmentation dan access control"
+      },
+      "deliverables": [
+        "IP addressing scheme dengan VLSM",
+        "Network topology design",
+        "VLAN assignment plan",
+        "Routing protocol recommendation",
+        "Security implementation plan"
+      ],
+      "evaluasi": [
+        {
+          "kriteria": "Addressing Efficiency",
+          "bobot": 30,
+          "deskripsi": "Efisiensi penggunaan IP addresses dengan VLSM"
+        },
+        {
+          "kriteria": "Scalability",
+          "bobot": 25,
+          "deskripsi": "Kemampuan design mengakomodasi future growth"
+        },
+        {
+          "kriteria": "Redundancy Design",
+          "bobot": 20,
+          "deskripsi": "Perencanaan failover dan high availability"
+        },
+        {
+          "kriteria": "Security Implementation",
+          "bobot": 25,
+          "deskripsi": "Penerapan security best practices"
+        }
+      ]
+    },
+    {
+      "id": 303,
+      "tipe": "Subnetting Calculator",
+      "judul": "Advanced Subnetting Calculator",
+      "description": "Bangun subnetting calculator yang dapat menangani complex scenarios",
+      "features": [
+        "Multiple network input dan simultaneous calculation",
+        "VLSM optimization algorithm",
+        "Visual subnet mapping",
+        "Conflict detection dan resolution",
+        "Documentation generation"
+      ],
+      "test_cases": [
+        {
+          "scenario": "Enterprise with multiple departments",
+          "input": "Network: 10.0.0.0/8, Departments: [500, 200, 100, 50, 25] hosts",
+          "expected_output": "Optimal VLSM design dengan minimal waste"
+        },
+        {
+          "scenario": "ISP customer allocation",
+          "input": "Block: 203.0.113.0/24, Customer requirements: [16, 8, 4, 2] hosts",
+          "expected_output": "Customer allocation table dengan utilization metrics"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+// Media Pembelajaran Interaktif - Jaringan Dasar
+// Main SCSS File
+
+// Abstracts
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+@import 'abstracts/animations';
+
+// Base
+@import 'base/reset';
+@import 'base/typography';
+
+// Components
+@import 'components/buttons';
+@import 'components/glass-panel';
+@import 'components/cards';
+@import 'components/loading';
+@import 'components/terminal';
+@import 'components/transitions';
+
+// Layout
+@import 'layout/sidebar';
+@import 'layout/header';
+@import 'layout/footer';
+@import 'layout/grid';
+
+// Pages
+@import 'pages/about';
+@import 'pages/certificate';
+@import 'pages/dashboard';
+@import 'pages/login';
+@import 'pages/materials';
+@import 'pages/missions';
+@import 'pages/quiz';
+
+// Utility Classes
+@import 'utilities';
+
+// Main Application Styles
+body {
+    font-family: $font-family-primary;
+    background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+    color: $color-light;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+            radial-gradient(circle at 20% 80%, rgba($color-primary, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba($color-secondary, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba($color-accent, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+    }
+}
+
+// Common animations
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+// Responsive breakpoints
+@include respond-to('tablet') {
+    body {
+        font-size: 14px;
+    }
+}
+
+@include respond-to('mobile') {
+    body {
+        font-size: 13px;
+    }
+}
+
+// Accessibility improvements
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Focus styles for accessibility
+:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

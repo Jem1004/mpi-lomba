@@ -1,0 +1,95 @@
+// Loading Component - Media Pembelajaran Interaktif
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $terminal-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+  @include scan-lines;
+
+  .loading-content {
+    text-align: center;
+    font-family: $font-family-mono;
+  }
+
+  .loading-text {
+    color: $terminal-text;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-lg;
+    text-shadow: 0 0 10px rgba($color-primary, 0.8);
+  }
+
+  .loading-dots {
+    display: flex;
+    gap: $spacing-xs;
+    justify-content: center;
+
+    span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: $color-primary;
+      border-radius: 50%;
+      animation: loadingDots 1.4s infinite ease-in-out both;
+
+      &:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+
+      &:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 0;
+      }
+    }
+  }
+
+  .loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba($color-primary, 0.1);
+    border-top: 3px solid $color-primary;
+    border-radius: 50%;
+    margin: 0 auto $spacing-lg;
+    animation: spin 1s linear infinite;
+  }
+
+  .loading-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: $radius-full;
+    overflow: hidden;
+    margin: 0 auto;
+
+    .loading-progress {
+      height: 100%;
+      background: linear-gradient(90deg, $color-primary, $color-secondary);
+      border-radius: $radius-full;
+      animation: loadingProgress 2s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes loadingProgress {
+  0% {
+    width: 0%;
+    transform: translateX(0);
+  }
+  50% {
+    width: 70%;
+    transform: translateX(0);
+  }
+  100% {
+    width: 100%;
+    transform: translateX(100%);
+  }
+}

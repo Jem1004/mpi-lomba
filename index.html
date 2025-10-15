@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif - Jaringan Dasar</title>
+    <meta name="description" content="Media Pembelajaran Interaktif untuk kompetensi Dasar Jaringan Komputer SMK TKJT">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/ai-tutor.css">
+
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
+    <!-- Meta Tags for SEO -->
+    <meta name="keywords" content="jaringan dasar, TKJT, SMK, pembelajaran interaktif, komputer">
+    <meta name="author" content="MPI Development Team">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-text">[root@smk-pembelajaran ~]# Initializing system...</div>
+            <div class="loading-dots">
+                <span>.</span><span>.</span><span>.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Session -->
+    <div id="terminalSession" class="terminal-session">
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-controls">
+                    <span class="control close"></span>
+                    <span class="control minimize"></span>
+                    <span class="control maximize"></span>
+                </div>
+                <div class="terminal-title">smk-pembelajaran@network: ~</div>
+            </div>
+            <div class="terminal-body">
+                <div id="terminalOutput" class="terminal-output">
+                    <div class="terminal-line">[root@smk-pembelajaran ~]# Inisialisasi sesi belajar...</div>
+                    <div class="terminal-line">System check: <span class="success">✓ OK</span></div>
+                    <div class="terminal-line">Network modules: <span class="success">✓ Loaded</span></div>
+                    <div class="terminal-line">Interactive mode: <span class="success">✓ Active</span></div>
+                    <div class="terminal-line">Memuat database materi...</div>
+                </div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">Masukkan 'callsign' Anda (nama panggilan): </span>
+                    <input type="text" id="nameInput" class="terminal-input" autofocus>
+                    <span class="terminal-cursor">_</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transition Effect -->
+    <div id="transitionEffect" class="transition-effect hidden">
+        <div class="glitch-overlay">
+            <div class="glitch-text">SYSTEM_READY</div>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="mainMenu" class="main-menu hidden">
+        <div class="menu-container">
+            <header class="menu-header">
+                <h1 class="menu-title">
+                    <span class="title-code">&lt;/&gt;</span>
+                    Media Pembelajaran Interaktif
+                </h1>
+                <p class="menu-subtitle">Jaringan Dasar - SMK TKJT</p>
+                <div class="user-info">
+                    <span class="welcome-text">Welcome, <span id="userName">User</span></span>
+                </div>
+            </header>
+
+            <main class="menu-content">
+                <div class="menu-grid">
+                    <!-- Menu 1: Tujuan Pembelajaran -->
+                    <div class="menu-card" data-page="objectives">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" class="icon">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Tujuan Pembelajaran</h3>
+                        <p class="card-description">Lihat target kompetensi yang akan dicapai</p>
+                        <div class="card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="objectivesProgress"></div>
+                            </div>
+                            <span class="progress-text">0% Complete</span>
+                        </div>
+                    </div>
+
+                    <!-- Menu 2: Materi Pembelajaran -->
+                    <div class="menu-card" data-page="materials">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" class="icon">
+                                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Materi Pembelajaran</h3>
+                        <p class="card-description">Pelajari konsep dasar jaringan komputer</p>
+                        <div class="card-badge">Interactive</div>
+                    </div>
+
+                    <!-- Menu 3: Test Pengetahuan -->
+                    <div class="menu-card" data-page="test">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" class="icon">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15H9V10H15V15L13,19H10Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Test Pengetahuan</h3>
+                        <p class="card-description">Latihan soal formatif tanpa batasan waktu</p>
+                        <div class="card-badge">Practice</div>
+                    </div>
+
+                    <!-- Menu 4: Kuis -->
+                    <div class="menu-card" data-page="quiz">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" class="icon">
+                                <path d="M21,5C19.89,4.65 18.67,4.5 17.5,4.5C15.55,4.5 13.45,4.9 12,6C10.55,4.9 8.45,4.5 6.5,4.5C4.55,4.5 2.45,4.9 1,6V20.65C1,20.9 1.25,21.15 1.5,21.15C1.6,21.15 1.65,21.1 1.75,21.1C3.1,20.45 5.05,20 6.5,20C8.45,20 10.55,20.4 12,21.5C13.35,20.65 15.8,20 17.5,20C19.15,20 20.85,20.3 22.25,21.05C22.35,21.1 22.4,21.1 22.5,21.1C22.75,21.1 23,20.85 23,20.6V6C22.4,5.55 21.75,5.25 21,5M21,18.5C19.9,18.15 18.7,18 17.5,18C15.8,18 13.35,18.65 12,19.5V8C13.35,7.15 15.8,6.5 17.5,6.5C18.7,6.5 19.9,6.65 21,7V18.5Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Kuis</h3>
+                        <p class="card-description">Ujian akhir dengan timer untuk semua materi</p>
+                        <div class="card-badge important">Final</div>
+                    </div>
+
+                    <!-- Menu 5: Sertifikat -->
+                    <div class="menu-card" data-page="certificate">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" class="icon">
+                                <path d="M5,3C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H5M5,5H19V19H5V5M12,7.5A2.5,2.5 0 0,0 9.5,10A2.5,2.5 0 0,0 12,12.5A2.5,2.5 0 0,0 14.5,10A2.5,2.5 0 0,0 12,7.5M12,8.5A1.5,1.5 0 0,1 13.5,10A1.5,1.5 0 0,1 12,11.5A1.5,1.5 0 0,1 10.5,10A1.5,1.5 0 0,1 12,8.5M7,15V16.5L12,18.5L17,16.5V15L12,17L7,15Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Sertifikat</h3>
+                        <p class="card-description">Unduh sertifikat pencapaian Anda</p>
+                        <div class="card-status" id="certificateStatus">Locked</div>
+                    </div>
+
+                    <!-- Menu 6: AI Tutor Virtual -->
+                    <div class="menu-card" data-page="ai-tutor">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" class="icon">
+                                <path d="M21,15.61C19.9,15.61 18.9,15.35 18,14.91C17.65,14.74 17.23,14.8 16.94,15.09L15.13,16.9C13.38,15.93 11.07,13.61 10.1,11.85L11.91,10.04C12.2,9.74 12.26,9.32 12.09,8.97C11.65,8.07 11.39,7.07 11.39,6C11.39,5.45 10.95,5 10.39,5H6C5.45,5 5,5.45 5,6C5,13.5 11.5,20 19,20C19.55,20 20,19.55 20,19V14.61C20,14.05 19.55,14.61 19,14.61Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">AI Tutor Virtual</h3>
+                        <p class="card-description">Tanya jawab dengan AI tentang materi</p>
+                        <div class="card-badge new">AI Powered</div>
+                    </div>
+
+                    <!-- Menu 7: Tentang Pengembang -->
+                    <div class="menu-card" data-page="about">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" class="icon">
+                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M7.07,18.28C7.5,17.38 10.12,16.5 12,16.5C13.88,16.5 16.5,17.38 16.93,18.28C15.57,19.36 13.86,20 12,20C10.14,20 8.43,19.36 7.07,18.28M18.36,16.83C16.93,15.09 13.46,14.5 12,14.5C10.54,14.5 7.07,15.09 5.64,16.83C4.62,15.5 4,13.82 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,13.82 19.38,15.5 18.36,16.83M12,6C10.06,6 8.5,7.56 8.5,9.5C8.5,11.44 10.06,13 12,13C13.94,13 15.5,11.44 15.5,9.5C15.5,7.56 13.94,6 12,6M12,11A1.5,1.5 0 0,1 10.5,9.5A1.5,1.5 0 0,1 12,8A1.5,1.5 0 0,1 13.5,9.5A1.5,1.5 0 0,1 12,11Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Tentang Pengembang</h3>
+                        <p class="card-description">Informasi tim pengembang aplikasi</p>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="menu-footer">
+                <button class="btn-logout" id="logoutBtn">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
+                    </svg>
+                    Keluar
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Content Pages (Hidden by default) -->
+    <div id="contentPages" class="content-pages">
+        <!-- Page content will be loaded dynamically -->
+    </div>
+
+    <!-- External Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Main Application Script -->
+    <script src="js/app.js"></script>
+    <script src="js/ai-tutor.js"></script>
+</body>
+</html>

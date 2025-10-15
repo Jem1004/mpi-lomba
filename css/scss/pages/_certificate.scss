@@ -1,0 +1,162 @@
+// Certificate Page - Media Pembelajaran Interaktif
+
+.certificate-page {
+  .page-content {
+    .certificate-content {
+      max-width: $container-lg;
+      margin: 0 auto;
+    }
+
+    .certificate-preview {
+      @include glass-effect(0.05, 10px);
+      border: 2px solid rgba($color-primary, 0.3);
+      border-radius: $radius-lg;
+      padding: $spacing-2xl;
+      margin-bottom: $spacing-xl;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.05) 100%);
+
+      .certificate-header {
+        text-align: center;
+        margin-bottom: $spacing-xl;
+
+        .certificate-title {
+          font-family: $font-family-secondary;
+          font-size: $font-size-3xl;
+          font-weight: $font-weight-bold;
+          color: $color-primary;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          margin-bottom: $spacing-md;
+        }
+
+        .certificate-subtitle {
+          font-size: $font-size-lg;
+          color: $color-light-dimmed;
+          font-style: italic;
+        }
+      }
+
+      .certificate-body {
+        text-align: center;
+        margin-bottom: $spacing-xl;
+
+        .certificate-text {
+          font-size: $font-size-base;
+          color: $color-light-dimmed;
+          line-height: $line-height-relaxed;
+          margin-bottom: $spacing-lg;
+        }
+
+        .student-name {
+          font-family: $font-family-secondary;
+          font-size: $font-size-2xl;
+          font-weight: $font-weight-bold;
+          color: $color-secondary;
+          margin: $spacing-lg 0;
+          padding: $spacing-md;
+          border-bottom: 2px solid $color-secondary;
+          display: inline-block;
+        }
+
+        .certificate-details {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: $spacing-lg;
+          margin-top: $spacing-xl;
+
+          .detail-item {
+            .detail-label {
+              font-weight: $font-weight-semibold;
+              color: $color-primary;
+              margin-bottom: $spacing-xs;
+            }
+
+            .detail-value {
+              color: $color-light-dimmed;
+            }
+          }
+        }
+      }
+
+      .certificate-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: $spacing-2xl;
+
+        .signature-section {
+          text-align: center;
+
+          .signature-line {
+            width: 200px;
+            height: 1px;
+            background: $color-light-dimmed;
+            margin-bottom: $spacing-sm;
+          }
+
+          .signature-title {
+            font-size: $font-size-sm;
+            color: $color-light-dimmed;
+          }
+        }
+
+        .certificate-id {
+          font-family: $font-family-mono;
+          font-size: $font-size-sm;
+          color: $color-gray;
+        }
+      }
+    }
+
+    .certificate-actions {
+      display: flex;
+      justify-content: center;
+      gap: $spacing-lg;
+      flex-wrap: wrap;
+
+      .btn-download {
+        @include button-style($color-success, $color-light, 1.05);
+      }
+
+      .btn-share {
+        @include button-style($color-secondary, $color-light, 1.05);
+      }
+    }
+
+    .no-certificate {
+      text-align: center;
+      padding: $spacing-3xl;
+
+      .no-certificate-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto $spacing-lg;
+        background: rgba($color-gray, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $color-gray;
+
+        svg {
+          width: 60px;
+          height: 60px;
+          fill: currentColor;
+        }
+      }
+
+      .no-certificate-title {
+        font-family: $font-family-secondary;
+        font-size: $font-size-xl;
+        font-weight: $font-weight-semibold;
+        color: $color-light;
+        margin-bottom: $spacing-md;
+      }
+
+      .no-certificate-text {
+        color: $color-light-dimmed;
+        margin-bottom: $spacing-xl;
+      }
+    }
+  }
+}

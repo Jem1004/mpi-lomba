@@ -1,0 +1,142 @@
+// Variables - Media Pembelajaran Interaktif
+
+// Colors
+$color-primary: #00FF7F;      // Neon Green
+$color-secondary: #00BFFF;    // Cyan
+$color-accent: #FF00FF;       // Magenta
+$color-warning: #FFA500;      // Orange
+$color-danger: #FF4444;       // Red
+$color-success: #00E676;      // Light Green
+
+// Base Colors
+$color-white: #FFFFFF;
+$color-black: #000000;
+$color-gray-light: #E0E0E0;
+$color-gray: #9E9E9E;
+$color-gray-dark: #424242;
+
+// Dark Theme Colors
+$color-dark: #0A0A1A;         // Main background
+$color-darker: #1E1E2E;       // Darker shade
+$color-light: #FFFFFF;        // Main text
+$color-light-dimmed: #B0B0B0; // Dimmed text
+
+// Glass morphism colors
+$glass-bg: rgba(255, 255, 255, 0.05);
+$glass-border: rgba(255, 255, 255, 0.1);
+$glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+
+// Typography
+$font-family-primary: 'Inter', sans-serif;
+$font-family-mono: 'Fira Code', monospace;
+$font-family-secondary: 'Poppins', sans-serif;
+
+// Font Sizes
+$font-size-xs: 0.75rem;      // 12px
+$font-size-sm: 0.875rem;     // 14px
+$font-size-base: 1rem;       // 16px
+$font-size-lg: 1.125rem;     // 18px
+$font-size-xl: 1.25rem;      // 20px
+$font-size-2xl: 1.5rem;      // 24px
+$font-size-3xl: 1.875rem;    // 30px
+$font-size-4xl: 2.25rem;     // 36px
+$font-size-5xl: 3rem;        // 48px
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+// Line Heights
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// Spacing
+$spacing-xs: 0.25rem;   // 4px
+$spacing-sm: 0.5rem;    // 8px
+$spacing-md: 1rem;      // 16px
+$spacing-lg: 1.5rem;    // 24px
+$spacing-xl: 2rem;      // 32px
+$spacing-2xl: 3rem;     // 48px
+$spacing-3xl: 4rem;     // 64px
+
+// Border Radius
+$radius-sm: 0.25rem;    // 4px
+$radius-md: 0.5rem;     // 8px
+$radius-lg: 0.75rem;    // 12px
+$radius-xl: 1rem;       // 16px
+$radius-2xl: 1.5rem;    // 24px
+$radius-full: 9999px;
+
+// Shadows
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+$shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+
+// Neon Glow Effects
+$neon-glow-primary: 0 0 10px rgba($color-primary, 0.8), 0 0 20px rgba($color-primary, 0.6), 0 0 30px rgba($color-primary, 0.4);
+$neon-glow-secondary: 0 0 10px rgba($color-secondary, 0.8), 0 0 20px rgba($color-secondary, 0.6), 0 0 30px rgba($color-secondary, 0.4);
+$neon-glow-accent: 0 0 10px rgba($color-accent, 0.8), 0 0 20px rgba($color-accent, 0.6), 0 0 30px rgba($color-accent, 0.4);
+
+// Breakpoints
+$breakpoint-sm: 640px;   // Small screens
+$breakpoint-md: 768px;   // Medium screens (tablet)
+$breakpoint-lg: 1024px;  // Large screens (laptop)
+$breakpoint-xl: 1280px;  // Extra large screens
+$breakpoint-2xl: 1536px; // 2X large screens
+
+// Z-index scale
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$z-index-toast: 1080;
+
+// Transitions
+$transition-fast: 150ms;
+$transition-normal: 300ms;
+$transition-slow: 500ms;
+
+$transition-base: all $transition-normal ease-in-out;
+$transition-colors: color $transition-normal ease-in-out, background-color $transition-normal ease-in-out, border-color $transition-normal ease-in-out;
+$transition-opacity: opacity $transition-normal ease-in-out;
+$transition-shadow: box-shadow $transition-normal ease-in-out;
+$transition-transform: transform $transition-normal ease-in-out;
+
+// Grid System
+$grid-columns: 12;
+$grid-gutter: $spacing-lg;
+
+// Container max widths
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1536px;
+
+// Animation durations
+$animation-duration-fast: 200ms;
+$animation-duration-normal: 300ms;
+$animation-duration-slow: 500ms;
+$animation-duration-slower: 1000ms;
+
+// Easing functions
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// Terminal specific colors
+$terminal-bg: #0a0a0a;
+$terminal-text: #00ff00;
+$terminal-cursor: #00ff00;
+$terminal-border: #333333;

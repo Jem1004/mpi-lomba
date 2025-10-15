@@ -1,0 +1,306 @@
+// Mixins - Media Pembelajaran Interaktif
+
+// Responsive breakpoints
+@mixin respond-to($breakpoint) {
+    @if $breakpoint == 'sm' {
+        @media (min-width: $breakpoint-sm) {
+            @content;
+        }
+    }
+    @else if $breakpoint == 'md' {
+        @media (min-width: $breakpoint-md) {
+            @content;
+        }
+    }
+    @else if $breakpoint == 'lg' {
+        @media (min-width: $breakpoint-lg) {
+            @content;
+        }
+    }
+    @else if $breakpoint == 'xl' {
+        @media (min-width: $breakpoint-xl) {
+            @content;
+        }
+    }
+    @else if $breakpoint == '2xl' {
+        @media (min-width: $breakpoint-2xl) {
+            @content;
+        }
+    }
+    @else if $breakpoint == 'mobile' {
+        @media (max-width: $breakpoint-md - 1px) {
+            @content;
+        }
+    }
+    @else if $breakpoint == 'tablet' {
+        @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg - 1px) {
+            @content;
+        }
+    }
+    @else if $breakpoint == 'desktop' {
+        @media (min-width: $breakpoint-lg) {
+            @content;
+        }
+    }
+}
+
+// Glass morphism effect
+@mixin glass-effect($opacity: 0.05, $blur: 10px) {
+    background: rgba(255, 255, 255, $opacity);
+    backdrop-filter: blur($blur);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: $glass-shadow;
+}
+
+// Neon glow effect
+@mixin neon-glow($color: $color-primary, $intensity: 0.8) {
+    box-shadow:
+        0 0 5px rgba($color, $intensity),
+        0 0 10px rgba($color, $intensity * 0.8),
+        0 0 15px rgba($color, $intensity * 0.6),
+        0 0 20px rgba($color, $intensity * 0.4);
+
+    &:hover {
+        box-shadow:
+            0 0 10px rgba($color, 1),
+            0 0 20px rgba($color, 0.9),
+            0 0 30px rgba($color, 0.8),
+            0 0 40px rgba($color, 0.7);
+    }
+}
+
+// Button styling
+@mixin button-style($bg-color: $color-primary, $text-color: $color-dark, $hover-scale: 1.05) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-sm $spacing-lg;
+    border: none;
+    border-radius: $radius-md;
+    background: $bg-color;
+    color: $text-color;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-base;
+    text-decoration: none;
+    cursor: pointer;
+    transition: $transition-base;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        transform: scale($hover-scale);
+        @include neon-glow($bg-color);
+    }
+
+    &:active {
+        transform: scale(1.02);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+
+        &:hover {
+            box-shadow: none;
+        }
+    }
+}
+
+// Card styling
+@mixin card-style($bg-opacity: 0.05, $hover-lift: 8px) {
+    @include glass-effect($bg-opacity);
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    transition: $transition-base;
+    position: relative;
+
+    &:hover {
+        transform: translateY(-$hover-lift);
+        @include neon-glow($color-secondary, 0.6);
+    }
+}
+
+// Terminal text effect
+@mixin terminal-text($color: $terminal-text) {
+    font-family: $font-family-mono;
+    color: $color;
+    text-shadow: 0 0 5px rgba($color, 0.8);
+    letter-spacing: 0.05em;
+}
+
+// Glitch effect
+@mixin glitch-effect {
+    position: relative;
+
+    &::before,
+    &::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+    }
+
+    &::before {
+        left: 2px;
+        text-shadow: -2px 0 #ff00ff;
+        animation: glitch-anim 2s infinite linear alternate-reverse;
+    }
+
+    &::after {
+        left: -2px;
+        text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff;
+        animation: glitch-anim2 2s infinite linear alternate-reverse;
+    }
+}
+
+// Flexbox utilities
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+@mixin flex-column-center {
+    @include flex-column;
+    align-items: center;
+    justify-content: center;
+}
+
+// Grid utilities
+@mixin grid($columns: 1, $gap: $spacing-md) {
+    display: grid;
+    grid-template-columns: repeat($columns, 1fr);
+    gap: $gap;
+}
+
+// Position utilities
+@mixin absolute-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@mixin fixed-center {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+// Text utilities
+@mixin text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@mixin text-clamp($lines: 2) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// Animation utilities
+@mixin fade-in($duration: $animation-duration-normal, $delay: 0) {
+    opacity: 0;
+    animation: fadeIn $duration ease-out $delay forwards;
+}
+
+@mixin slide-in($direction: 'left', $duration: $animation-duration-normal, $delay: 0) {
+    opacity: 0;
+
+    @if $direction == 'left' {
+        transform: translateX(-50px);
+    } @else if $direction == 'right' {
+        transform: translateX(50px);
+    } @else if $direction == 'top' {
+        transform: translateY(-50px);
+    } @else if $direction == 'bottom' {
+        transform: translateY(50px);
+    }
+
+    animation: slideInFrom#{$direction} $duration ease-out $delay forwards;
+}
+
+// Loading spinner
+@mixin spinner($size: 40px, $border-width: 4px) {
+    width: $size;
+    height: $size;
+    border: $border-width solid rgba(255, 255, 255, 0.1);
+    border-top: $border-width solid $color-primary;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+// Hover lift effect
+@mixin hover-lift($distance: 8px, $shadow-intensity: 0.3) {
+    transition: $transition-transform, $transition-shadow;
+
+    &:hover {
+        transform: translateY(-$distance);
+        box-shadow: 0 $distance + 4px 20px rgba(0, 0, 0, $shadow-intensity);
+    }
+}
+
+// Gradient background
+@mixin gradient-bg($start-color: $color-dark, $end-color: $color-darker, $direction: 135deg) {
+    background: linear-gradient($direction, $start-color 0%, $end-color 100%);
+}
+
+// Scan lines effect
+@mixin scan-lines {
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            transparent 50%,
+            rgba(255, 255, 255, 0.03) 50%
+        );
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 1;
+    }
+}
+
+// Typography animations
+@mixin typing-effect($chars-per-second: 10) {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing (length($string) / $chars-per-second) steps(length($string)) forwards;
+}
+
+// Responsive container
+@mixin container($max-width: $container-xl) {
+    width: 100%;
+    max-width: $max-width;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+
+    @include respond-to('mobile') {
+        padding: 0 $spacing-md;
+    }
+}

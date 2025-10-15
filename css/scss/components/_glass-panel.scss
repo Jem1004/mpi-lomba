@@ -1,0 +1,34 @@
+// Glass Panel Component - Media Pembelajaran Interaktif
+
+.glass-panel {
+  @include glass-effect(0.05, 10px);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  }
+
+  &:hover {
+    @include glass-effect(0.08, 15px);
+    transform: translateY(-4px);
+  }
+
+  &.glass-panel-dark {
+    @include glass-effect(0.1, 10px);
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  &.glass-panel-light {
+    @include glass-effect(0.15, 10px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

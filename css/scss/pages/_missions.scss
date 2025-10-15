@@ -1,0 +1,252 @@
+// Missions Page - Media Pembelajaran Interaktif
+
+.missions-page {
+  .page-content {
+    .missions-content {
+      max-width: $container-xl;
+      margin: 0 auto;
+    }
+
+    .missions-header {
+      text-align: center;
+      margin-bottom: $spacing-2xl;
+
+      .missions-title {
+        font-family: $font-family-secondary;
+        font-size: $font-size-3xl;
+        font-weight: $font-weight-bold;
+        color: $color-light;
+        margin-bottom: $spacing-lg;
+      }
+
+      .missions-description {
+        font-size: $font-size-lg;
+        color: $color-light-dimmed;
+        line-height: $line-height-relaxed;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+    }
+
+    .missions-filters {
+      display: flex;
+      justify-content: center;
+      gap: $spacing-md;
+      margin-bottom: $spacing-xl;
+      flex-wrap: wrap;
+
+      .filter-button {
+        @include button-style(transparent, $color-light-dimmed, 1);
+        padding: $spacing-sm $spacing-md;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        transition: $transition-base;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: $color-primary;
+        }
+
+        &.active {
+          background: rgba($color-primary, 0.1);
+          border-color: $color-primary;
+          color: $color-primary;
+        }
+      }
+    }
+
+    .missions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: $spacing-lg;
+    }
+
+    .mission-card {
+      @include card-style(0.05, 8px);
+      padding: $spacing-lg;
+      position: relative;
+      overflow: hidden;
+
+      &.mission-completed {
+        border-color: rgba($color-success, 0.3);
+
+        &::before {
+          content: '✓ COMPLETED';
+          position: absolute;
+          top: $spacing-sm;
+          right: $spacing-sm;
+          background: rgba($color-success, 0.2);
+          color: $color-success;
+          padding: $spacing-xs $spacing-sm;
+          border-radius: $radius-full;
+          font-size: $font-size-xs;
+          font-weight: $font-weight-semibold;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+      }
+
+      &.mission-locked {
+        opacity: 0.6;
+        cursor: not-allowed;
+
+        &::before {
+          content: '🔒 LOCKED';
+          position: absolute;
+          top: $spacing-sm;
+          right: $spacing-sm;
+          background: rgba($color-gray, 0.2);
+          color: $color-gray;
+          padding: $spacing-xs $spacing-sm;
+          border-radius: $radius-full;
+          font-size: $font-size-xs;
+          font-weight: $font-weight-semibold;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+      }
+
+      .mission-header {
+        display: flex;
+        align-items: flex-start;
+        gap: $spacing-md;
+        margin-bottom: $spacing-lg;
+
+        .mission-icon {
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, $color-primary, $color-secondary);
+          border-radius: $radius-md;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: $color-dark;
+          flex-shrink: 0;
+
+          svg {
+            width: 30px;
+            height: 30px;
+            fill: currentColor;
+          }
+        }
+
+        .mission-info {
+          flex: 1;
+
+          .mission-title {
+            font-family: $font-family-secondary;
+            font-size: $font-size-lg;
+            font-weight: $font-weight-semibold;
+            color: $color-light;
+            margin-bottom: $spacing-xs;
+          }
+
+          .mission-category {
+            display: inline-block;
+            background: rgba($color-accent, 0.1);
+            color: $color-accent;
+            padding: $spacing-xs $spacing-sm;
+            border-radius: $radius-sm;
+            font-size: $font-size-xs;
+            font-weight: $font-weight-semibold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+        }
+      }
+
+      .mission-description {
+        color: $color-light-dimmed;
+        line-height: $line-height-relaxed;
+        margin-bottom: $spacing-lg;
+      }
+
+      .mission-rewards {
+        display: flex;
+        align-items: center;
+        gap: $spacing-lg;
+        margin-bottom: $spacing-lg;
+        padding: $spacing-md;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: $radius-md;
+
+        .reward-item {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          font-size: $font-size-sm;
+          color: $color-light-dimmed;
+
+          .reward-icon {
+            width: 16px;
+            height: 16px;
+            color: $color-warning;
+          }
+
+          .reward-value {
+            font-weight: $font-weight-semibold;
+            color: $color-warning;
+          }
+        }
+      }
+
+      .mission-progress {
+        margin-bottom: $spacing-lg;
+
+        .progress-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: $spacing-xs;
+
+          .progress-label {
+            font-size: $font-size-sm;
+            color: $color-light-dimmed;
+          }
+
+          .progress-value {
+            font-size: $font-size-sm;
+            font-weight: $font-weight-semibold;
+            color: $color-primary;
+          }
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 6px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: $radius-full;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, $color-primary, $color-secondary);
+            border-radius: $radius-full;
+            transition: width $animation-duration-normal ease-out;
+          }
+        }
+      }
+
+      .mission-actions {
+        display: flex;
+        gap: $spacing-md;
+
+        .btn-start {
+          flex: 1;
+          @include button-style($color-primary, $color-dark, 1.05);
+        }
+
+        .btn-continue {
+          flex: 1;
+          @include button-style($color-secondary, $color-dark, 1.05);
+        }
+
+        .btn-replay {
+          flex: 1;
+          @include button-style($color-accent, $color-light, 1.05);
+        }
+      }
+    }
+  }
+}

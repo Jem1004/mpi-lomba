@@ -1,0 +1,151 @@
+// Footer Layout - Media Pembelajaran Interaktif
+
+.footer {
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $spacing-xl 0;
+  margin-top: auto;
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: $spacing-xl;
+  }
+
+  .footer-section {
+    .footer-title {
+      font-family: $font-family-secondary;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-light;
+      margin-bottom: $spacing-md;
+    }
+
+    .footer-text {
+      color: $color-light-dimmed;
+      line-height: $line-height-relaxed;
+      margin-bottom: $spacing-md;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+
+      .footer-link {
+        color: $color-light-dimmed;
+        text-decoration: none;
+        transition: $transition-colors;
+
+        &:hover {
+          color: $color-primary;
+        }
+      }
+    }
+
+    .social-links {
+      display: flex;
+      gap: $spacing-md;
+
+      .social-link {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: $radius-md;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $color-light-dimmed;
+        text-decoration: none;
+        transition: $transition-base;
+
+        &:hover {
+          background: rgba($color-primary, 0.1);
+          border-color: $color-primary;
+          color: $color-primary;
+          transform: translateY(-2px);
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+          fill: currentColor;
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    padding-top: $spacing-lg;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+
+    .copyright {
+      color: $color-gray;
+      font-size: $font-size-sm;
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: $spacing-lg;
+      list-style: none;
+
+      .footer-bottom-link {
+        color: $color-gray;
+        text-decoration: none;
+        font-size: $font-size-sm;
+        transition: $transition-colors;
+
+        &:hover {
+          color: $color-primary;
+        }
+      }
+    }
+  }
+}
+
+// Menu Footer (Special footer for main menu)
+.menu-footer {
+  text-align: center;
+  padding-top: $spacing-xl;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+// Responsive Footer
+@include respond-to('mobile') {
+  .footer {
+    padding: $spacing-lg 0;
+
+    .footer-content {
+      grid-template-columns: 1fr;
+      gap: $spacing-lg;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: $spacing-sm;
+
+      .footer-bottom-links {
+        justify-content: center;
+      }
+    }
+  }
+
+  .menu-footer {
+    padding-top: $spacing-lg;
+  }
+}
