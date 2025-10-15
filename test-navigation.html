@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-button {
+            padding: 10px 20px;
+            margin: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .debug-info {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .menu-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .content-pages {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 300px;
+        }
+        .page {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Navigation System</h1>
+
+    <div class="debug-info">
+        <h3>Debug Information</h3>
+        <p>Testing navigation functionality...</p>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="mainMenu" class="menu-container">
+        <h2>Main Menu</h2>
+        <button class="test-button" onclick="testNavigation('objectives')">Test Objectives</button>
+        <button class="test-button" onclick="testNavigation('materials')">Test Materials</button>
+        <button class="test-button" onclick="testNavigation('evaluasi')">Test Evaluasi</button>
+        <button class="test-button" onclick="testNavigation('about')">Test About</button>
+    </div>
+
+    <!-- Content Pages -->
+    <div id="contentPages" class="content-pages hidden">
+        <!-- Content will be loaded here -->
+    </div>
+
+    <div class="debug-info">
+        <h3>Test Results</h3>
+        <div id="testResults">Click buttons above to test navigation</div>
+    </div>
+
+    <script>
+        function testNavigation(page) {
+            console.log('Testing navigation to:', page);
+
+            // Hide main menu
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) {
+                mainMenu.classList.add('hidden');
+                console.log('✓ Main menu hidden');
+            } else {
+                console.log('✗ Main menu not found');
+            }
+
+            // Show content pages
+            const contentPages = document.getElementById('contentPages');
+            if (contentPages) {
+                contentPages.classList.remove('hidden');
+                console.log('✓ Content pages shown');
+
+                // Load test content
+                contentPages.innerHTML = `
+                    <div class="page">
+                        <h2>Test Page: ${page}</h2>
+                        <p>This is a test page for ${page}.</p>
+                        <button class="test-button" onclick="goBack()">Go Back to Menu</button>
+                    </div>
+                `;
+
+                document.getElementById('testResults').innerHTML =
+                    `✓ Successfully navigated to: <strong>${page}</strong>`;
+            } else {
+                console.log('✗ Content pages not found');
+                document.getElementById('testResults').innerHTML =
+                    `✗ Failed to find contentPages element`;
+            }
+        }
+
+        function goBack() {
+            console.log('Going back to main menu');
+
+            // Hide content pages
+            const contentPages = document.getElementById('contentPages');
+            if (contentPages) {
+                contentPages.innerHTML = '';
+                contentPages.classList.add('hidden');
+                console.log('✓ Content pages hidden');
+            }
+
+            // Show main menu
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) {
+                mainMenu.classList.remove('hidden');
+                console.log('✓ Main menu shown');
+            }
+
+            document.getElementById('testResults').innerHTML =
+                '✓ Returned to main menu';
+        }
+
+        // Test on load
+        window.onload = function() {
+            const mainMenu = document.getElementById('mainMenu');
+            const contentPages = document.getElementById('contentPages');
+
+            console.log('Elements found:');
+            console.log('- mainMenu:', !!mainMenu);
+            console.log('- contentPages:', !!contentPages);
+
+            if (mainMenu && contentPages) {
+                document.getElementById('testResults').innerHTML =
+                    '✓ All required elements found. Ready to test navigation.';
+            } else {
+                document.getElementById('testResults').innerHTML =
+                    '✗ Missing required elements!';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -9,6 +9,8 @@ class MPIApp {
     constructor() {
         this.currentPage = 'terminal';
         this.studentName = '';
+        this.completionRate = 0;
+        this.certificateData = null;
         this.userData = {
             progress: {},
             scores: {},
@@ -35,6 +37,9 @@ class MPIApp {
 
         // Initialize event listeners
         this.initEventListeners();
+
+        // Initialize Enhanced Test System
+        this.initializeEnhancedTestSystem();
 
         // Show loading screen
         this.showLoadingScreen();
@@ -86,6 +91,26 @@ class MPIApp {
             localStorage.setItem('userData', JSON.stringify(this.userData));
         } catch (error) {
             console.error('Error saving user data:', error);
+        }
+    }
+
+    /**
+     * Initialize Enhanced Test System
+     */
+    initializeEnhancedTestSystem() {
+        // Wait for Enhanced Test System to be available
+        if (typeof EnhancedTestSystem !== 'undefined') {
+            this.enhancedTestSystem = new EnhancedTestSystem(this);
+            console.log('Enhanced Test System initialized');
+        } else {
+            console.log('Enhanced Test System not yet available, will retry...');
+            // Retry after a short delay
+            setTimeout(() => {
+                if (typeof EnhancedTestSystem !== 'undefined') {
+                    this.enhancedTestSystem = new EnhancedTestSystem(this);
+                    console.log('Enhanced Test System initialized (retry)');
+                }
+            }, 1000);
         }
     }
 
@@ -411,6 +436,12 @@ class MPIApp {
             mainMenu.classList.add('hidden');
         }
 
+        // Show content pages
+        const contentPages = document.getElementById('contentPages');
+        if (contentPages) {
+            contentPages.classList.remove('hidden');
+        }
+
         // Load page content
         this.loadPageContent(page);
         this.currentPage = page;
@@ -434,11 +465,12 @@ class MPIApp {
             case 'materials':
                 this.loadMaterialsPage(contentPages);
                 break;
-            case 'test':
-                this.loadTestPage(contentPages);
+            case 'evaluasi':
+                this.loadEvaluasiPage(contentPages);
                 break;
             case 'quiz':
-                this.loadQuizPage(contentPages);
+                // Redirect ke evaluasi untuk compatibility
+                this.loadEvaluasiPage(contentPages);
                 break;
             case 'certificate':
                 this.loadCertificatePage(contentPages);
@@ -463,6 +495,7 @@ class MPIApp {
         const contentPages = document.getElementById('contentPages');
         if (contentPages) {
             contentPages.innerHTML = '';
+            contentPages.classList.add('hidden');
         }
 
         // Show main menu
@@ -1100,15 +1133,312 @@ class MPIApp {
                 <header class="page-header">
                     <button class="btn-back">← Kembali</button>
                     <h1>Test Pengetahuan</h1>
+                    <div class="test-info">
+                        <span class="test-mode">Mode Formatif</span>
+                        <span class="test-description">Latihan tanpa batasan waktu untuk menguji pemahaman</span>
+                    </div>
                 </header>
                 <main class="page-content">
                     <div class="test-content">
-                        <p>Halaman Test Pengetahuan sedang dalam pengembangan...</p>
+                        <!-- Test content will be loaded dynamically -->
                     </div>
                 </main>
             </div>
         `;
         this.initializeTest();
+    }
+
+    /**
+     * Load evaluasi page (merged test + quiz)
+     */
+    loadEvaluasiPage(container) {
+        container.innerHTML = `
+            <div class="page evaluasi-page">
+                <header class="page-header">
+                    <div class="container">
+                        <button class="btn-back" onclick="window.mpiApp.navigateToMainMenu()">← Kembali</button>
+                        <h1>Evaluasi Pembelajaran</h1>
+                        <p class="evaluasi-description">Pilih jenis evaluasi yang ingin Anda ikuti</p>
+                    </div>
+                </header>
+
+                <main class="page-content">
+                    <div class="container">
+                        <!-- Simple Card Layout -->
+                        <div class="evaluasi-cards">
+                            <!-- Test Formatif Card -->
+                            <div class="evaluasi-card formatif-card">
+                                <div class="card-header">
+                                    <div class="card-icon">📝</div>
+                                    <div class="card-title-section">
+                                        <h2>Latihan</h2>
+                                        <p>Test Pengetahuan Formatif</p>
+                                    </div>
+                                </div>
+
+                                <div class="card-content">
+                                    <div class="quick-info">
+                                        <div class="info-item">
+                                            <span class="info-icon">⏱️</span>
+                                            <span>Tanpa batas waktu</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-icon">🔄</span>
+                                            <span>Bisa diulang</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-icon">💡</span>
+                                            <span>Feedback langsung</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="card-description">
+                                        Latihan soal untuk menguji pemahaman konsep tanpa tekanan. Cocok untuk persiapan sebelum kuis akhir.
+                                    </p>
+                                </div>
+
+                                <div class="card-footer">
+                                    <button class="btn btn-primary btn-block" onclick="window.mpiApp.startLatihan()">
+                                        Mulai Latihan
+                                    </button>
+                                    <small class="card-note">45+ soal • Tidak mempengaruhi nilai</small>
+                                </div>
+                            </div>
+
+                            <!-- Quiz Sumatif Card -->
+                            <div class="evaluasi-card quiz-card">
+                                <div class="card-header">
+                                    <div class="card-icon">🎯</div>
+                                    <div class="card-title-section">
+                                        <h2>Ujian</h2>
+                                        <p>Kuis Akhir Sumatif</p>
+                                    </div>
+                                    <div class="difficulty-badge">
+                                        <span>⚡</span>
+                                    </div>
+                                </div>
+
+                                <div class="card-content">
+                                    <div class="quick-info">
+                                        <div class="info-item">
+                                            <span class="info-icon">⏰</span>
+                                            <span>30 menit</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-icon">📊</span>
+                                            <span>15 soal</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-icon">🏆</span>
+                                            <span>Sertifikat</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="card-description">
+                                        Evaluasi resmi untuk mengukur kompetensi keseluruhan. Nilai akan disimpan untuk sertifikat.
+                                    </p>
+
+                                    <div class="requirements-alert">
+                                        <span class="alert-icon">⚠️</span>
+                                        <span>Minimal 70% untuk lulus • Satu kesempatan</span>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer">
+                                    <button class="btn btn-secondary btn-block" onclick="window.mpiApp.startKuis()">
+                                        Mulai Ujian
+                                    </button>
+                                    <small class="card-note">Penilaian resmi • Dapat sertifikat</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Summary -->
+                        <div class="progress-summary">
+                            <h3>Progress Anda</h3>
+                            <div class="progress-grid">
+                                <div class="progress-item">
+                                    <div class="progress-label">Latihan Selesai</div>
+                                    <div class="progress-value">0</div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-label">Nilai Terbaik</div>
+                                    <div class="progress-value">-</div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-label">Status Sertifikat</div>
+                                    <div class="progress-value">🔒</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        `;
+
+        // Load progress data
+        this.loadEvaluationProgress();
+
+        // Add hover sound effects for cards
+        this.addCardInteractions();
+    }
+
+    /**
+     * Add interactive effects to evaluation cards
+     */
+    addCardInteractions() {
+        const cards = document.querySelectorAll('.evaluasi-card');
+
+        cards.forEach(card => {
+            // Add hover effect with subtle animation
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+
+            // Add click feedback
+            const button = card.querySelector('button');
+            if (button) {
+                button.addEventListener('click', (e) => {
+                    // Add ripple effect
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+                    ripple.style.width = '20px';
+                    ripple.style.height = '20px';
+                    ripple.style.animation = 'ripple 0.6s ease-out';
+                    ripple.style.pointerEvents = 'none';
+
+                    const rect = button.getBoundingClientRect();
+                    ripple.style.left = `${e.clientX - rect.left - 10}px`;
+                    ripple.style.top = `${e.clientY - rect.top - 10}px`;
+
+                    button.style.position = 'relative';
+                    button.style.overflow = 'hidden';
+                    button.appendChild(ripple);
+
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            }
+        });
+    }
+
+    /**
+     * Load progress data for evaluation page
+     */
+    loadEvaluationProgress() {
+        // Load progress from localStorage
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+
+        // Update progress display
+        const progressValues = document.querySelectorAll('.progress-value');
+        if (progressValues.length >= 3) {
+            progressValues[0].textContent = progress.practiceCompleted || 0;
+            progressValues[1].textContent = progress.bestScore ? `${progress.bestScore}%` : '-';
+            progressValues[2].textContent = progress.certificateUnlocked ? '🏆' : '🔒';
+        }
+    }
+
+    /**
+     * Start latihan (test formatif)
+     */
+    startLatihan() {
+        console.log('Starting Test Pengetahuan Formatif...');
+
+        // Show loading message
+        this.showNotification('Memuat soal latihan...', 'info');
+
+        // Load questions from data/soal.json
+        fetch('data/soal.json')
+            .then(response => response.json())
+            .then(data => {
+                const formatifQuestions = data.test_pengetahuan || [];
+
+                if (formatifQuestions.length === 0) {
+                    this.showNotification('Soal latihan tidak tersedia', 'error');
+                    return;
+                }
+
+                if (this.enhancedTestSystem) {
+                    // Start enhanced test system with practice configuration
+                    this.enhancedTestSystem.startTestSession({
+                        mode: 'practice',
+                        category: 'mixed',
+                        enableFeedback: true,
+                        enableExplanations: true,
+                        timeLimit: 0, // No timer for practice
+                        shuffleQuestions: true,
+                        shuffleAnswers: true,
+                        questions: formatifQuestions,
+                        onPracticeComplete: (results) => {
+                            // Update practice progress
+                            this.updatePracticeProgress();
+                            this.showNotification('Latihan selesai! ✅', 'success');
+                        }
+                    });
+                } else {
+                    // Fallback to original test system
+                    this.initializeTest();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading formatif questions:', error);
+                this.showNotification('Gagal memuat soal latihan', 'error');
+            });
+    }
+
+    /**
+     * Start kuis (ujian sumatif)
+     */
+    startKuis() {
+        console.log('Starting Kuis Akhir Sumatif...');
+
+        // Show confirmation dialog
+        const confirmStart = confirm('Apakah Anda siap untuk memulai kuis akhir?\n\n• 30 menit waktu pengerjaan\n• 15 soal pilihan ganda\n• Minimal 70% untuk lulus\n• Satu kesempatan saja\n\nKlik OK untuk melanjutkan.');
+
+        if (!confirmStart) {
+            return;
+        }
+
+        // Show loading message
+        this.showNotification('Memuat soal kuis...', 'info');
+
+        // Load questions from data/soal.json
+        fetch('data/soal.json')
+            .then(response => response.json())
+            .then(data => {
+                const sumatifQuestions = data.quiz_akhir || [];
+
+                if (sumatifQuestions.length === 0) {
+                    this.showNotification('Soal kuis tidak tersedia', 'error');
+                    return;
+                }
+
+                if (this.enhancedQuizSystem) {
+                    // Start enhanced quiz system with exam configuration
+                    this.enhancedQuizSystem.initializeQuiz(sumatifQuestions, {
+                        allowBackNavigation: true,
+                        showImmediateFeedback: false,
+                        timeLimit: 1800, // 30 minutes
+                        passingScore: 70,
+                        shuffleQuestions: true,
+                        shuffleAnswers: true,
+                        studentName: this.studentName,
+                        isSumatif: true
+                    });
+                } else {
+                    // Fallback to original quiz system
+                    this.initializeQuiz();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading sumatif questions:', error);
+                this.showNotification('Gagal memuat soal kuis', 'error');
+            });
     }
 
     /**
@@ -1118,17 +1448,24 @@ class MPIApp {
         container.innerHTML = `
             <div class="page quiz-page">
                 <header class="page-header">
-                    <button class="btn-back">← Kembali</button>
-                    <h1>Kuis</h1>
+                    <button class="btn-back" onclick="window.mpiApp.showMainMenu()">← Kembali</button>
+                    <h1>Kuis Akhir</h1>
+                    <div class="user-info">
+                        <span class="welcome-text">Welcome, <span id="userName">${this.studentName}</span></span>
+                    </div>
                 </header>
                 <main class="page-content">
-                    <div class="quiz-content">
-                        <p>Halaman Kuis sedang dalam pengembangan...</p>
+                    <div class="quiz-content" id="quizContent">
+                        <!-- Quiz content will be loaded dynamically -->
                     </div>
                 </main>
             </div>
         `;
-        this.initializeQuiz();
+
+        // Initialize Enhanced Quiz System after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            this.initializeEnhancedQuiz();
+        }, 100);
     }
 
     /**
@@ -1138,16 +1475,87 @@ class MPIApp {
         container.innerHTML = `
             <div class="page certificate-page">
                 <header class="page-header">
-                    <button class="btn-back">← Kembali</button>
-                    <h1>Sertifikat</h1>
+                    <div class="container">
+                        <button class="btn-back" onclick="window.mpiApp.navigateToMainMenu()">← Kembali</button>
+                        <h1>Sertifikat Kompetensi</h1>
+                        <p class="certificate-description">Sertifikat digital pencapaian kompetensi jaringan dasar</p>
+                    </div>
                 </header>
+
                 <main class="page-content">
-                    <div class="certificate-content">
-                        <p>Halaman Sertifikat sedang dalam pengembangan...</p>
+                    <div class="container">
+                        <!-- Certificate Status Section -->
+                        <section class="certificate-status">
+                            <div class="status-card" id="certificateStatusCard">
+                                <!-- Content will be loaded based on user status -->
+                            </div>
+                        </section>
+
+                        <!-- Certificate Preview Section -->
+                        <section class="certificate-preview-section" id="certificatePreviewSection" style="display: none;">
+                            <div class="preview-header">
+                                <h2>Sertifikat Anda</h2>
+                                <p>Preview sertifikat kompetensi Anda</p>
+                            </div>
+
+                            <div class="certificate-container">
+                                <div class="certificate-frame" id="certificateFrame">
+                                    <!-- Certificate will be rendered here -->
+                                </div>
+                            </div>
+
+                            <div class="certificate-actions">
+                                <button class="btn btn-primary" onclick="window.mpiApp.downloadCertificate()">
+                                    <span class="btn-icon">📥</span>
+                                    Download PDF
+                                </button>
+                                <button class="btn btn-secondary" onclick="window.mpiApp.shareCertificate()">
+                                    <span class="btn-icon">🔗</span>
+                                    Bagikan
+                                </button>
+                                <button class="btn btn-outline" onclick="window.mpiApp.printCertificate()">
+                                    <span class="btn-icon">🖨️</span>
+                                    Cetak
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Certificate Requirements Section -->
+                        <section class="certificate-requirements">
+                            <h2>Persyaratan Mendapatkan Sertifikat</h2>
+                            <div class="requirements-grid">
+                                <div class="requirement-item completed" id="requirement-quiz">
+                                    <div class="requirement-icon">✅</div>
+                                    <div class="requirement-content">
+                                        <h4>Lulus Kuis Akhir</h4>
+                                        <p>Dapatkan nilai minimal 70% pada kuis akhir</p>
+                                        <div class="requirement-status">Status: <span id="quiz-status">Belum</span></div>
+                                    </div>
+                                </div>
+                                <div class="requirement-item" id="requirement-practice">
+                                    <div class="requirement-icon">📝</div>
+                                    <div class="requirement-content">
+                                        <h4>Selesaikan Latihan</h4>
+                                        <p>Selesaikan minimal 10 latihan untuk pemahaman</p>
+                                        <div class="requirement-status">Progress: <span id="practice-status">0/10</span></div>
+                                    </div>
+                                </div>
+                                <div class="requirement-item" id="requirement-completion">
+                                    <div class="requirement-icon">📚</div>
+                                    <div class="requirement-content">
+                                        <h4>Selesaikan Semua Materi</h4>
+                                        <p>Pelajari semua modul materi pembelajaran</p>
+                                        <div class="requirement-status">Progress: <span id="completion-status">0%</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </main>
             </div>
         `;
+
+        // Initialize certificate page
         this.initializeCertificate();
     }
 
@@ -3452,6 +3860,810 @@ class MPIApp {
      */
     initializeTest() {
         console.log('Test page initialized');
+
+        // Check if Enhanced Test System is available
+        if (this.enhancedTestSystem) {
+            this.initializeEnhancedTest();
+        } else {
+            // Fallback to original test system
+            this.initializeOriginalTest();
+        }
+    }
+
+    /**
+     * Load test data from JSON
+     */
+    async loadTestData() {
+        try {
+            const response = await fetch('data/soal.json');
+            const data = await response.json();
+            this.testState.questions = data.test_pengetahuan || [];
+            console.log('Test data loaded:', this.testState.questions.length, 'questions');
+        } catch (error) {
+            console.error('Error loading test data:', error);
+            this.showTestError('Gagal memuat data soal. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Render test selection interface
+     */
+    renderTestSelection() {
+        const testContent = document.querySelector('.test-content');
+        if (!testContent) return;
+
+        // Group questions by category
+        const categories = this.groupQuestionsByCategory();
+
+        testContent.innerHTML = `
+            <div class="test-selection">
+                <div class="selection-header">
+                    <h2>Pilih Topik Test</h2>
+                    <p>Pilih topik yang ingin Anda pelajari dan uji pemahaman Anda</p>
+                </div>
+
+                <div class="categories-grid">
+                    ${Object.entries(categories).map(([category, questions]) => `
+                        <div class="category-card" data-category="${category}">
+                            <div class="category-icon">
+                                ${this.getCategoryIcon(category)}
+                            </div>
+                            <div class="category-info">
+                                <h3>${category}</h3>
+                                <p>${questions.length} soal tersedia</p>
+                                <div class="difficulty-info">
+                                    ${this.getDifficultyInfo(questions)}
+                                </div>
+                            </div>
+                            <div class="category-action">
+                                <button class="btn-start-category" data-category="${category}">
+                                    Mulai Test
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="quick-actions">
+                    <button class="btn-random-test" id="btnRandomTest">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14.83,13.41L13.42,14.82L16.55,17.95L14.5,20H20V14.5L17.96,16.54L14.83,13.41M14.5,4L16.54,6.04L4,18.59L5.41,20L17.96,7.46L20,9.5V4M10.59,9.17L5.41,4L4,5.41L9.17,10.58L10.59,9.17Z"/>
+                        </svg>
+                        Test Acak (Semua Topik)
+                    </button>
+                    <button class="btn-review-mistakes" id="btnReviewMistakes">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z"/>
+                        </svg>
+                        Review Kesalahan
+                    </button>
+                </div>
+            </div>
+        `;
+
+        this.bindTestSelectionEvents();
+    }
+
+    /**
+     * Group questions by category
+     */
+    groupQuestionsByCategory() {
+        const categories = {};
+
+        this.testState.questions.forEach(question => {
+            const category = this.extractCategory(question.bab);
+            if (!categories[category]) {
+                categories[category] = [];
+            }
+            categories[category].push(question);
+        });
+
+        return categories;
+    }
+
+    /**
+     * Extract category from question bab
+     */
+    extractCategory(bab) {
+        if (bab.includes('OSI')) return 'Model OSI Layer';
+        if (bab.includes('IP Addressing')) return 'Alamat IP';
+        if (bab.includes('Subnetting')) return 'IP Subnetting';
+        return bab.split(' - ')[0] || 'General';
+    }
+
+    /**
+     * Get category icon
+     */
+    getCategoryIcon(category) {
+        const icons = {
+            'Model OSI Layer': '<svg viewBox="0 0 24 24"><path d="M12,2L13.09,8.26L22,9L16,14.14L18.18,21.02L12,17.77L5.82,21.02L8,14.14L2,9L10.91,8.26L12,2M12,6.39L11.5,8.81L8.75,9.15L10.5,10.89L10.06,13.64L12,12.32L13.94,13.64L13.5,10.89L15.25,9.15L12.5,8.81L12,6.39Z"/></svg>',
+            'Alamat IP': '<svg viewBox="0 0 24 24"><path d="M17,9H7V7H17M17,13H7V11H17M17,17H7V15H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"/></svg>',
+            'IP Subnetting': '<svg viewBox="0 0 24 24"><path d="M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6M17,13H7V11H17V13M17,17H7V15H17V17Z"/></svg>'
+        };
+
+        return icons[category] || '<svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>';
+    }
+
+    /**
+     * Get difficulty info for category
+     */
+    getDifficultyInfo(questions) {
+        const easy = questions.filter(q => !q.difficulty || q.difficulty === 'Easy').length;
+        const medium = questions.filter(q => q.difficulty === 'Medium').length;
+        const hard = questions.filter(q => q.difficulty === 'Hard').length;
+
+        let difficultyHtml = '';
+        if (easy > 0) difficultyHtml += `<span class="difficulty easy">Mudah: ${easy}</span>`;
+        if (medium > 0) difficultyHtml += `<span class="difficulty medium">Sedang: ${medium}</span>`;
+        if (hard > 0) difficultyHtml += `<span class="difficulty hard">Sulit: ${hard}</span>`;
+
+        return difficultyHtml || '<span class="difficulty easy">Campuran</span>';
+    }
+
+    /**
+     * Bind test selection events
+     */
+    bindTestSelectionEvents() {
+        // Category card clicks
+        document.querySelectorAll('.btn-start-category').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const category = e.target.dataset.category;
+                this.startCategoryTest(category);
+            });
+        });
+
+        // Random test button
+        const randomBtn = document.getElementById('btnRandomTest');
+        if (randomBtn) {
+            randomBtn.addEventListener('click', () => {
+                this.startRandomTest();
+            });
+        }
+
+        // Review mistakes button
+        const reviewBtn = document.getElementById('btnReviewMistakes');
+        if (reviewBtn) {
+            reviewBtn.addEventListener('click', () => {
+                this.reviewMistakes();
+            });
+        }
+    }
+
+    /**
+     * Start test for specific category
+     */
+    startCategoryTest(category) {
+        const categoryQuestions = this.testState.questions.filter(q =>
+            this.extractCategory(q.bab) === category
+        );
+
+        this.testState.currentCategory = category;
+        this.testState.questions = this.shuffleArray(categoryQuestions);
+        this.testState.currentQuestionIndex = 0;
+        this.testState.answers = [];
+        this.testState.score = 0;
+        this.testState.isTestCompleted = false;
+
+        this.renderTestInterface();
+    }
+
+    /**
+     * Start random test
+     */
+    startRandomTest() {
+        // Select 10 random questions from all available questions
+        const allQuestions = [...this.testState.questions];
+        const randomQuestions = this.shuffleArray(allQuestions).slice(0, 10);
+
+        this.testState.currentCategory = 'Campuran';
+        this.testState.questions = randomQuestions;
+        this.testState.currentQuestionIndex = 0;
+        this.testState.answers = [];
+        this.testState.score = 0;
+        this.testState.isTestCompleted = false;
+
+        this.renderTestInterface();
+    }
+
+    /**
+     * Render test interface
+     */
+    renderTestInterface() {
+        const testContent = document.querySelector('.test-content');
+        if (!testContent) return;
+
+        testContent.innerHTML = `
+            <div class="test-interface">
+                <div class="test-header">
+                    <div class="test-progress">
+                        <div class="progress-info">
+                            <span class="question-number">Soal ${this.testState.currentQuestionIndex + 1} dari ${this.testState.questions.length}</span>
+                            <span class="category-tag">${this.testState.currentCategory}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${this.getProgressPercentage()}%"></div>
+                        </div>
+                    </div>
+                    <button class="btn-exit-test" id="btnExitTest">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="question-container" id="questionContainer">
+                    <!-- Question will be rendered here -->
+                </div>
+
+                <div class="test-navigation">
+                    <button class="btn-nav btn-prev" id="btnPrevQuestion" disabled>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                        </svg>
+                        Sebelumnya
+                    </button>
+
+                    <div class="question-indicators">
+                        ${this.renderQuestionIndicators()}
+                    </div>
+
+                    <button class="btn-nav btn-next" id="btnNextQuestion">
+                        Selanjutnya
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4,11V13H16L10.5,18.5L11.92,17.08L16.5,12.5L11.92,7.92L10.5,9.34L16,13H4Z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        this.renderCurrentQuestion();
+        this.bindTestInterfaceEvents();
+    }
+
+    /**
+     * Get progress percentage
+     */
+    getProgressPercentage() {
+        return ((this.testState.currentQuestionIndex + 1) / this.testState.questions.length) * 100;
+    }
+
+    /**
+     * Render question indicators
+     */
+    renderQuestionIndicators() {
+        return this.testState.questions.map((_, index) => {
+            const isAnswered = this.testState.answers[index] !== undefined;
+            const isCurrent = index === this.testState.currentQuestionIndex;
+            const isCorrect = isAnswered ? this.testState.answers[index].isCorrect : null;
+
+            let className = 'indicator';
+            if (isCurrent) className += ' current';
+            else if (isAnswered) {
+                className += isCorrect ? ' correct' : ' incorrect';
+            }
+
+            return `<div class="${className}" data-index="${index}"></div>`;
+        }).join('');
+    }
+
+    /**
+     * Render current question
+     */
+    renderCurrentQuestion() {
+        const question = this.testState.questions[this.testState.currentQuestionIndex];
+        const container = document.getElementById('questionContainer');
+
+        if (!container || !question) return;
+
+        const userAnswer = this.testState.answers[this.testState.currentQuestionIndex];
+        const hasFeedback = userAnswer && userAnswer.showFeedback;
+
+        container.innerHTML = `
+            <div class="question-card ${hasFeedback ? 'show-feedback' : ''}">
+                <div class="question-header">
+                    <span class="question-category">${question.bab}</span>
+                    <span class="question-id">#${question.id}</span>
+                </div>
+
+                <div class="question-text">
+                    <h3>${question.pertanyaan}</h3>
+                </div>
+
+                <div class="options-container">
+                    ${question.options.map((option, index) => {
+                        const isSelected = userAnswer && userAnswer.selectedAnswer === index;
+                        const isCorrect = index === question.jawaban_benar;
+                        const showCorrect = hasFeedback && isCorrect;
+                        const showWrong = hasFeedback && isSelected && !isCorrect;
+
+                        let optionClass = 'option';
+                        if (isSelected) optionClass += ' selected';
+                        if (showCorrect) optionClass += ' correct';
+                        if (showWrong) optionClass += ' wrong';
+
+                        return `
+                            <div class="${optionClass}" data-index="${index}">
+                                <label class="option-label">
+                                    <input type="radio"
+                                           name="answer"
+                                           value="${index}"
+                                           ${isSelected ? 'checked' : ''}
+                                           ${hasFeedback ? 'disabled' : ''}>
+                                    <span class="option-indicator">${String.fromCharCode(65 + index)}</span>
+                                    <span class="option-text">${option}</span>
+                                    ${showCorrect ? '<span class="correct-indicator">✓ Benar</span>' : ''}
+                                    ${showWrong ? '<span class="wrong-indicator">✗ Salah</span>' : ''}
+                                </label>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                ${hasFeedback ? `
+                    <div class="feedback-container">
+                        <div class="feedback-header ${userAnswer.isCorrect ? 'correct' : 'incorrect'}">
+                            <div class="feedback-icon">
+                                ${userAnswer.isCorrect ?
+                                    '<svg viewBox="0 0 24 24"><path fill="#10b981" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"/></svg>' :
+                                    '<svg viewBox="0 0 24 24"><path fill="#ef4444" d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/></svg>'
+                                }
+                            </div>
+                            <h4>${userAnswer.isCorrect ? 'Benar!' : 'Salah!'}</h4>
+                        </div>
+                        <div class="feedback-content">
+                            <p><strong>Penjelasan:</strong></p>
+                            <p>${question.penjelasan}</p>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        // Update navigation and re-bind events
+        this.updateNavigationButtons();
+        this.bindTestInterfaceEvents();
+    }
+
+    /**
+     * Bind test interface events
+     */
+    bindTestInterfaceEvents() {
+        // Remove existing event listeners to prevent duplicates
+        const optionInputs = document.querySelectorAll('.option input');
+        optionInputs.forEach(input => {
+            input.replaceWith(input.cloneNode(true));
+        });
+
+        // Option selection - re-bind to new elements
+        document.querySelectorAll('.option input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                // Prevent multiple selections if already answered
+                const currentAnswer = this.testState.answers[this.testState.currentQuestionIndex];
+                if (!currentAnswer) {
+                    this.selectAnswer(parseInt(e.target.value));
+                }
+            });
+        });
+
+        // Navigation buttons - remove and re-bind
+        const prevBtn = document.getElementById('btnPrevQuestion');
+        const nextBtn = document.getElementById('btnNextQuestion');
+        const exitBtn = document.getElementById('btnExitTest');
+
+        if (prevBtn) {
+            prevBtn.replaceWith(prevBtn.cloneNode(true));
+            document.getElementById('btnPrevQuestion').addEventListener('click', () => this.previousQuestion());
+        }
+
+        if (nextBtn) {
+            nextBtn.replaceWith(nextBtn.cloneNode(true));
+            document.getElementById('btnNextQuestion').addEventListener('click', () => this.nextQuestion());
+        }
+
+        if (exitBtn) {
+            exitBtn.replaceWith(exitBtn.cloneNode(true));
+            document.getElementById('btnExitTest').addEventListener('click', () => this.exitTest());
+        }
+
+        // Question indicators - remove and re-bind
+        document.querySelectorAll('.indicator').forEach(indicator => {
+            indicator.replaceWith(indicator.cloneNode(true));
+        });
+
+        document.querySelectorAll('.indicator').forEach(indicator => {
+            indicator.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                if (index < this.testState.currentQuestionIndex ||
+                    this.testState.answers[index] !== undefined) {
+                    this.goToQuestion(index);
+                }
+            });
+        });
+    }
+
+    /**
+     * Select answer for current question
+     */
+    selectAnswer(answerIndex) {
+        const question = this.testState.questions[this.testState.currentQuestionIndex];
+        const isCorrect = answerIndex === question.jawaban_benar;
+
+        // Store answer
+        this.testState.answers[this.testState.currentQuestionIndex] = {
+            selectedAnswer: answerIndex,
+            isCorrect: isCorrect,
+            showFeedback: true
+        };
+
+        // Update score
+        if (isCorrect) {
+            this.testState.score++;
+        }
+
+        // Show feedback immediately
+        this.renderCurrentQuestion();
+        this.updateQuestionIndicators();
+        this.updateProgressBar();
+
+        // Auto advance after delay (only if not last question)
+        setTimeout(() => {
+            // Check if test is still active and not completed
+            if (!this.testState.isTestCompleted &&
+                this.testState.currentQuestionIndex < this.testState.questions.length - 1) {
+                this.nextQuestion();
+            } else if (!this.testState.isTestCompleted) {
+                this.completeTest();
+            }
+        }, 3000);
+    }
+
+    /**
+     * Update question indicators
+     */
+    updateQuestionIndicators() {
+        document.querySelectorAll('.indicator').forEach((indicator, index) => {
+            const answer = this.testState.answers[index];
+
+            // Reset all classes
+            indicator.className = 'indicator';
+
+            // Add appropriate classes based on state
+            if (index === this.testState.currentQuestionIndex) {
+                indicator.className += ' current';
+            } else if (answer && answer.showFeedback) {
+                indicator.className += answer.isCorrect ? ' correct' : ' incorrect';
+            }
+        });
+    }
+
+    /**
+     * Navigate to previous question
+     */
+    previousQuestion() {
+        if (this.testState.currentQuestionIndex > 0) {
+            this.testState.currentQuestionIndex--;
+            this.renderCurrentQuestion();
+            // Update indicators and progress after render
+            setTimeout(() => {
+                this.updateQuestionIndicators();
+                this.updateProgressBar();
+            }, 50);
+        }
+    }
+
+    /**
+     * Navigate to next question
+     */
+    nextQuestion() {
+        if (this.testState.currentQuestionIndex < this.testState.questions.length - 1) {
+            this.testState.currentQuestionIndex++;
+            this.renderCurrentQuestion();
+            // Update indicators and progress after render
+            setTimeout(() => {
+                this.updateQuestionIndicators();
+                this.updateProgressBar();
+            }, 50);
+        } else {
+            this.completeTest();
+        }
+    }
+
+    /**
+     * Go to specific question
+     */
+    goToQuestion(index) {
+        this.testState.currentQuestionIndex = index;
+        this.renderCurrentQuestion();
+        // Update indicators and progress after render
+        setTimeout(() => {
+            this.updateQuestionIndicators();
+            this.updateProgressBar();
+        }, 50);
+    }
+
+    /**
+     * Update progress bar
+     */
+    updateProgressBar() {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            progressFill.style.width = `${this.getProgressPercentage()}%`;
+        }
+
+        const questionNumber = document.querySelector('.question-number');
+        if (questionNumber) {
+            questionNumber.textContent = `Soal ${this.testState.currentQuestionIndex + 1} dari ${this.testState.questions.length}`;
+        }
+    }
+
+    /**
+     * Update navigation buttons
+     */
+    updateNavigationButtons() {
+        const prevBtn = document.getElementById('btnPrevQuestion');
+        const nextBtn = document.getElementById('btnNextQuestion');
+        const currentAnswer = this.testState.answers[this.testState.currentQuestionIndex];
+
+        // Previous button - enable if not first question
+        if (prevBtn) {
+            prevBtn.disabled = this.testState.currentQuestionIndex === 0;
+        }
+
+        // Next button - enable if current question has been answered
+        if (nextBtn) {
+            const isLastQuestion = this.testState.currentQuestionIndex === this.testState.questions.length - 1;
+            nextBtn.innerHTML = isLastQuestion ?
+                'Selesai<svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17V19H11V16.17L15.09,12.09L16.5,13.5L11,19V7H21Z"/></svg>' :
+                'Selanjutnya<svg viewBox="0 0 24 24"><path d="M4,11V13H16L10.5,18.5L11.92,17.08L16.5,12.5L11.92,7.92L10.5,9.34L16,13H4Z"/></svg>';
+
+            // Enable next button only if current question has been answered
+            nextBtn.disabled = !currentAnswer;
+        }
+    }
+
+    /**
+     * Complete test
+     */
+    completeTest() {
+        this.testState.isTestCompleted = true;
+        this.saveTestProgress();
+        this.renderTestResults();
+    }
+
+    /**
+     * Render test results
+     */
+    renderTestResults() {
+        const testContent = document.querySelector('.test-content');
+        if (!testContent) return;
+
+        const percentage = Math.round((this.testState.score / this.testState.questions.length) * 100);
+        const grade = this.getGrade(percentage);
+
+        testContent.innerHTML = `
+            <div class="test-results">
+                <div class="results-header">
+                    <div class="score-circle">
+                        <div class="score-percentage">${percentage}%</div>
+                        <div class="score-label">Skor Akhir</div>
+                    </div>
+                    <div class="results-info">
+                        <h2>Test Selesai!</h2>
+                        <p class="grade-message">${grade.message}</p>
+                        <div class="score-details">
+                            <span class="correct-answers">${this.testState.score} Benar</span>
+                            <span class="total-questions">dari ${this.testState.questions.length} Soal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-analysis">
+                    <h3>Analisis Hasil</h3>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <div class="analysis-label">Topik</div>
+                            <div class="analysis-value">${this.testState.currentCategory}</div>
+                        </div>
+                        <div class="analysis-item">
+                            <div class="analysis-label">Waktu Pengerjaan</div>
+                            <div class="analysis-value">Tidak dibatasi</div>
+                        </div>
+                        <div class="analysis-item">
+                            <div class="analysis-label">Akurasi</div>
+                            <div class="analysis-value">${percentage}%</div>
+                        </div>
+                        <div class="analysis-item">
+                            <div class="analysis-label">Nilai Huruf</div>
+                            <div class="analysis-value grade-${grade.class}">${grade.letter}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn-review" onclick="mpiApp.reviewAnswers()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+                        </svg>
+                        Review Jawaban
+                    </button>
+                    <button class="btn-retake" onclick="mpiApp.retaketest()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                        </svg>
+                        Ulangi Test
+                    </button>
+                    <button class="btn-back-menu" onclick="mpiApp.navigateToMainMenu()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                        </svg>
+                        Kembali ke Menu
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Get grade based on percentage
+     */
+    getGrade(percentage) {
+        if (percentage >= 90) return { letter: 'A+', class: 'excellent', message: 'Luar biasa! Pemahaman Anda sangat baik!' };
+        if (percentage >= 80) return { letter: 'A', class: 'great', message: 'Hebat! Pemahaman Anda sangat baik!' };
+        if (percentage >= 70) return { letter: 'B', class: 'good', message: 'Bagus! Pemahaman Anda cukup baik!' };
+        if (percentage >= 60) return { letter: 'C', class: 'average', message: 'Cukup. Perlu lebih banyak belajar!' };
+        if (percentage >= 50) return { letter: 'D', class: 'below-average', message: 'Kurang. Perlu belajar lebih giat!' };
+        return { letter: 'E', class: 'poor', message: 'Sangat kurang. Perlu belajar lebih serius!' };
+    }
+
+    /**
+     * Review answers
+     */
+    reviewAnswers() {
+        this.testState.currentQuestionIndex = 0;
+        this.testState.isReviewMode = true;
+        this.renderReviewInterface();
+    }
+
+    /**
+     * Render review interface
+     */
+    renderReviewInterface() {
+        const testContent = document.querySelector('.test-content');
+        if (!testContent) return;
+
+        testContent.innerHTML = `
+            <div class="review-interface">
+                <div class="review-header">
+                    <h2>Review Jawaban</h2>
+                    <p>Lihat kembali jawaban Anda dan pembahasannya</p>
+                </div>
+
+                <div class="review-questions">
+                    ${this.testState.questions.map((question, index) => {
+                        const answer = this.testState.answers[index];
+                        return `
+                            <div class="review-question ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                                <div class="review-question-header">
+                                    <span class="question-number">Soal ${index + 1}</span>
+                                    <span class="result-badge ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                                        ${answer.isCorrect ? 'Benar' : 'Salah'}
+                                    </span>
+                                </div>
+                                <div class="review-question-text">
+                                    <p>${question.pertanyaan}</p>
+                                </div>
+                                <div class="review-answer">
+                                    <p><strong>Jawaban Anda:</strong> ${question.options[answer.selectedAnswer]}</p>
+                                    <p><strong>Jawaban Benar:</strong> ${question.options[question.jawaban_benar]}</p>
+                                </div>
+                                <div class="review-explanation">
+                                    <p><strong>Pembahasan:</strong> ${question.penjelasan}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <div class="review-actions">
+                    <button class="btn-back-menu" onclick="mpiApp.navigateToMainMenu()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                        </svg>
+                        Kembali ke Menu
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Retake test
+     */
+    retaketest() {
+        if (confirm('Apakah Anda ingin mengulang test ini? Progress saat ini akan hilang.')) {
+            this.renderTestSelection();
+        }
+    }
+
+    /**
+     * Exit test
+     */
+    exitTest() {
+        if (confirm('Apakah Anda yakin ingin keluar dari test? Progress yang telah dicapai akan hilang.')) {
+            this.renderTestSelection();
+        }
+    }
+
+    /**
+     * Review mistakes (placeholder)
+     */
+    reviewMistakes() {
+        alert('Fitur Review Kesalahan akan segera tersedia!');
+    }
+
+    /**
+     * Save test progress to localStorage
+     */
+    saveTestProgress() {
+        try {
+            const progress = {
+                category: this.testState.currentCategory,
+                score: this.testState.score,
+                totalQuestions: this.testState.questions.length,
+                percentage: Math.round((this.testState.score / this.testState.questions.length) * 100),
+                timestamp: new Date().toISOString(),
+                answers: this.testState.answers
+            };
+
+            let testHistory = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            testHistory.push(progress);
+
+            // Keep only last 10 test records
+            if (testHistory.length > 10) {
+                testHistory = testHistory.slice(-10);
+            }
+
+            localStorage.setItem('testHistory', JSON.stringify(testHistory));
+            console.log('Test progress saved:', progress);
+        } catch (error) {
+            console.error('Error saving test progress:', error);
+        }
+    }
+
+    /**
+     * Show test error
+     */
+    showTestError(message) {
+        const testContent = document.querySelector('.test-content');
+        if (testContent) {
+            testContent.innerHTML = `
+                <div class="error-container">
+                    <div class="error-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="#ef4444" d="M12,2L13.09,8.26L22,9L16,14.14L18.18,21.02L12,17.77L5.82,21.02L8,14.14L2,9L10.91,8.26L12,2M12,6.39L11.5,8.81L8.75,9.15L10.5,10.89L10.06,13.64L12,12.32L13.94,13.64L13.5,10.89L15.25,9.15L12.5,8.81L12,6.39Z"/>
+                        </svg>
+                    </div>
+                    <h3>Kesalahan Memuat Test</h3>
+                    <p>${message}</p>
+                    <button class="btn-retry" onclick="mpiApp.initializeTest()">
+                        Coba Lagi
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Shuffle array
+     */
+    shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
     }
 
     /**
@@ -3459,6 +4671,791 @@ class MPIApp {
      */
     initializeQuiz() {
         console.log('Quiz page initialized');
+
+        // Initialize quiz state
+        this.quizState = {
+            questions: [],
+            currentQuestionIndex: 0,
+            answers: [],
+            score: 0,
+            isQuizStarted: false,
+            isQuizCompleted: false,
+            timeRemaining: 600, // 10 minutes in seconds
+            timerInterval: null,
+            startTime: null,
+            endTime: null
+        };
+
+        // Load quiz data and initialize interface
+        this.loadQuizData();
+        this.renderQuizStart();
+    }
+
+    /**
+     * Load quiz data from JSON
+     */
+    async loadQuizData() {
+        try {
+            const response = await fetch('data/soal.json');
+            const data = await response.json();
+            this.quizState.questions = data.quiz_akhir || [];
+            console.log('Quiz data loaded:', this.quizState.questions.length, 'questions');
+        } catch (error) {
+            console.error('Error loading quiz data:', error);
+            this.showQuizError('Gagal memuat data soal. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Render quiz start screen
+     */
+    renderQuizStart() {
+        const quizContent = document.querySelector('.quiz-content');
+        if (!quizContent) return;
+
+        quizContent.innerHTML = `
+            <div class="quiz-start">
+                <div class="quiz-instructions">
+                    <h2>Petunjuk Kuis Akhir</h2>
+                    <div class="instructions-list">
+                        <div class="instruction-item">
+                            <div class="instruction-icon">⏱️</div>
+                            <div class="instruction-text">
+                                <strong>Waktu:</strong> 10 menit untuk ${this.quizState.questions.length} soal
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">📝</div>
+                            <div class="instruction-text">
+                                <strong>Soal:</strong> Satu soal per halaman dengan progress bar
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">🎯</div>
+                            <div class="instruction-text">
+                                <strong>Skor:</strong> Akan disimpan untuk sertifikat
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">⚠️</div>
+                            <div class="instruction-text">
+                                <strong>Penting:</strong> Tidak ada kesempatan mengulang jawaban
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-info-summary">
+                    <h3>Ringkasan Kuis</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Jumlah Soal:</span>
+                            <span class="info-value">${this.quizState.questions.length} soal</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Durasi:</span>
+                            <span class="info-value">10 menit</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Materi:</span>
+                            <span class="info-value">Semua topik</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Kelulusan:</span>
+                            <span class="info-value">Minimal 70%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-start-actions">
+                    <button class="btn btn-primary btn-large" id="btnStartQuiz">
+                        <svg viewBox="0 0 24 24" class="icon">
+                            <path d="M8,5.14V19.14L19,12.14L8,5.14Z"/>
+                        </svg>
+                        Mulai Kuis
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.mpiApp.showMainMenu()">
+                        Kembali ke Menu
+                    </button>
+                </div>
+            </div>
+        `;
+
+        this.bindQuizStartEvents();
+    }
+
+    /**
+     * Bind quiz start events
+     */
+    bindQuizStartEvents() {
+        const startBtn = document.getElementById('btnStartQuiz');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => {
+                this.startQuiz();
+            });
+        }
+    }
+
+    /**
+     * Start the quiz
+     */
+    startQuiz() {
+        if (this.quizState.questions.length === 0) {
+            this.showQuizError('Tidak ada soal yang tersedia.');
+            return;
+        }
+
+        this.quizState.isQuizStarted = true;
+        this.quizState.startTime = new Date();
+        this.quizState.currentQuestionIndex = 0;
+        this.quizState.answers = [];
+        this.quizState.score = 0;
+        this.quizState.isQuizCompleted = false;
+
+        // Shuffle questions
+        this.quizState.questions = this.shuffleArray([...this.quizState.questions]);
+
+        // Start timer
+        this.startQuizTimer();
+
+        // Render first question
+        this.renderQuizInterface();
+    }
+
+    /**
+     * Start quiz timer countdown
+     */
+    startQuizTimer() {
+        this.quizState.timerInterval = setInterval(() => {
+            this.quizState.timeRemaining--;
+            this.updateTimerDisplay();
+
+            if (this.quizState.timeRemaining <= 0) {
+                this.completeQuiz();
+            }
+        }, 1000);
+
+        this.updateTimerDisplay();
+    }
+
+    /**
+     * Update timer display
+     */
+    updateTimerDisplay() {
+        const timerElement = document.getElementById('quizTimer');
+        if (timerElement) {
+            const minutes = Math.floor(this.quizState.timeRemaining / 60);
+            const seconds = this.quizState.timeRemaining % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Add warning class when time is running out
+            if (this.quizState.timeRemaining <= 60) {
+                timerElement.classList.add('warning');
+            }
+        }
+    }
+
+    /**
+     * Render quiz interface
+     */
+    renderQuizInterface() {
+        const quizContent = document.querySelector('.quiz-content');
+        if (!quizContent) return;
+
+        const question = this.quizState.questions[this.quizState.currentQuestionIndex];
+
+        quizContent.innerHTML = `
+            <div class="quiz-interface">
+                <div class="quiz-header">
+                    <div class="quiz-progress">
+                        <div class="progress-info">
+                            <span class="question-number">Soal ${this.quizState.currentQuestionIndex + 1} dari ${this.quizState.questions.length}</span>
+                            <span class="timer-display" id="quizTimer">10:00</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${this.getQuizProgressPercentage()}%"></div>
+                        </div>
+                    </div>
+                    <button class="btn-exit-quiz" id="btnExitQuiz">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="question-container" id="quizQuestionContainer">
+                    <!-- Question will be rendered here -->
+                </div>
+
+                <div class="quiz-navigation">
+                    <button class="btn-nav btn-prev" id="btnPrevQuestion" disabled>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"/>
+                        </svg>
+                        Sebelumnya
+                    </button>
+
+                    <div class="question-indicators">
+                        ${this.renderQuestionIndicators()}
+                    </div>
+
+                    <button class="btn-nav btn-next" id="btnNextQuestion" disabled>
+                        ${this.quizState.currentQuestionIndex === this.quizState.questions.length - 1 ?
+                            'Selesai<svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19,6.08L21,7Z"/></svg>' :
+                            'Selanjutnya<svg viewBox="0 0 24 24"><path d="M4,11V13H16L10.5,18.5L11.92,17.08L16.5,12.5L11.92,7.92L10.5,9.34L16,13H4Z"/></svg>'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        this.renderCurrentQuizQuestion();
+        this.bindQuizInterfaceEvents();
+    }
+
+    /**
+     * Render current quiz question
+     */
+    renderCurrentQuizQuestion() {
+        const container = document.getElementById('quizQuestionContainer');
+        const question = this.quizState.questions[this.quizState.currentQuestionIndex];
+
+        if (!container || !question) return;
+
+        const userAnswer = this.quizState.answers[this.quizState.currentQuestionIndex];
+
+        container.innerHTML = `
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-id">#${question.id}</span>
+                </div>
+
+                <div class="question-text">
+                    <h3>${question.pertanyaan}</h3>
+                </div>
+
+                <div class="options-container">
+                    ${question.options.map((option, index) => `
+                        <div class="option ${userAnswer === index ? 'selected' : ''}" data-index="${index}">
+                            <label class="option-label">
+                                <input type="radio"
+                                       name="quiz-answer"
+                                       value="${index}"
+                                       ${userAnswer === index ? 'checked' : ''}>
+                                <span class="option-indicator">${String.fromCharCode(65 + index)}</span>
+                                <span class="option-text">${option}</span>
+                            </label>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        this.updateQuizNavigationButtons();
+    }
+
+    /**
+     * Render question indicators
+     */
+    renderQuestionIndicators() {
+        return this.quizState.questions.map((_, index) => {
+            const hasAnswer = this.quizState.answers[index] !== undefined;
+            const isCurrent = index === this.quizState.currentQuestionIndex;
+
+            let className = 'indicator';
+            if (isCurrent) className += ' current';
+            if (hasAnswer) className += ' answered';
+
+            return `
+                <div class="${className}" data-index="${index}" title="Soal ${index + 1}"></div>
+            `;
+        }).join('');
+    }
+
+    /**
+     * Get quiz progress percentage
+     */
+    getQuizProgressPercentage() {
+        return ((this.quizState.currentQuestionIndex + 1) / this.quizState.questions.length) * 100;
+    }
+
+    /**
+     * Bind quiz interface events
+     */
+    bindQuizInterfaceEvents() {
+        // Remove existing event listeners to prevent duplicates
+        const optionInputs = document.querySelectorAll('.option input');
+        optionInputs.forEach(input => {
+            input.replaceWith(input.cloneNode(true));
+        });
+
+        // Option selection - re-bind to new elements
+        document.querySelectorAll('.option input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                // Prevent multiple selections if already answered
+                const currentAnswer = this.quizState.answers[this.quizState.currentQuestionIndex];
+                if (currentAnswer === undefined) {
+                    this.selectQuizAnswer(parseInt(e.target.value));
+                }
+            });
+        });
+
+        // Navigation buttons - remove and re-bind
+        const prevBtn = document.getElementById('btnPrevQuestion');
+        const nextBtn = document.getElementById('btnNextQuestion');
+        const exitBtn = document.getElementById('btnExitQuiz');
+
+        if (prevBtn) {
+            prevBtn.replaceWith(prevBtn.cloneNode(true));
+            document.getElementById('btnPrevQuestion').addEventListener('click', () => this.previousQuizQuestion());
+        }
+
+        if (nextBtn) {
+            nextBtn.replaceWith(nextBtn.cloneNode(true));
+            const newNextBtn = document.getElementById('btnNextQuestion');
+            if (newNextBtn) {
+                newNextBtn.addEventListener('click', () => this.nextQuizQuestion());
+                console.log('Next button event listener attached');
+            }
+        }
+
+        if (exitBtn) {
+            exitBtn.replaceWith(exitBtn.cloneNode(true));
+            document.getElementById('btnExitQuiz').addEventListener('click', () => this.exitQuiz());
+        }
+
+        // Question indicators - remove and re-bind
+        document.querySelectorAll('.indicator').forEach(indicator => {
+            indicator.replaceWith(indicator.cloneNode(true));
+        });
+
+        document.querySelectorAll('.indicator').forEach(indicator => {
+            indicator.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                if (index <= this.quizState.currentQuestionIndex) {
+                    this.goToQuizQuestion(index);
+                }
+            });
+        });
+    }
+
+    /**
+     * Select answer for current quiz question
+     */
+    selectQuizAnswer(answerIndex) {
+        console.log('Quiz answer selected:', answerIndex, 'for question:', this.quizState.currentQuestionIndex);
+
+        this.quizState.answers[this.quizState.currentQuestionIndex] = answerIndex;
+
+        // Update UI
+        document.querySelectorAll('.option').forEach((option, index) => {
+            option.classList.toggle('selected', index === answerIndex);
+        });
+
+        this.updateQuizNavigationButtons();
+        this.updateQuizIndicators();
+
+        console.log('Quiz navigation buttons updated');
+    }
+
+    /**
+     * Update quiz navigation buttons
+     */
+    updateQuizNavigationButtons() {
+        const prevBtn = document.getElementById('btnPrevQuestion');
+        const nextBtn = document.getElementById('btnNextQuestion');
+        const currentAnswer = this.quizState.answers[this.quizState.currentQuestionIndex];
+
+        console.log('Updating navigation buttons. Current answer:', currentAnswer, 'Current index:', this.quizState.currentQuestionIndex);
+
+        // Previous button
+        if (prevBtn) {
+            prevBtn.disabled = this.quizState.currentQuestionIndex === 0;
+        }
+
+        // Next button
+        if (nextBtn) {
+            const isLastQuestion = this.quizState.currentQuestionIndex === this.quizState.questions.length - 1;
+            nextBtn.innerHTML = isLastQuestion ?
+                'Selesai<svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19,6.08L21,7Z"/></svg>' :
+                'Selanjutnya<svg viewBox="0 0 24 24"><path d="M4,11V13H16L10.5,18.5L11.92,17.08L16.5,12.5L11.92,7.92L10.5,9.34L16,13H4Z"/></svg>';
+
+            // Enable next button only if current question has been answered
+            const shouldDisable = currentAnswer === undefined;
+            nextBtn.disabled = shouldDisable;
+
+            console.log('Next button disabled:', shouldDisable, 'Answer exists:', currentAnswer !== undefined);
+        }
+    }
+
+    /**
+     * Update quiz indicators
+     */
+    updateQuizIndicators() {
+        document.querySelectorAll('.indicator').forEach((indicator, index) => {
+            const hasAnswer = this.quizState.answers[index] !== undefined;
+            const isCurrent = index === this.quizState.currentQuestionIndex;
+
+            indicator.className = 'indicator';
+            if (isCurrent) indicator.className += ' current';
+            if (hasAnswer) indicator.className += ' answered';
+        });
+    }
+
+    /**
+     * Navigate to previous quiz question
+     */
+    previousQuizQuestion() {
+        if (this.quizState.currentQuestionIndex > 0) {
+            this.quizState.currentQuestionIndex--;
+            this.renderCurrentQuizQuestion();
+            // Update indicators and progress after render with small delay
+            setTimeout(() => {
+                this.updateQuizIndicators();
+                this.updateQuizProgressBar();
+            }, 50);
+        }
+    }
+
+    /**
+     * Navigate to next quiz question
+     */
+    nextQuizQuestion() {
+        console.log('Next quiz question clicked, current index:', this.quizState.currentQuestionIndex);
+
+        const isLastQuestion = this.quizState.currentQuestionIndex === this.quizState.questions.length - 1;
+
+        if (isLastQuestion) {
+            console.log('Last question reached, completing quiz');
+            this.completeQuiz();
+        } else if (this.quizState.currentQuestionIndex < this.quizState.questions.length - 1) {
+            console.log('Moving to next question');
+            this.quizState.currentQuestionIndex++;
+            this.renderCurrentQuizQuestion();
+            // Update indicators and progress after render with small delay
+            setTimeout(() => {
+                this.updateQuizIndicators();
+                this.updateQuizProgressBar();
+            }, 50);
+        } else {
+            console.log('Cannot navigate to next question');
+        }
+    }
+
+    /**
+     * Go to specific quiz question
+     */
+    goToQuizQuestion(index) {
+        if (index <= this.quizState.currentQuestionIndex) {
+            this.quizState.currentQuestionIndex = index;
+            this.renderCurrentQuizQuestion();
+            // Update indicators and progress after render with small delay
+            setTimeout(() => {
+                this.updateQuizIndicators();
+                this.updateQuizProgressBar();
+            }, 50);
+        }
+    }
+
+    /**
+     * Update quiz progress bar
+     */
+    updateQuizProgressBar() {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            progressFill.style.width = `${this.getQuizProgressPercentage()}%`;
+        }
+
+        const questionNumber = document.querySelector('.question-number');
+        if (questionNumber) {
+            questionNumber.textContent = `Soal ${this.quizState.currentQuestionIndex + 1} dari ${this.quizState.questions.length}`;
+        }
+    }
+
+    /**
+     * Complete quiz
+     */
+    completeQuiz() {
+        this.quizState.isQuizCompleted = true;
+        this.quizState.endTime = new Date();
+
+        // Stop timer
+        if (this.quizState.timerInterval) {
+            clearInterval(this.quizState.timerInterval);
+            this.quizState.timerInterval = null;
+        }
+
+        // Calculate score
+        this.calculateQuizScore();
+
+        // Save quiz results to localStorage for certificate
+        this.saveQuizResults();
+
+        // Show results
+        this.renderQuizResults();
+    }
+
+    /**
+     * Calculate quiz score
+     */
+    calculateQuizScore() {
+        this.quizState.score = 0;
+
+        this.quizState.answers.forEach((answerIndex, questionIndex) => {
+            if (answerIndex !== undefined && this.quizState.questions[questionIndex]) {
+                const question = this.quizState.questions[questionIndex];
+                if (answerIndex === question.jawaban_benar) {
+                    this.quizState.score++;
+                }
+            }
+        });
+    }
+
+    /**
+     * Save quiz results to localStorage for certificate
+     */
+    saveQuizResults() {
+        const results = {
+            score: this.quizState.score,
+            totalQuestions: this.quizState.questions.length,
+            percentage: Math.round((this.quizState.score / this.quizState.questions.length) * 100),
+            startTime: this.quizState.startTime,
+            endTime: this.quizState.endTime,
+            timeUsed: 600 - this.quizState.timeRemaining, // time used in seconds
+            studentName: localStorage.getItem('studentName') || 'Unknown',
+            answers: this.quizState.answers
+        };
+
+        // Save final score for certificate
+        localStorage.setItem('finalScore', JSON.stringify(results));
+        localStorage.setItem('quizCompleted', 'true');
+
+        // Update evaluation progress for certificate
+        this.updateEvaluationProgress(results);
+
+        console.log('Quiz results saved:', results);
+    }
+
+    /**
+     * Update evaluation progress for certificate tracking
+     */
+    updateEvaluationProgress(quizResults = null) {
+        // Get existing progress
+        let progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+
+        // Update practice completed count
+        if (!progress.practiceCompleted) {
+            progress.practiceCompleted = 0;
+        }
+
+        // Update best score
+        if (quizResults && quizResults.percentage > (progress.bestScore || 0)) {
+            progress.bestScore = quizResults.percentage;
+        }
+
+        // Calculate completion rate (mock calculation - replace with actual logic)
+        progress.completionRate = this.calculateCompletionRate();
+
+        // Check if certificate requirements are met
+        const quizPassed = (progress.bestScore || 0) >= 70;
+        const practiceEnough = progress.practiceCompleted >= 10;
+        const completionEnough = progress.completionRate >= 80;
+
+        // Unlock certificate if all requirements are met
+        if (quizPassed && practiceEnough && completionEnough) {
+            progress.certificateUnlocked = true;
+            progress.certificateDate = new Date().toISOString();
+
+            // Show notification
+            this.showNotification('🎉 Selamat! Sertifikat kompetensi Anda telah tersedia!', 'success');
+        }
+
+        // Save updated progress
+        localStorage.setItem('evaluationProgress', JSON.stringify(progress));
+
+        // Update main menu certificate status
+        this.updateCertificateStatus();
+
+        console.log('Evaluation progress updated:', progress);
+    }
+
+    /**
+     * Calculate completion rate for materials
+     */
+    calculateCompletionRate() {
+        // Mock calculation - replace with actual progress tracking
+        const materialsProgress = JSON.parse(localStorage.getItem('materialsProgress') || '{}');
+        const completedModules = Object.values(materialsProgress).filter(module => module.completed).length;
+        const totalModules = 4; // Total number of modules
+        return Math.round((completedModules / totalModules) * 100);
+    }
+
+    /**
+     * Update practice completed count
+     */
+    updatePracticeProgress() {
+        let progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+
+        if (!progress.practiceCompleted) {
+            progress.practiceCompleted = 0;
+        }
+
+        progress.practiceCompleted += 1;
+
+        // Update evaluation progress
+        this.updateEvaluationProgress();
+    }
+
+    /**
+     * Update materials progress
+     */
+    updateMaterialsProgress(moduleId) {
+        let materialsProgress = JSON.parse(localStorage.getItem('materialsProgress') || '{}');
+
+        if (!materialsProgress[moduleId]) {
+            materialsProgress[moduleId] = { completed: false, progress: 0 };
+        }
+
+        materialsProgress[moduleId].completed = true;
+        materialsProgress[moduleId].progress = 100;
+
+        localStorage.setItem('materialsProgress', JSON.stringify(materialsProgress));
+
+        // Update evaluation progress
+        this.updateEvaluationProgress();
+    }
+
+    /**
+     * Render quiz results
+     */
+    renderQuizResults() {
+        const quizContent = document.querySelector('.quiz-content');
+        if (!quizContent) return;
+
+        const percentage = Math.round((this.quizState.score / this.quizState.questions.length) * 100);
+        const passed = percentage >= 70;
+        const timeUsed = 600 - this.quizState.timeRemaining;
+        const minutes = Math.floor(timeUsed / 60);
+        const seconds = timeUsed % 60;
+
+        quizContent.innerHTML = `
+            <div class="quiz-results">
+                <div class="results-header">
+                    <h2>Hasil Kuis Akhir</h2>
+                    <div class="status-badge ${passed ? 'passed' : 'failed'}">
+                        ${passed ? '✅ LULUS' : '❌ TIDAK LULUS'}
+                    </div>
+                </div>
+
+                <div class="score-display">
+                    <div class="score-circle">
+                        <div class="score-percentage">${percentage}%</div>
+                        <div class="score-label">Skor Akhir</div>
+                    </div>
+                    <div class="score-details">
+                        <h3>${this.quizState.score} Benar dari ${this.quizState.questions.length} Soal</h3>
+                        <p>Waktu Pengerjaan: ${minutes} menit ${seconds} detik</p>
+                    </div>
+                </div>
+
+                <div class="results-analysis">
+                    <h3>Analisis Hasil</h3>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <span class="analysis-label">Total Soal:</span>
+                            <span class="analysis-value">${this.quizState.questions.length}</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="analysis-label">Jawaban Benar:</span>
+                            <span class="analysis-value ${passed ? 'grade-excellent' : 'grade-poor'}">${this.quizState.score}</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="analysis-label">Jawaban Salah:</span>
+                            <span class="analysis-value">${this.quizState.questions.length - this.quizState.score}</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="analysis-label">Persentase:</span>
+                            <span class="analysis-value ${percentage >= 90 ? 'grade-excellent' : percentage >= 70 ? 'grade-good' : 'grade-poor'}">${percentage}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                ${passed ? `
+                    <div class="certificate-eligibility">
+                        <h3>🎉 Selamat! Anda Berhak Mendapatkan Sertifikat</h3>
+                        <p>Sertifikat Anda sudah tersedia di menu Sertifikat.</p>
+                        <button class="btn btn-primary" onclick="window.mpiApp.navigateToPage('certificate')">
+                            Lihat Sertifikat
+                        </button>
+                    </div>
+                ` : `
+                    <div class="retry-section">
+                        <h3>💪 Tetap Semangat!</h3>
+                        <p>Anda belum lulus. Coba pelajari materi lagi dan ulangi kuis.</p>
+                        <button class="btn btn-primary" onclick="window.mpiApp.retryQuiz()">
+                            Ulangi Kuis
+                        </button>
+                    </div>
+                `}
+
+                <div class="results-actions">
+                    <button class="btn btn-secondary" onclick="window.mpiApp.showMainMenu()">
+                        Kembali ke Menu
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.mpiApp.reviewQuizAnswers()">
+                        Review Jawaban
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Retry quiz
+     */
+    retryQuiz() {
+        if (confirm('Apakah Anda ingin mengulang kuis? Hasil sebelumnya akan diganti.')) {
+            this.quizState.timeRemaining = 600;
+            this.startQuiz();
+        }
+    }
+
+    /**
+     * Review quiz answers
+     */
+    reviewQuizAnswers() {
+        // This would show detailed review of answers
+        alert('Fitur review jawaban akan segera tersedia.');
+    }
+
+    /**
+     * Exit quiz
+     */
+    exitQuiz() {
+        if (confirm('Apakah Anda yakin ingin keluar dari kuis? Progress yang telah dicapai akan hilang.')) {
+            if (this.quizState.timerInterval) {
+                clearInterval(this.quizState.timerInterval);
+                this.quizState.timerInterval = null;
+            }
+            this.showMainMenu();
+        }
+    }
+
+    /**
+     * Show quiz error
+     */
+    showQuizError(message) {
+        const quizContent = document.querySelector('.quiz-content');
+        if (quizContent) {
+            quizContent.innerHTML = `
+                <div class="error-container">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Terjadi Kesalahan</h3>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="window.mpiApp.initializeQuiz()">Coba Lagi</button>
+                    <button class="btn btn-secondary" onclick="window.mpiApp.showMainMenu()">Kembali ke Menu</button>
+                </div>
+            `;
+        }
     }
 
     /**
@@ -3466,6 +5463,348 @@ class MPIApp {
      */
     initializeCertificate() {
         console.log('Certificate page initialized');
+
+        // Load user progress and certificate data
+        this.loadCertificateStatus();
+        this.updateCertificateRequirements();
+        this.generateCertificatePreview();
+    }
+
+    /**
+     * Load certificate status based on user progress
+     */
+    loadCertificateStatus() {
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        const statusCard = document.getElementById('certificateStatusCard');
+
+        if (!statusCard) return;
+
+        const hasCertificate = progress.certificateUnlocked || false;
+        const quizScore = progress.bestScore || 0;
+        const practiceCompleted = progress.practiceCompleted || 0;
+
+        if (hasCertificate) {
+            // User has certificate - show certificate preview
+            statusCard.innerHTML = `
+                <div class="certificate-unlocked">
+                    <div class="celebration-icon">🏆</div>
+                    <h2>Selamat! Anda Telah Berhasil</h2>
+                    <p>Sertifikat kompetensi jaringan dasar telah tersedia untuk Anda</p>
+                    <div class="achievement-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">${quizScore}%</span>
+                            <span class="stat-label">Nilai Kuis</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${practiceCompleted}</span>
+                            <span class="stat-label">Latihan Selesai</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${this.completionRate || 0}%</span>
+                            <span class="stat-label">Materi Selesai</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="window.mpiApp.showCertificatePreview()">
+                        Lihat Sertifikat
+                    </button>
+                </div>
+            `;
+        } else {
+            // User doesn't have certificate yet
+            const quizPassed = quizScore >= 70;
+            const practiceEnough = practiceCompleted >= 10;
+            const completionEnough = (this.completionRate || 0) >= 80;
+
+            statusCard.innerHTML = `
+                <div class="certificate-locked">
+                    <div class="lock-icon">🔒</div>
+                    <h2>Sertifikat Belum Tersedia</h2>
+                    <p>Selesaikan semua persyaratan di bawah ini untuk mendapatkan sertifikat kompetensi</p>
+                    <div class="progress-overview">
+                        <div class="progress-item ${quizPassed ? 'completed' : 'pending'}">
+                            <span class="progress-icon">${quizPassed ? '✅' : '⭕'}</span>
+                            <span>Kuis Akhir (${quizScore}%)</span>
+                        </div>
+                        <div class="progress-item ${practiceEnough ? 'completed' : 'pending'}">
+                            <span class="progress-icon">${practiceEnough ? '✅' : '⭕'}</span>
+                            <span>Latihan (${practiceCompleted}/10)</span>
+                        </div>
+                        <div class="progress-item ${completionEnough ? 'completed' : 'pending'}">
+                            <span class="progress-icon">${completionEnough ? '✅' : '⭕'}</span>
+                            <span>Materi (${this.completionRate || 0}%)</span>
+                        </div>
+                    </div>
+                    <div class="motivation-message">
+                        <p>💪 <strong>Tetap semangat!</strong> Anda sudah menyelesaikan ${Math.round((quizPassed + practiceEnough + completionEnough) / 3 * 100)}% persyaratan.</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Update certificate requirements display
+     */
+    updateCertificateRequirements() {
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+
+        // Update quiz status
+        const quizStatus = document.getElementById('quiz-status');
+        if (quizStatus) {
+            const quizScore = progress.bestScore || 0;
+            quizStatus.textContent = quizScore >= 70 ? `Lulus (${quizScore}%)` : `Belum (${quizScore}%)`;
+        }
+
+        // Update practice status
+        const practiceStatus = document.getElementById('practice-status');
+        if (practiceStatus) {
+            const practiceCompleted = progress.practiceCompleted || 0;
+            practiceStatus.textContent = `${practiceCompleted}/10`;
+        }
+
+        // Update completion status
+        const completionStatus = document.getElementById('completion-status');
+        if (completionStatus) {
+            completionStatus.textContent = `${this.completionRate || 0}%`;
+        }
+    }
+
+    /**
+     * Show certificate preview
+     */
+    showCertificatePreview() {
+        const previewSection = document.getElementById('certificatePreviewSection');
+        if (previewSection) {
+            previewSection.style.display = 'block';
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    /**
+     * Generate certificate preview
+     */
+    generateCertificatePreview() {
+        const certificateFrame = document.getElementById('certificateFrame');
+        if (!certificateFrame) return;
+
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        const currentDate = new Date().toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        certificateFrame.innerHTML = `
+            <div class="certificate-content" id="certificateContent">
+                <div class="certificate-border">
+                    <div class="certificate-header">
+                        <div class="certificate-logo">
+                            <div class="logo-icon">🏫</div>
+                            <div class="logo-text">
+                                <h3>SMK TAMAN KARYA JASA TEKNIK</h3>
+                                <p>Jurusan Teknik Komputer dan Jaringan</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="certificate-body">
+                        <div class="certificate-title">
+                            <h1>SERTIFIKAT KOMPETENSI</h1>
+                            <h2>JARINGAN DASAR</h2>
+                        </div>
+
+                        <div class="certificate-text">
+                            <p>Dengan ini dinyatakan bahwa:</p>
+                            <div class="student-name">
+                                <h3>${this.studentName || 'Peserta Didik'}</h3>
+                            </div>
+                            <p>Telah berhasil menyelesaikan pembelajaran dan lulus evaluasi kompetensi</p>
+                            <p>pada program <strong>Media Pembelajaran Interaktif Jaringan Dasar</strong></p>
+                        </div>
+
+                        <div class="certificate-details">
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Nilai Akhir:</span>
+                                    <span class="detail-value">${progress.bestScore || 0}%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Tanggal:</span>
+                                    <span class="detail-value">${currentDate}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Kode Sertifikat:</span>
+                                    <span class="detail-value">MPI-JD-${Date.now().toString().slice(-6)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="certificate-signatures">
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <p class="signature-title">Kepala Jurusan TKJ</p>
+                            </div>
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <p class="signature-title">Guru Pembimbing</p>
+                            </div>
+                        </div>
+
+                        <div class="certificate-seal">
+                            <div class="seal-icon">🏆</div>
+                            <div class="seal-text">RESMI</div>
+                        </div>
+                    </div>
+
+                    <div class="certificate-footer">
+                        <p><em>"Menguasai Teknologi, Membangun Masa Depan"</em></p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Download certificate as PDF
+     */
+    downloadCertificate() {
+        const certificateContent = document.getElementById('certificateContent');
+        if (!certificateContent) {
+            this.showNotification('Sertifikat belum tersedia', 'error');
+            return;
+        }
+
+        // Add loading state
+        const downloadBtn = event.target;
+        const originalText = downloadBtn.innerHTML;
+        downloadBtn.innerHTML = '<span class="btn-icon">⏳</span> Mengunduh...';
+        downloadBtn.disabled = true;
+
+        // Use html2canvas and jsPDF to create PDF
+        html2canvas(certificateContent, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new window.jspdf.jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const imgWidth = 297; // A4 width in mm (landscape)
+            const pageHeight = 210; // A4 height in mm (landscape)
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            // Download the PDF
+            const fileName = `Sertifikat_Jaringan_Dasar_${this.studentName || 'Peserta'}_${Date.now()}.pdf`;
+            pdf.save(fileName);
+
+            // Reset button
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+
+            this.showNotification('Sertifikat berhasil diunduh!', 'success');
+        }).catch(error => {
+            console.error('Error generating PDF:', error);
+            this.showNotification('Gagal mengunduh sertifikat', 'error');
+
+            // Reset button
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+        });
+    }
+
+    /**
+     * Share certificate
+     */
+    shareCertificate() {
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+
+        if (!progress.certificateUnlocked) {
+            this.showNotification('Selesaikan semua persyaratan terlebih dahulu', 'warning');
+            return;
+        }
+
+        const shareData = {
+            title: 'Sertifikat Kompetensi Jaringan Dasar',
+            text: `Saya telah mendapatkan sertifikat kompetensi jaringan dasar dengan nilai ${progress.bestScore}%! 🏆`,
+            url: window.location.href
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData)
+                .then(() => this.showNotification('Sertifikat berhasil dibagikan!', 'success'))
+                .catch(error => {
+                    if (error.name !== 'AbortError') {
+                        console.error('Error sharing:', error);
+                    }
+                });
+        } else {
+            // Fallback - copy to clipboard
+            const textToCopy = `Saya telah mendapatkan sertifikat kompetensi jaringan dasar dengan nilai ${progress.bestScore}%! 🏆\n${shareData.url}`;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                this.showNotification('Tautan sertifikat disalin ke clipboard!', 'success');
+            }).catch(error => {
+                console.error('Error copying to clipboard:', error);
+                this.showNotification('Gagal membagikan sertifikat', 'error');
+            });
+        }
+    }
+
+    /**
+     * Print certificate
+     */
+    printCertificate() {
+        const certificateContent = document.getElementById('certificateContent');
+        if (!certificateContent) {
+            this.showNotification('Sertifikat belum tersedia', 'error');
+            return;
+        }
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Sertifikat Kompetensi</title>
+                <style>
+                    body { margin: 0; padding: 20px; font-family: 'Times New Roman', serif; }
+                    @media print { body { margin: 0; } }
+                    .certificate-content { width: 100%; max-width: 1200px; margin: 0 auto; }
+                </style>
+            </head>
+            <body>
+                ${certificateContent.outerHTML}
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+
+        // Wait for content to load before printing
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
+
+        this.showNotification('Dialog cetak terbuka', 'info');
     }
 
     /**
@@ -3579,12 +5918,662 @@ class MPIApp {
             element.scrollTop = element.scrollHeight;
         }
     }
+
+    /**
+     * Initialize Enhanced Test System
+     */
+    initializeEnhancedTest() {
+        console.log('Initializing Enhanced Test System...');
+
+        // Show enhanced test selection screen
+        this.showEnhancedTestSelection();
+    }
+
+    /**
+     * Initialize Enhanced Quiz System
+     */
+    initializeEnhancedQuiz() {
+        console.log('Initializing Enhanced Quiz System...');
+        console.log('Enhanced Quiz System available:', !!this.enhancedQuizSystem);
+
+        if (this.enhancedQuizSystem) {
+            this.startEnhancedQuiz();
+        } else {
+            console.warn('Enhanced Quiz System not available, falling back to original quiz');
+            // Fallback to original quiz system
+            this.initializeOriginalQuiz();
+        }
+    }
+
+    /**
+     * Start Enhanced Quiz
+     */
+    startEnhancedQuiz() {
+        console.log('Starting Enhanced Quiz...');
+
+        // Load quiz questions
+        this.loadQuizQuestions();
+
+        // Get questions from data or use fallback
+        const questions = this.getQuizQuestions();
+
+        if (questions.length === 0) {
+            this.showError('Tidak ada soal kuis yang tersedia');
+            return;
+        }
+
+        // Initialize enhanced quiz system with questions
+        this.enhancedQuizSystem.initializeQuiz(questions, {
+            allowBackNavigation: true,
+            showImmediateFeedback: false,
+            timePerQuestion: null,
+            passingScore: 70,
+            shuffleQuestions: true,
+            shuffleAnswers: true,
+            category: 'final'
+        });
+
+        // Start the quiz
+        this.enhancedQuizSystem.startQuiz();
+    }
+
+    /**
+     * Get quiz questions with fallback data
+     */
+    getQuizQuestions() {
+        // Try to get from loaded data first
+        if (window.appData && window.appData.quiz_akhir && window.appData.quiz_akhir.length > 0) {
+            return window.appData.quiz_akhir.map((q, index) => ({
+                id: q.id || `quiz-${index + 1}`,
+                pertanyaan: q.pertanyaan || q.question,
+                options: q.options || q.jawaban,
+                jawaban_benar: q.jawaban_benar || q.correctAnswer,
+                points: q.points || 10,
+                type: q.type || 'multiple-choice'
+            }));
+        }
+
+        // Fallback questions if no data available
+        return [
+            {
+                id: 'fallback-1',
+                pertanyaan: 'Apa fungsi utama dari router dalam jaringan komputer?',
+                options: [
+                    'Menghubungkan jaringan lokal dengan internet',
+                    'Memberikan alamat IP ke perangkat',
+                    'Melindungi jaringan dari virus',
+                    'Menyimpan data pengguna'
+                ],
+                jawaban_benar: 0,
+                points: 10,
+                type: 'multiple-choice'
+            },
+            {
+                id: 'fallback-2',
+                pertanyaan: 'Protokol mana yang digunakan untuk pengiriman email?',
+                options: ['HTTP', 'FTP', 'SMTP', 'SSH'],
+                jawaban_benar: 2,
+                points: 10,
+                type: 'multiple-choice'
+            },
+            {
+                id: 'fallback-3',
+                pertanyaan: 'OSI Layer yang bertanggung jawab untuk routing adalah...',
+                options: ['Physical', 'Data Link', 'Network', 'Transport'],
+                jawaban_benar: 2,
+                points: 10,
+                type: 'multiple-choice'
+            },
+            {
+                id: 'fallback-4',
+                pertanyaan: 'Topologi jaringan yang paling reliable adalah...',
+                options: ['Bus', 'Star', 'Ring', 'Mesh'],
+                jawaban_benar: 1,
+                points: 10,
+                type: 'multiple-choice'
+            },
+            {
+                id: 'fallback-5',
+                pertanyaan: 'Firewall berfungsi untuk...',
+                options: [
+                    'Mempercepat koneksi internet',
+                    'Memblokir akses yang tidak sah',
+                    'Mengompres file',
+                    'Backup data otomatis'
+                ],
+                jawaban_benar: 1,
+                points: 10,
+                type: 'multiple-choice'
+            }
+        ];
+    }
+
+    /**
+     * Show Enhanced Test Selection Screen
+     */
+    showEnhancedTestSelection() {
+        const contentPages = document.getElementById('contentPages');
+        if (!contentPages) return;
+
+        contentPages.innerHTML = `
+            <div class="page" data-page="test">
+                <div class="page-header">
+                    <div class="container">
+                        <h1>Test Pengetahuan Jaringan Komputer</h1>
+                        <button class="btn-back" onclick="window.mpiApp.showMainMenu()">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                            </svg>
+                            Kembali ke Menu
+                        </button>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <div class="container">
+                        <div class="enhanced-test-selection">
+                            <div class="selection-intro">
+                                <h2>Pilih Mode Test</h2>
+                                <p>Tingkatkan pemahaman Anda tentang jaringan komputer dengan tes interaktif yang adaptif.</p>
+                            </div>
+
+                            <div class="test-modes-grid">
+                                <!-- Quick Practice -->
+                                <div class="test-mode-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'quick', category: 'mixed' })">
+                                    <div class="mode-icon">⚡</div>
+                                    <h3>Quick Practice</h3>
+                                    <p>10 soal acak dari semua materi</p>
+                                    <div class="mode-details">
+                                        <span>📊 Tanpa timer</span>
+                                        <span>🎯 Semua tingkat kesulitan</span>
+                                        <span>🔄 Dapat diulang</span>
+                                    </div>
+                                    <button class="btn btn-secondary">Mulai Test</button>
+                                </div>
+
+                                <!-- Category Test -->
+                                <div class="test-mode-card" onclick="window.mpiApp.showCategorySelection()">
+                                    <div class="mode-icon">📚</div>
+                                    <h3>Test per Kategori</h3>
+                                    <p>Fokus pada materi spesifik</p>
+                                    <div class="mode-details">
+                                        <span>📝 Dasar Jaringan</span>
+                                        <span>🌐 Topologi Jaringan</span>
+                                        <span>🔐 Model OSI & TCP/IP</span>
+                                        <span>🛡️ Keamanan Jaringan</span>
+                                    </div>
+                                    <button class="btn btn-secondary">Pilih Kategori</button>
+                                </div>
+
+                                <!-- Adaptive Test -->
+                                <div class="test-mode-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'adaptive', category: 'mixed' })">
+                                    <div class="mode-icon">🧠</div>
+                                    <h3>Adaptive Test</h3>
+                                    <p>Test dengan kesulitan yang menyesuaikan</p>
+                                    <div class="mode-details">
+                                        <span>⚙️ Kesulitan adaptif</span>
+                                        <span>📈 Progress tracking</span>
+                                        <span>🏆 Achievement system</span>
+                                    </div>
+                                    <button class="btn btn-primary">Mulai Test</button>
+                                </div>
+
+                                <!-- Timed Challenge -->
+                                <div class="test-mode-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'timed', category: 'mixed', timeLimit: 600 })">
+                                    <div class="mode-icon">⏱️</div>
+                                    <h3>Timed Challenge</h3>
+                                    <p>Test dengan batas waktu 10 menit</p>
+                                    <div class="mode-details">
+                                        <span>⏰ 10 menit</span>
+                                        <span>🔥 Semua soal</span>
+                                        <span>📊 Live scoring</span>
+                                    </div>
+                                    <button class="btn btn-warning">Mulai Challenge</button>
+                                </div>
+
+                                <!-- Final Exam -->
+                                <div class="test-mode-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'final', category: 'mixed', questionCount: 30, timeLimit: 1800 })">
+                                    <div class="mode-icon">🎓</div>
+                                    <h3>Final Exam</h3>
+                                    <p>Ujian komprehensif 30 soal</p>
+                                    <div class="mode-details">
+                                        <span>📋 30 soal</span>
+                                        <span>⏰ 30 menit</span>
+                                        <span>🏆 Sertifikat</span>
+                                        <span>📊 Analisis lengkap</span>
+                                    </div>
+                                    <button class="btn btn-danger">Mulai Final Exam</button>
+                                </div>
+
+                                <!-- Custom Test -->
+                                <div class="test-mode-card" onclick="window.mpiApp.showCustomTestOptions()">
+                                    <div class="mode-icon">⚙️</div>
+                                    <h3>Custom Test</h3>
+                                    <p>Sesuaikan test sesuai kebutuhan</p>
+                                    <div class="mode-details">
+                                        <span>🎯 Pilih kategori</span>
+                                        <span>📊 Tentukan jumlah soal</span>
+                                        <span>⏰ Atur waktu</span>
+                                        <span>🔧 Tingkat kesulitan</span>
+                                    </div>
+                                    <button class="btn btn-secondary">Buat Test</button>
+                                </div>
+                            </div>
+
+                            <!-- Test Statistics -->
+                            <div class="test-stats-overview">
+                                <h3>Statistik Anda</h3>
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <div class="stat-value">${this.getUserTotalTests() || 0}</div>
+                                        <div class="stat-label">Total Test</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${this.getUserAverageScore() || 0}%</div>
+                                        <div class="stat-label">Skor Rata-rata</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${this.getUserBestScore() || 0}%</div>
+                                        <div class="stat-label">Skor Tertinggi</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${this.getUserStreak() || 0}</div>
+                                        <div class="stat-label">Current Streak</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Show Category Selection for Enhanced Test
+     */
+    showCategorySelection() {
+        const contentPages = document.getElementById('contentPages');
+        if (!contentPages) return;
+
+        contentPages.innerHTML = `
+            <div class="page" data-page="test">
+                <div class="page-header">
+                    <div class="container">
+                        <h1>Pilih Kategori Test</h1>
+                        <button class="btn-back" onclick="window.mpiApp.initializeTest()">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                            </svg>
+                            Kembali
+                        </button>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <div class="container">
+                        <div class="category-selection">
+                            <div class="categories-grid">
+                                <div class="category-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'category', category: 'network-basics' })">
+                                    <div class="category-icon">🌐</div>
+                                    <h3>Dasar Jaringan</h3>
+                                    <p>Konsep fundamental jaringan komputer</p>
+                                    <div class="category-info">
+                                        <span>15 soal</span>
+                                        <span>Pemula</span>
+                                    </div>
+                                </div>
+
+                                <div class="category-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'category', category: 'network-topology' })">
+                                    <div class="category-icon">🔗</div>
+                                    <h3>Topologi Jaringan</h3>
+                                    <p>Berbagai jenis topologi dan karakteristiknya</p>
+                                    <div class="category-info">
+                                        <span>12 soal</span>
+                                        <span>Menengah</span>
+                                    </div>
+                                </div>
+
+                                <div class="category-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'category', category: 'osi-model' })">
+                                    <div class="category-icon">📊</div>
+                                    <h3>Model OSI & TCP/IP</h3>
+                                    <p>Layer network dan protokol komunikasi</p>
+                                    <div class="category-info">
+                                        <span>18 soal</span>
+                                        <span>Menengah</span>
+                                    </div>
+                                </div>
+
+                                <div class="category-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'category', category: 'network-protocols' })">
+                                    <div class="category-icon">📡</div>
+                                    <h3>Protokol Jaringan</h3>
+                                    <p>Berbagai protokol komunikasi data</p>
+                                    <div class="category-info">
+                                        <span>20 soal</span>
+                                        <span>Lanjutan</span>
+                                    </div>
+                                </div>
+
+                                <div class="category-card" onclick="window.mpiApp.startEnhancedTest({ mode: 'category', category: 'network-security' })">
+                                    <div class="category-icon">🛡️</div>
+                                    <h3>Keamanan Jaringan</h3>
+                                    <p>Konsep dan praktik keamanan jaringan</p>
+                                    <div class="category-info">
+                                        <span>25 soal</span>
+                                        <span>Lanjutan</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Show Custom Test Options
+     */
+    showCustomTestOptions() {
+        const contentPages = document.getElementById('contentPages');
+        if (!contentPages) return;
+
+        contentPages.innerHTML = `
+            <div class="page" data-page="test">
+                <div class="page-header">
+                    <div class="container">
+                        <h1>Buat Test Kustom</h1>
+                        <button class="btn-back" onclick="window.mpiApp.initializeTest()">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                            </svg>
+                            Kembali
+                        </button>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <div class="container">
+                        <div class="custom-test-config">
+                            <div class="config-form">
+                                <h3>Konfigurasi Test Anda</h3>
+
+                                <div class="form-group">
+                                    <label for="customCategory">Pilih Kategori:</label>
+                                    <select id="customCategory" class="form-select">
+                                        <option value="mixed">Campuran</option>
+                                        <option value="network-basics">Dasar Jaringan</option>
+                                        <option value="network-topology">Topologi Jaringan</option>
+                                        <option value="osi-model">Model OSI & TCP/IP</option>
+                                        <option value="network-protocols">Protokol Jaringan</option>
+                                        <option value="network-security">Keamanan Jaringan</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="customDifficulty">Tingkat Kesulitan:</label>
+                                    <select id="customDifficulty" class="form-select">
+                                        <option value="mixed">Campuran</option>
+                                        <option value="easy">Mudah</option>
+                                        <option value="medium">Sedang</option>
+                                        <option value="hard">Sulit</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="customQuestions">Jumlah Soal:</label>
+                                    <input type="number" id="customQuestions" class="form-input" min="5" max="50" value="15">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="customTime">Waktu (menit):</label>
+                                    <input type="number" id="customTime" class="form-input" min="0" max="120" value="0" placeholder="0 = tanpa batas waktu">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="enableHints" checked>
+                                        <span>Aktifkan petunjuk</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="enableExplanations" checked>
+                                        <span>Tampilkan penjelasan</span>
+                                    </label>
+                                </div>
+
+                                <button class="btn btn-primary btn-large" onclick="window.mpiApp.startCustomTest()">
+                                    Mulai Test Kustom
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Start Custom Test
+     */
+    startCustomTest() {
+        const category = document.getElementById('customCategory').value;
+        const difficulty = document.getElementById('customDifficulty').value;
+        const questionCount = parseInt(document.getElementById('customQuestions').value);
+        const timeLimit = parseInt(document.getElementById('customTime').value) * 60; // Convert to seconds
+        const enableHints = document.getElementById('enableHints').checked;
+        const enableExplanations = document.getElementById('enableExplanations').checked;
+
+        this.startEnhancedTest({
+            mode: 'custom',
+            category: category,
+            difficulty: difficulty,
+            questionCount: questionCount,
+            timeLimit: timeLimit,
+            enableHints: enableHints,
+            enableExplanations: enableExplanations
+        });
+    }
+
+    /**
+     * Start Enhanced Test
+     */
+    startEnhancedTest(options = {}) {
+        console.log('Starting Enhanced Test with options:', options);
+
+        if (!this.enhancedTestSystem) {
+            console.error('Enhanced Test System not initialized');
+            this.showNotification('Enhanced Test System tidak tersedia', 'error');
+            return;
+        }
+
+        // Configure test options
+        const testOptions = {
+            category: options.category || 'mixed',
+            difficulty: options.difficulty || 'mixed',
+            questionCount: options.questionCount || (options.mode === 'quick' ? 10 : options.mode === 'final' ? 30 : 20),
+            timeLimit: options.timeLimit || (options.mode === 'timed' ? 600 : options.mode === 'final' ? 1800 : 0),
+            adaptiveMode: options.mode === 'adaptive' || false,
+            enableHints: options.enableHints !== false,
+            enableExplanations: options.enableExplanations !== false
+        };
+
+        // Start the test session
+        const testState = this.enhancedTestSystem.startTestSession(testOptions);
+
+        // Show test interface
+        this.showEnhancedTestInterface(testState);
+    }
+
+    /**
+     * Show Enhanced Test Interface
+     */
+    showEnhancedTestInterface(testState) {
+        const contentPages = document.getElementById('contentPages');
+        if (!contentPages) return;
+
+        contentPages.innerHTML = `
+            <div class="page" data-page="test">
+                <div class="page-header">
+                    <div class="container">
+                        <h1>Enhanced Test - ${testState.config.category === 'mixed' ? 'Campuran' : testState.config.category}</h1>
+                        <button class="btn-back" onclick="window.mpiApp.exitTest()">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                            </svg>
+                            Keluar Test
+                        </button>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <div class="container">
+                        <div class="enhanced-test-container">
+                            <div class="test-header">
+                                <div class="test-title">Test Pengetahuan Jaringan Komputer</div>
+                                <div class="test-info">
+                                    <div class="test-timer" id="testTimer">
+                                        ${this.formatTime(testState.timeRemaining)}
+                                    </div>
+                                    <div class="test-score">
+                                        Skor: <span id="currentScore">0</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="question-container" id="questionContainer">
+                                <!-- Question will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Exit Enhanced Test
+     */
+    exitTest() {
+        if (this.enhancedTestSystem && this.enhancedTestSystem.testEngine) {
+            const confirmExit = confirm('Apakah Anda yakin ingin keluar dari test? Progress Anda akan hilang.');
+            if (confirmExit) {
+                this.enhancedTestSystem.testEngine.pause();
+                this.initializeTest();
+            }
+        } else {
+            this.initializeTest();
+        }
+    }
+
+    /**
+     * Initialize Original Test System (Fallback)
+     */
+    initializeOriginalTest() {
+        console.log('Using original test system (fallback)');
+
+        // Initialize test state
+        this.testState = {
+            questions: [],
+            currentQuestionIndex: 0,
+            answers: [],
+            score: 0,
+            isTestCompleted: false,
+            selectedTopics: [],
+            currentCategory: null
+        };
+
+        // Load test data and initialize interface
+        this.loadTestData();
+        this.renderTestSelection();
+    }
+
+    /**
+     * Initialize Original Quiz System (Fallback)
+     */
+    initializeOriginalQuiz() {
+        console.log('Using original quiz system (fallback)');
+
+        // Initialize quiz state
+        this.quizState = {
+            questions: [],
+            currentQuestionIndex: 0,
+            answers: [],
+            score: 0,
+            isQuizStarted: false,
+            isQuizCompleted: false,
+            timeRemaining: 600, // 10 minutes
+            timerInterval: null,
+            startTime: null,
+            endTime: null
+        };
+
+        // Load quiz data and initialize interface
+        this.loadQuizQuestions();
+        this.initializeQuiz();
+    }
+
+    /**
+     * Get user total tests
+     */
+    getUserTotalTests() {
+        return Object.keys(this.userData.scores || {}).length;
+    }
+
+    /**
+     * Get user average score
+     */
+    getUserAverageScore() {
+        const scores = Object.values(this.userData.scores || {});
+        if (scores.length === 0) return 0;
+        const total = scores.reduce((sum, score) => sum + (score.score || 0), 0);
+        return Math.round(total / scores.length);
+    }
+
+    /**
+     * Get user best score
+     */
+    getUserBestScore() {
+        const scores = Object.values(this.userData.scores || {});
+        if (scores.length === 0) return 0;
+        return Math.max(...scores.map(score => score.score || 0));
+    }
+
+    /**
+     * Get user current streak
+     */
+    getUserStreak() {
+        // This would need to be implemented based on user test history
+        return this.userData.currentStreak || 0;
+    }
+
+    /**
+     * Format time display
+     */
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
 }
 
 // Initialize app when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing MPI App...');
     window.mpiApp = new MPIApp();
+
+    // Initialize Enhanced Quiz System after app is ready
+    setTimeout(() => {
+        if (window.mpiApp && typeof EnhancedQuizSystem !== 'undefined') {
+            window.mpiApp.enhancedQuizSystem = new EnhancedQuizSystem(window.mpiApp);
+            console.log('Enhanced Quiz System integrated with main app');
+            console.log('Enhanced Quiz System available:', window.mpiApp.enhancedQuizSystem);
+        } else {
+            console.warn('Enhanced Quiz System not available, will use fallback');
+        }
+    }, 1500);
 });
 
 // Fallback initialization if DOMContentLoaded already fired
