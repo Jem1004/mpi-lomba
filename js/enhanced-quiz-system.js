@@ -38,6 +38,46 @@ class EnhancedQuizSystem {
     }
 
     /**
+     * Generate consistent page header (using main app method if available)
+     */
+    generatePageHeader(title, subtitle = '', showBackButton = true, backAction = null, extraInfo = '') {
+        // Use main app's header generator if available
+        if (this.app && this.app.generatePageHeader) {
+            return this.app.generatePageHeader(title, subtitle, showBackButton, backAction, extraInfo);
+        }
+
+        // Fallback header generation
+        const backButtonText = backAction ? '← Kembali' : '← Kembali';
+        const backClickHandler = backAction || 'window.enhancedQuizSystem.backToMenu()';
+
+        return `
+            <header class="page-header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="header-left">
+                            ${showBackButton ? `
+                                <button class="btn-back" onclick="${backClickHandler}">
+                                    <svg viewBox="0 0 24 24" class="back-icon">
+                                        <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                                    </svg>
+                                    ${backButtonText}
+                                </button>
+                            ` : ''}
+                        </div>
+                        <div class="header-center">
+                            <h1 class="page-title">${title}</h1>
+                            ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
+                        </div>
+                        <div class="header-right">
+                            ${extraInfo}
+                        </div>
+                    </div>
+                </div>
+            </header>
+        `;
+    }
+
+    /**
      * Initialize event listeners for quiz navigation
      */
     initializeEventListeners() {
@@ -67,18 +107,45 @@ class EnhancedQuizSystem {
      * Initialize quiz with questions
      */
     initializeQuiz(questions, config = {}) {
+        console.log('🚀 Initializing Enhanced Quiz System...');
+        console.log(`📝 Questions received: ${questions.length}`);
+
+        // Validate questions
+        if (!questions || questions.length === 0) {
+            throw new Error('No questions provided for quiz initialization');
+        }
+
+        // Validate question format
+        questions.forEach((q, index) => {
+            const hasQuestion = q.pertanyaan || q.question;
+            const hasOptions = q.options || q.jawaban;
+
+            if (!hasQuestion || !hasOptions) {
+                console.warn(`⚠️ Question ${index + 1} has invalid format:`, q);
+                console.warn(`Missing:`, {
+                    question: hasQuestion ? '✓' : '✗',
+                    options: hasOptions ? '✓' : '✗',
+                    data: q
+                });
+            }
+        });
+
         // Merge config with defaults
         this.config = { ...this.config, ...config };
+        console.log('⚙️ Quiz config:', this.config);
+
+        // Shuffle questions if enabled
+        const shuffledQuestions = this.config.shuffleQuestions ? this.shuffleArray([...questions]) : [...questions];
 
         // Reset state
         this.quizState = {
-            questions: this.config.shuffleQuestions ? this.shuffleArray([...questions]) : [...questions],
+            questions: shuffledQuestions,
             currentQuestionIndex: 0,
-            answers: new Array(questions.length).fill(null),
+            answers: new Array(shuffledQuestions.length).fill(null),
             score: 0,
             isQuizStarted: false,
             isQuizCompleted: false,
-            timeRemaining: this.config.timePerQuestion ? this.config.timePerQuestion * questions.length : 600,
+            timeRemaining: this.config.timeLimit || 600,
             timerInterval: null,
             startTime: null,
             endTime: null,
@@ -90,21 +157,21 @@ class EnhancedQuizSystem {
         // Shuffle answers for each question if enabled
         if (this.config.shuffleAnswers) {
             this.quizState.questions = this.quizState.questions.map(question => {
-                if (question.options && question.type === 'multiple-choice') {
+                if (question.options && (question.type === 'multiple-choice' || !question.type)) {
                     return this.shuffleQuestionAnswers(question);
                 }
                 return question;
             });
         }
 
-        console.log('Enhanced Quiz System initialized with', this.quizState.questions.length, 'questions');
+        console.log(`✅ Quiz initialized with ${this.quizState.questions.length} questions`);
     }
 
     /**
      * Start the quiz
      */
     startQuiz() {
-        console.log('Starting Enhanced Quiz with', this.quizState.questions.length, 'questions');
+        console.log('🚀 Starting Enhanced Quiz with', this.quizState.questions.length, 'questions');
 
         if (this.quizState.questions.length === 0) {
             console.error('No questions available for quiz');
@@ -140,19 +207,10 @@ class EnhancedQuizSystem {
         }
 
         try {
+            const timerInfo = `<div class="quiz-timer" id="quizTimer">${this.formatTime(this.quizState.timeRemaining)}</div>`;
             contentPages.innerHTML = `
                 <div class="page" data-page="quiz">
-                    <div class="page-header">
-                        <div class="container">
-                            <h1>Kuis Jaringan Komputer</h1>
-                            <button class="btn-back" onclick="window.enhancedQuizSystem.exitQuiz()">
-                                <svg class="icon" viewBox="0 0 24 24">
-                                    <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                                </svg>
-                                Kembali
-                            </button>
-                        </div>
-                    </div>
+                    ${this.generatePageHeader('Kuis Jaringan Komputer', `Final Quiz - ${this.quizState.category}`, true, 'window.enhancedQuizSystem.exitQuiz()', timerInfo)}
 
                     <div class="page-content">
                         <div class="container">
@@ -751,19 +809,14 @@ class EnhancedQuizSystem {
 
         const passed = this.quizState.score >= this.config.passingScore;
 
+        const title = passed ? '🎉 Selamat! Anda Lulus' : '💪 Belum Lulus, Coba Lagi!';
+        const subtitle = passed ? 'Prestasi yang sangat baik!' : 'Terus belajar dan coba lagi.';
+        const resultIcon = passed ? '🏆' : '📚';
+        const extraInfo = `<div class="result-icon ${passed ? 'passed' : 'failed'}">${resultIcon}</div>`;
+
         contentPages.innerHTML = `
             <div class="page" data-page="quiz-results">
-                <div class="page-header">
-                    <div class="container">
-                        <h1>Hasil Kuis</h1>
-                        <button class="btn-back" onclick="window.enhancedQuizSystem.backToMenu()">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                            </svg>
-                            Kembali ke Menu
-                        </button>
-                    </div>
-                </div>
+                ${this.generatePageHeader(title, subtitle, true, 'window.enhancedQuizSystem.backToMenu()', extraInfo)}
 
                 <div class="page-content">
                     <div class="container">
@@ -853,17 +906,7 @@ class EnhancedQuizSystem {
 
         contentPages.innerHTML = `
             <div class="page" data-page="quiz-error">
-                <div class="page-header">
-                    <div class="container">
-                        <h1>Kuis - Error</h1>
-                        <button class="btn-back" onclick="window.enhancedQuizSystem.backToMenu()">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                            </svg>
-                            Kembali ke Menu
-                        </button>
-                    </div>
-                </div>
+                ${this.generatePageHeader('Kuis - Error', 'Terjadi kesalahan saat memuat kuis', true, 'window.enhancedQuizSystem.backToMenu()')}
 
                 <div class="page-content">
                     <div class="container">
@@ -971,9 +1014,11 @@ class EnhancedQuizSystem {
         }
 
         const shuffledQuestion = { ...question };
+        const correctAnswerIndex = question.jawaban_benar || question.correctAnswer;
+
         const optionsWithIndex = question.options.map((option, index) => ({
             text: option,
-            isCorrect: index === question.jawaban_benar
+            isCorrect: index === correctAnswerIndex
         }));
 
         // Shuffle options
@@ -982,6 +1027,7 @@ class EnhancedQuizSystem {
         // Update question with shuffled options and new correct answer index
         shuffledQuestion.options = shuffledOptions.map(opt => opt.text);
         shuffledQuestion.jawaban_benar = shuffledOptions.findIndex(opt => opt.isCorrect);
+        shuffledQuestion.correctAnswer = shuffledOptions.findIndex(opt => opt.isCorrect);
 
         return shuffledQuestion;
     }

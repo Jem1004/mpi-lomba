@@ -32,6 +32,16 @@ class EnhancedTestSystem {
      * Initialize comprehensive question bank
      */
     async initializeQuestionBank() {
+        console.log('📚 Initializing Enhanced Question Bank...');
+
+        // Add empty categories that will be populated dynamically
+        this.questionBank.addCategory('practice', {
+            title: 'Latihan Formatif',
+            description: 'Test pengetahuan untuk latihan tanpa tekanan',
+            difficulty: 'mixed',
+            questions: []
+        });
+
         // Network Fundamentals Questions
         this.questionBank.addCategory('network-basics', {
             title: 'Dasar Jaringan Komputer',
@@ -266,11 +276,15 @@ class EnhancedTestSystem {
             timeLimit: options.timeLimit || (this.config.timePerQuestion * options.questionCount),
             adaptiveMode: options.adaptiveMode || this.config.adaptiveDifficulty,
             enableHints: options.enableHints !== undefined ? options.enableHints : this.config.enableHints,
-            enableExplanations: options.enableExplanations !== undefined ? options.enableExplanations : this.config.enableExplanations
+            enableExplanations: options.enableExplanations !== undefined ? options.enableExplanations : this.config.enableExplanations,
+            mode: options.mode || 'test'
         };
 
         // Generate test questions
         const questions = this.generateTestQuestions(testConfig);
+
+        // Create the test interface in the DOM
+        this.createTestInterface(testConfig, questions);
 
         // Initialize test engine
         this.testEngine.initialize({
@@ -291,27 +305,265 @@ class EnhancedTestSystem {
     }
 
     /**
+     * Create the test interface in the DOM
+     */
+    createTestInterface(config, questions) {
+        const contentPages = document.getElementById('contentPages');
+        if (!contentPages) {
+            throw new Error('Content pages container not found');
+        }
+
+        const isPractice = config.mode === 'practice';
+
+        contentPages.innerHTML = `
+            <div class="page enhanced-test-page">
+                ${this.generateConsistentHeader(config, isPractice)}
+
+                <main class="test-content">
+                    <div class="container">
+                        <div id="questionContainer" class="question-container">
+                            <!-- Questions will be rendered here -->
+                        </div>
+                    </div>
+                </main>
+
+                <div class="test-sidebar">
+                    <div class="question-overview">
+                        <h3>Ringkasan Soal</h3>
+                        <div class="overview-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Soal</span>
+                                <span class="stat-value" id="totalQuestions">${questions.length}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Dijawab</span>
+                                <span class="stat-value" id="answeredQuestions">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Skor Sementara</span>
+                                <span class="stat-value" id="currentScore">0</span>
+                            </div>
+                        </div>
+                        <div class="question-grid" id="questionGrid">
+                            <!-- Question indicators will be rendered here -->
+                        </div>
+                    </div>
+
+                    ${config.enableHints ? `
+                        <div class="test-help">
+                            <h3>Bantuan</h3>
+                            <div class="help-content">
+                                <div class="help-item">
+                                    <span class="help-icon">💡</span>
+                                    <span>Baca soal dengan teliti</span>
+                                </div>
+                                <div class="help-item">
+                                    <span class="help-icon">🎯</span>
+                                    <span>Pilih jawaban terbaik</span>
+                                </div>
+                                <div class="help-item">
+                                    <span class="help-icon">⏰</span>
+                                    <span>${config.timeLimit > 0 ? 'Kelola waktu dengan baik' : 'Kerjakan dengan santai'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Generate consistent page header (using main app method if available)
+     */
+    generatePageHeader(title, subtitle = '', showBackButton = true, backAction = null, extraInfo = '') {
+        // Use main app's header generator if available
+        if (this.app && this.app.generatePageHeader) {
+            return this.app.generatePageHeader(title, subtitle, showBackButton, backAction, extraInfo);
+        }
+
+        // Fallback header generation
+        const backButtonText = backAction ? '← Kembali' : '← Kembali';
+        const backClickHandler = backAction || 'window.enhancedTestSystem.exitTest()';
+
+        return `
+            <header class="page-header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="header-left">
+                            ${showBackButton ? `
+                                <button class="btn-back" onclick="${backClickHandler}">
+                                    <svg viewBox="0 0 24 24" class="back-icon">
+                                        <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                                    </svg>
+                                    ${backButtonText}
+                                </button>
+                            ` : ''}
+                        </div>
+                        <div class="header-center">
+                            <h1 class="page-title">${title}</h1>
+                            ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
+                        </div>
+                        <div class="header-right">
+                            ${extraInfo}
+                        </div>
+                    </div>
+                </div>
+            </header>
+        `;
+    }
+
+    /**
+     * Generate consistent header for test pages
+     */
+    generateConsistentHeader(config, isPractice) {
+        const title = isPractice ? 'Latihan Formatif' : 'Test Komprehensif';
+        const subtitle = config.category === 'practice' ? 'Latihan soal untuk meningkatkan pemahaman' : 'Evaluasi pengetahuan jaringan komputer';
+
+        const timerInfo = config.timeLimit > 0 ? `
+            <div class="timer-display">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,20A7,7 0 0,1 5,13A7,7 0 0,1 12,6A7,7 0 0,1 19,13A7,7 0 0,1 12,20M12,4A9,9 0 0,0 3,13A9,9 0 0,0 12,22A9,9 0 0,0 21,13A9,9 0 0,0 12,4M12.5,8H11V14L15.75,16.85L16.5,15.62L12.5,13.25V8M7.88,3.39L6.6,1.86L2,5.71L3.29,7.24L7.88,3.39M22,5.72L17.4,1.86L16.11,3.39L20.71,7.25L22,5.72Z"/>
+                </svg>
+                <span id="testTimer">${this.formatTime(config.timeLimit)}</span>
+            </div>
+        ` : `
+            <div class="timer-display unlimited">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,20A7,7 0 0,1 5,13A7,7 0 0,1 12,6A7,7 0 0,1 19,13A7,7 0 0,1 12,20M12,4A9,9 0 0,0 3,13A9,9 0 0,0 12,22A9,9 0 0,0 21,13A9,9 0 0,0 12,4M12.5,8H11V14L15.75,16.85L16.5,15.62L12.5,13.25V8Z"/>
+                </svg>
+                <span>Tanpa Batas Waktu</span>
+            </div>
+        `;
+
+        return `
+            <header class="page-header test-page-header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="header-left">
+                            <button class="btn-back" onclick="window.enhancedTestSystem.exitTest()">
+                                <svg viewBox="0 0 24 24" class="back-icon">
+                                    <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                                </svg>
+                                Keluar
+                            </button>
+                        </div>
+                        <div class="header-center">
+                            <h1 class="page-title">${title}</h1>
+                            <p class="page-subtitle">${subtitle}</p>
+                        </div>
+                        <div class="header-right">
+                            <div class="test-timer" id="testTimerContainer">
+                                ${timerInfo}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        `;
+    }
+
+    /**
+     * Format time display
+     */
+    formatTime(seconds) {
+        if (seconds <= 0) return '00:00';
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    /**
+     * Exit test and return to evaluasi page
+     */
+    exitTest() {
+        if (confirm('Apakah Anda yakin ingin keluar dari test? Progress yang telah dicapai akan hilang.')) {
+            if (this.app && this.app.loadEvaluasiPage) {
+                this.app.loadEvaluasiPage(document.getElementById('contentPages'));
+            } else {
+                // Fallback: try to navigate back
+                window.history.back();
+            }
+        }
+    }
+
+    /**
      * Generate test questions based on configuration
      */
     generateTestQuestions(config) {
+        console.log('🔍 Generating test questions with config:', config);
         let questions = [];
 
-        if (config.category === 'mixed') {
+        // Special handling for practice category - check if external questions are loaded
+        if (config.category === 'practice') {
+            console.log('📚 Processing practice category...');
+            const practiceQuestions = this.questionBank.getQuestionsByCategory('practice');
+            console.log(`Found ${practiceQuestions.length} practice questions in bank`);
+
+            if (practiceQuestions.length === 0) {
+                console.warn('⚠️ No practice questions found in bank, trying to load from built-in categories...');
+                // If no practice questions loaded, use built-in questions
+                const builtInCategories = ['network-basics', 'network-topology', 'osi-model'];
+                builtInCategories.forEach(category => {
+                    if (questions.length < config.questionCount) {
+                        const categoryQuestions = this.questionBank.getQuestionsByCategory(category);
+                        console.log(`Adding ${categoryQuestions.length} questions from ${category}`);
+                        questions = questions.concat(categoryQuestions);
+                    }
+                });
+            } else {
+                // Use loaded practice questions
+                questions = practiceQuestions;
+                console.log(`Using ${questions.length} loaded practice questions`);
+            }
+        } else if (config.category === 'mixed') {
             // Get questions from all categories
             const allCategories = this.questionBank.getAllCategories();
-            allCategories.forEach(category => {
+            console.log('Available categories:', allCategories);
+
+            // Filter out the empty practice category for mixed tests
+            const categoriesToUse = allCategories.filter(cat => {
+                if (cat === 'practice') {
+                    const catQuestions = this.questionBank.getQuestionsByCategory(cat);
+                    return catQuestions.length > 0; // Only include if has questions
+                }
+                return true;
+            });
+
+            categoriesToUse.forEach(category => {
+                console.log(`Processing category: ${category}`);
                 const categoryQuestions = this.questionBank.getQuestionsByCategory(
                     category,
                     config.difficulty !== 'mixed' ? config.difficulty : null
                 );
+                console.log(`Found ${categoryQuestions.length} questions in category ${category}`);
                 questions = questions.concat(categoryQuestions);
             });
         } else {
             // Get questions from specific category
+            console.log(`Getting questions from category: ${config.category}`);
             questions = this.questionBank.getQuestionsByCategory(
                 config.category,
                 config.difficulty !== 'mixed' ? config.difficulty : null
             );
+            console.log(`Found ${questions.length} questions in category ${config.category}`);
+        }
+
+        console.log(`Total questions before filtering: ${questions.length}`);
+
+        // Ensure we have some questions
+        if (!questions || questions.length === 0) {
+            console.error('❌ No questions found in specified categories, using fallback...');
+            const fallbackQuestions = this.getFallbackQuestions();
+            if (fallbackQuestions.length > 0) {
+                questions = fallbackQuestions;
+                console.log(`Using ${fallbackQuestions.length} fallback questions`);
+            } else {
+                console.error('❌ No fallback questions available!');
+                // Create emergency fallback questions
+                questions = this.createEmergencyFallbackQuestions();
+                console.log(`Created ${questions.length} emergency fallback questions`);
+            }
         }
 
         // Apply adaptive selection if enabled
@@ -327,7 +579,106 @@ class EnhancedTestSystem {
             questions = questions.map(q => this.shuffleQuestionAnswers(q));
         }
 
+        console.log(`Final questions count: ${questions.length}`);
+
+        // Final validation
+        if (!questions || questions.length === 0) {
+            console.error('❌ CRITICAL: No questions available even after fallback!');
+            throw new Error('No questions available for test');
+        }
+
+        console.log('Questions sample:', questions.slice(0, 2));
         return questions;
+    }
+
+    /**
+     * Get fallback questions when main questions fail to load
+     */
+    getFallbackQuestions() {
+        console.log('🚨 Getting fallback questions...');
+
+        // Try to return built-in questions from question bank
+        const builtInQuestions = [];
+
+        const allCategories = this.questionBank.getAllCategories();
+        allCategories.forEach(category => {
+            const categoryQuestions = this.questionBank.getQuestionsByCategory(category);
+            if (categoryQuestions && categoryQuestions.length > 0) {
+                builtInQuestions.push(...categoryQuestions);
+            }
+        });
+
+        console.log(`Fallback: ${builtInQuestions.length} questions available`);
+        return builtInQuestions;
+    }
+
+    /**
+     * Create emergency fallback questions when no questions are available at all
+     */
+    createEmergencyFallbackQuestions() {
+        console.log('🚨 Creating emergency fallback questions...');
+
+        return [
+            {
+                id: 'emergency-001',
+                type: 'multiple-choice',
+                question: 'Apa tujuan utama dari jaringan komputer?',
+                options: [
+                    'Hanya untuk internet browsing',
+                    'Resource sharing dan komunikasi',
+                    'Mengganti komputer lama',
+                    'Main game online'
+                ],
+                correctAnswer: 1,
+                explanation: 'Jaringan komputer memungkinkan sharing resource (printer, file) dan komunikasi antar komputer.',
+                difficulty: 'easy',
+                points: 10
+            },
+            {
+                id: 'emergency-002',
+                type: 'multiple-choice',
+                question: 'Jaringan yang mencakup area geografis yang kecil seperti satu kantor atau gedung disebut?',
+                options: ['PAN', 'LAN', 'WAN', 'MAN'],
+                correctAnswer: 1,
+                explanation: 'LAN (Local Area Network) adalah jaringan yang mencakup area terbatas seperti kantor atau gedung.',
+                difficulty: 'easy',
+                points: 10
+            },
+            {
+                id: 'emergency-003',
+                type: 'multiple-choice',
+                question: 'Layer manakah yang bertanggung jawab untuk routing paket dalam model OSI?',
+                options: ['Physical', 'Data Link', 'Network', 'Transport'],
+                correctAnswer: 2,
+                explanation: 'Network Layer (Layer 3) bertanggung jawab untuk routing paket dari source ke destination.',
+                difficulty: 'medium',
+                points: 15
+            },
+            {
+                id: 'emergency-004',
+                type: 'multiple-choice',
+                question: 'Apa fungsi utama dari firewall dalam jaringan?',
+                options: [
+                    'Mempercepat koneksi internet',
+                    'Memblokir akses yang tidak sah',
+                    'Mengompres file',
+                    'Backup data'
+                ],
+                correctAnswer: 1,
+                explanation: 'Firewall berfungsi sebagai sistem keamanan yang memfilter dan memblokir akses yang tidak sah ke jaringan.',
+                difficulty: 'medium',
+                points: 15
+            },
+            {
+                id: 'emergency-005',
+                type: 'true-false',
+                question: 'WAN (Wide Area Network) mencakup area geografis yang sangat luas seperti antar kota atau negara.',
+                correctAnswer: true,
+                explanation: 'WAN memang digunakan untuk menghubungkan jaringan di area geografis yang sangat luas.',
+                difficulty: 'easy',
+                points: 5
+            }
+        ];
     }
 
     /**
@@ -361,9 +712,11 @@ class EnhancedTestSystem {
         const analytics = this.analytics.generateTestReport(results);
 
         // Update user scores
-        this.app.userData.scores = this.app.userData.scores || {};
-        this.app.userData.scores[this.testEngine.config.category || 'mixed'] = analytics;
-        this.app.saveUserData();
+        if (this.app) {
+            this.app.userData.scores = this.app.userData.scores || {};
+            this.app.userData.scores[this.testEngine.config.category || 'mixed'] = analytics;
+            this.app.saveUserData();
+        }
 
         // Check for achievements
         this.checkAchievements(analytics);
@@ -373,7 +726,237 @@ class EnhancedTestSystem {
             this.generateCertificate(analytics);
         }
 
+        // Show results
+        this.renderTestResults(results, analytics);
+
         return analytics;
+    }
+
+    /**
+     * Render test results
+     */
+    renderTestResults(results, analytics) {
+        const contentPages = document.getElementById('contentPages');
+        if (!contentPages) return;
+
+        const isPractice = this.testEngine.config.mode === 'practice';
+        const passed = analytics.score >= this.config.passingScore;
+
+        const title = passed ? 'Selamat! Anda Lulus' : 'Belum Lulus';
+        const subtitle = isPractice ? 'Hasil Latihan Formatif' : 'Hasil Test Komprehensif';
+        const resultIcon = passed ? '🏆' : '📚';
+        const extraInfo = `<div class="result-icon ${passed ? 'passed' : 'failed'}">${resultIcon}</div>`;
+
+        contentPages.innerHTML = `
+            <div class="page test-results-page">
+                ${this.generatePageHeader(title, subtitle, true, 'window.enhancedTestSystem.exitTest()', extraInfo)}
+
+                <main class="results-content">
+                    <div class="container">
+                        <div class="results-grid">
+                            <!-- Score Card -->
+                            <div class="result-card score-card">
+                                <h3>Skor Akhir</h3>
+                                <div class="score-display ${passed ? 'excellent' : 'need-improvement'}">
+                                    <span class="score-number">${analytics.score}%</span>
+                                    <span class="score-label">${this.getScoreLabel(analytics.score)}</span>
+                                </div>
+                                <div class="score-breakdown">
+                                    <div class="breakdown-item">
+                                        <span>Jawaban Benar:</span>
+                                        <span class="correct">${results.correctAnswers}/${results.totalQuestions}</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span>Waktu Pengerjaan:</span>
+                                        <span>${this.formatTime(results.timeSpent)}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Performance Analysis -->
+                            <div class="result-card performance-card">
+                                <h3>Analisis Performa</h3>
+                                <div class="performance-stats">
+                                    <div class="stat-row">
+                                        <span class="stat-label">Rata-rata Waktu per Soal:</span>
+                                        <span class="stat-value">${analytics.averageTimePerQuestion} detik</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span class="stat-label">Jawaban Benar Beruntun:</span>
+                                        <span class="stat-value">${analytics.correctStreak} soal</span>
+                                    </div>
+                                </div>
+                                ${analytics.recommendations && analytics.recommendations.length > 0 ? `
+                                    <div class="recommendations">
+                                        <h4>Rekomendasi:</h4>
+                                        <ul>
+                                            ${analytics.recommendations.map(rec => `
+                                                <li class="recommendation ${rec.priority}">${rec.message}</li>
+                                            `).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Question Review -->
+                            <div class="result-card review-card">
+                                <h3>Review Jawaban</h3>
+                                <div class="review-grid">
+                                    ${results.questions.map((question, index) => {
+                                        const isCorrect = results.answers[index] === question.correctAnswer;
+                                        return `
+                                            <div class="review-item ${isCorrect ? 'correct' : 'incorrect'}"
+                                                 onclick="window.enhancedTestSystem.reviewQuestion(${index})">
+                                                <span class="question-number">${index + 1}</span>
+                                                <span class="result-indicator">${isCorrect ? '✓' : '✗'}</span>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        ${this.testEngine.config.enableExplanations ? `
+                            <div class="achievements-section">
+                                <h3>Pencapaian Anda</h3>
+                                <div class="achievements-list">
+                                    ${this.getAchievementsForScore(analytics).map(achievement => `
+                                        <div class="achievement ${achievement.earned ? 'earned' : 'locked'}">
+                                            <div class="achievement-icon">${achievement.icon}</div>
+                                            <div class="achievement-info">
+                                                <h4>${achievement.title}</h4>
+                                                <p>${achievement.description}</p>
+                                            </div>
+                                            ${achievement.earned ? '<div class="achievement-badge">✓</div>' : '<div class="achievement-locked">🔒</div>'}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </main>
+
+                <footer class="results-actions">
+                    <div class="container">
+                        <div class="action-buttons">
+                            ${!isPractice && !passed ? `
+                                <button class="btn btn-primary" onclick="window.enhancedTestSystem.retaketest()">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                                    </svg>
+                                    Ulangi Test
+                                </button>
+                            ` : ''}
+
+                            <button class="btn btn-secondary" onclick="window.enhancedTestSystem.reviewAnswers()">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+                                </svg>
+                                Review Jawaban
+                            </button>
+
+                            ${passed && !isPractice ? `
+                                <button class="btn btn-success" onclick="window.enhancedTestSystem.downloadCertificate()">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M4,6H2V20A2,2 0 0,0 4,22H18V20H4M18,7H15V13H13V7H10V13H8V7H5V13A2,2 0 0,0 7,15H19A2,2 0 0,0 21,13V7H18Z"/>
+                                    </svg>
+                                    Unduh Sertifikat
+                                </button>
+                            ` : ''}
+
+                            <button class="btn btn-outline" onclick="window.enhancedTestSystem.exitTest()">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                                </svg>
+                                Kembali ke Menu
+                            </button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        `;
+    }
+
+    /**
+     * Get score label based on percentage
+     */
+    getScoreLabel(score) {
+        if (score >= 90) return 'Luar Biasa!';
+        if (score >= 80) return 'Sangat Baik!';
+        if (score >= 70) return 'Baik!';
+        if (score >= 60) return 'Cukup';
+        return 'Perlu Perbaikan';
+    }
+
+    /**
+     * Get achievements for score
+     */
+    getAchievementsForScore(analytics) {
+        const achievements = [
+            {
+                id: 'perfect-score',
+                title: 'Skor Sempurna',
+                description: 'Jawaban benar 100%',
+                icon: '🏆',
+                earned: analytics.score === 100
+            },
+            {
+                id: 'speed-demon',
+                title: 'Kecepatan Tinggi',
+                description: 'Rata-rata waktu < 30 detik',
+                icon: '⚡',
+                earned: analytics.averageTimePerQuestion < 30
+            },
+            {
+                id: 'hot-streak',
+                title: 'Hot Streak',
+                description: `${analytics.correctStreak} jawaban benar berturut-turut`,
+                icon: '🔥',
+                earned: analytics.correctStreak >= 5
+            },
+            {
+                id: 'persistent',
+                title: 'Pantang Menyerah',
+                description: 'Menyelesaikan semua soal',
+                icon: '💪',
+                earned: analytics.correctAnswers === analytics.totalQuestions
+            }
+        ];
+
+        return achievements;
+    }
+
+    /**
+     * Review all answers
+     */
+    reviewAnswers() {
+        // This would show a detailed review of all answers
+        alert('Fitur review detail akan segera tersedia!');
+    }
+
+    /**
+     * Review specific question
+     */
+    reviewQuestion(index) {
+        // This would show a specific question review
+        console.log('Review question:', index);
+    }
+
+    /**
+     * Download certificate
+     */
+    downloadCertificate() {
+        alert('Fitur unduh sertifikat akan segera tersedia!');
+    }
+
+    /**
+     * Retake test
+     */
+    retaketest() {
+        if (confirm('Apakah Anda ingin mengulang test ini?')) {
+            // Restart the test with same configuration
+            this.startTestSession(this.testEngine.config);
+        }
     }
 
     /**
@@ -537,12 +1120,34 @@ class QuestionBank {
 
     addCategory(categoryId, categoryData) {
         this.categories.set(categoryId, categoryData);
-        categoryData.questions.forEach(question => {
-            this.questions.set(question.id, {
-                ...question,
-                category: categoryId
+        this.updateQuestionsForCategory(categoryId);
+    }
+
+    /**
+     * Update questions map for a specific category
+     */
+    updateQuestionsForCategory(categoryId) {
+        const categoryData = this.categories.get(categoryId);
+        if (categoryData && categoryData.questions) {
+            categoryData.questions.forEach(question => {
+                this.questions.set(question.id, {
+                    ...question,
+                    category: categoryId
+                });
             });
-        });
+        }
+    }
+
+    /**
+     * Update questions for existing category
+     */
+    updateCategoryQuestions(categoryId, questions) {
+        const categoryData = this.categories.get(categoryId);
+        if (categoryData) {
+            categoryData.questions = questions;
+            this.updateQuestionsForCategory(categoryId);
+            console.log(`✅ Updated ${questions.length} questions for category: ${categoryId}`);
+        }
     }
 
     getQuestionsByCategory(category, difficulty = null) {
@@ -640,7 +1245,61 @@ class TestEngine {
     answerQuestion(answerIndex) {
         if (this.state.isCompleted) return;
 
+        // Comprehensive validation before accessing question
+        if (!this.state.questions || !Array.isArray(this.state.questions)) {
+            console.error('❌ No questions available in test state');
+            return;
+        }
+
+        if (this.state.currentQuestionIndex < 0 || this.state.currentQuestionIndex >= this.state.questions.length) {
+            console.error('❌ Invalid question index:', this.state.currentQuestionIndex);
+            console.error('Available questions:', this.state.questions.length);
+            console.error('Current state:', {
+                currentIndex: this.state.currentQuestionIndex,
+                totalQuestions: this.state.questions.length,
+                isCompleted: this.state.isCompleted,
+                isRunning: this.state.isRunning
+            });
+            return;
+        }
+
         const currentQuestion = this.state.questions[this.state.currentQuestionIndex];
+
+        // Additional validation for question object
+        if (!currentQuestion || typeof currentQuestion !== 'object') {
+            console.error('❌ Invalid question object at index:', this.state.currentQuestionIndex);
+            console.error('Question data:', currentQuestion);
+            return;
+        }
+
+        // Debug: Log question structure to identify the issue
+        console.log('Current Question:', currentQuestion);
+        console.log('Answer Index:', answerIndex);
+        console.log('Current Question Index:', this.state.currentQuestionIndex);
+        console.log('Total Questions:', this.state.questions.length);
+
+        // Handle case where correctAnswer might be undefined
+        if (currentQuestion.correctAnswer === undefined || currentQuestion.correctAnswer === null) {
+            console.error('❌ Question missing correctAnswer property:', currentQuestion);
+            // Try to fallback to other possible property names
+            const fallbackCorrectAnswer = currentQuestion.jawaban_benar ||
+                                        currentQuestion.answer ||
+                                        currentQuestion.correct;
+            if (fallbackCorrectAnswer !== undefined) {
+                currentQuestion.correctAnswer = fallbackCorrectAnswer;
+                console.log('✅ Fixed correctAnswer using fallback:', fallbackCorrectAnswer);
+            } else {
+                console.error('❌ Cannot determine correct answer for question:', currentQuestion);
+                return;
+            }
+        }
+
+        // Validate answer index
+        if (typeof answerIndex !== 'number' || answerIndex < 0) {
+            console.error('❌ Invalid answer index:', answerIndex);
+            return;
+        }
+
         const isCorrect = answerIndex === currentQuestion.correctAnswer;
         const timeSpent = this.calculateTimeSpent();
 
@@ -669,31 +1328,77 @@ class TestEngine {
     }
 
     nextQuestion() {
+        if (!this.state.questions || !Array.isArray(this.state.questions)) {
+            console.error('❌ No questions available for navigation');
+            return;
+        }
+
         if (this.state.currentQuestionIndex < this.state.questions.length - 1) {
             this.state.currentQuestionIndex++;
+            console.log('Moving to next question:', this.state.currentQuestionIndex);
             this.renderCurrentQuestion();
+        } else {
+            console.log('Already at last question, cannot go next');
         }
     }
 
     previousQuestion() {
+        if (!this.state.questions || !Array.isArray(this.state.questions)) {
+            console.error('❌ No questions available for navigation');
+            return;
+        }
+
         if (this.state.currentQuestionIndex > 0) {
             this.state.currentQuestionIndex--;
+            console.log('Moving to previous question:', this.state.currentQuestionIndex);
             this.renderCurrentQuestion();
+        } else {
+            console.log('Already at first question, cannot go previous');
         }
     }
 
     goToQuestion(index) {
+        if (!this.state.questions || !Array.isArray(this.state.questions)) {
+            console.error('❌ No questions available for navigation');
+            return;
+        }
+
         if (index >= 0 && index < this.state.questions.length) {
             this.state.currentQuestionIndex = index;
+            console.log('Navigating to question:', index);
             this.renderCurrentQuestion();
+        } else {
+            console.error('❌ Invalid question index for goToQuestion:', index);
+            console.error('Available range: 0 to', this.state.questions.length - 1);
         }
     }
 
     renderCurrentQuestion() {
+        // Validate state before rendering
+        if (!this.state.questions || !Array.isArray(this.state.questions)) {
+            console.error('❌ No questions available for rendering');
+            return;
+        }
+
+        if (this.state.currentQuestionIndex < 0 || this.state.currentQuestionIndex >= this.state.questions.length) {
+            console.error('❌ Invalid question index for rendering:', this.state.currentQuestionIndex);
+            console.error('Available questions:', this.state.questions.length);
+            return;
+        }
+
         const question = this.state.questions[this.state.currentQuestionIndex];
+
+        if (!question || typeof question !== 'object') {
+            console.error('❌ Invalid question object for rendering at index:', this.state.currentQuestionIndex);
+            return;
+        }
+
         const questionContainer = document.getElementById('questionContainer');
 
-        if (!questionContainer) return;
+        if (!questionContainer) {
+            console.error('❌ Question container element not found');
+            return;
+        }
 
         let questionHTML = this.generateQuestionHTML(question);
 
@@ -711,7 +1416,7 @@ class TestEngine {
             </div>
 
             <div class="question-content">
-                <h3 class="question-text">${question.question}</h3>
+                <h3 class="question-text">${question.pertanyaan || question.question}</h3>
                 ${this.generateAnswerOptions(question)}
             </div>
 
@@ -737,6 +1442,51 @@ class TestEngine {
         if (indicators[this.state.currentQuestionIndex]) {
             indicators[this.state.currentQuestionIndex].classList.add('current');
         }
+
+        // Update sidebar question grid and stats
+        this.updateSidebar();
+    }
+
+    /**
+     * Update sidebar question grid and stats
+     */
+    updateSidebar() {
+        // Update stats
+        const answeredElement = document.getElementById('answeredQuestions');
+        const scoreElement = document.getElementById('currentScore');
+
+        if (answeredElement) {
+            const answeredCount = this.state.answers.filter(answer => answer !== null).length;
+            answeredElement.textContent = answeredCount;
+        }
+
+        if (scoreElement) {
+            scoreElement.textContent = this.state.score;
+        }
+
+        // Update question grid
+        const questionGrid = document.getElementById('questionGrid');
+        if (questionGrid) {
+            questionGrid.innerHTML = this.generateQuestionGrid();
+        }
+    }
+
+    /**
+     * Generate question grid for sidebar
+     */
+    generateQuestionGrid() {
+        return this.state.questions.map((_, index) => {
+            const isAnswered = this.state.answers[index] !== null;
+            const isCurrent = index === this.state.currentQuestionIndex;
+
+            return `
+                <div class="grid-question ${isAnswered ? 'answered' : ''} ${isCurrent ? 'current' : ''}"
+                     onclick="window.enhancedTestSystem.testEngine.goToQuestion(${index})"
+                     title="Soal ${index + 1}${isAnswered ? ' (Sudah dijawab)' : ''}">
+                    ${index + 1}
+                </div>
+            `;
+        }).join('');
     }
 
     generateQuestionHTML(question) {
@@ -771,8 +1521,11 @@ class TestEngine {
     generateAnswerOptions(question) {
         let optionsHTML = '<div class="answer-options">';
 
-        if (question.options) {
-            question.options.forEach((option, index) => {
+        // Handle both Indonesian and English property names
+        const options = question.options || question.jawaban;
+
+        if (options && Array.isArray(options)) {
+            options.forEach((option, index) => {
                 optionsHTML += `
                     <div class="answer-option" onclick="window.enhancedTestSystem.testEngine.answerQuestion(${index})">
                         <span class="option-label">${String.fromCharCode(65 + index)}.</span>
@@ -780,6 +1533,9 @@ class TestEngine {
                     </div>
                 `;
             });
+        } else {
+            console.warn('⚠️ No options found for question:', question);
+            optionsHTML += '<p class="error">No options available for this question</p>';
         }
 
         optionsHTML += '</div>';
@@ -927,7 +1683,8 @@ class TestEngine {
             totalQuestions: this.state.questions.length,
             timeSpent: this.calculateTotalTimeSpent(),
             answers: this.state.answers,
-            questions: this.state.questions
+            questions: this.state.questions,
+            state: this.state
         };
 
         if (this.callbacks.onTestCompleted) {
@@ -1117,7 +1874,8 @@ class AdaptiveTesting {
         const questions = [];
         const difficultyDistribution = this.calculateDifficultyDistribution(count);
 
-        difficultyDistribution.forEach((numQuestions, difficulty) => {
+        // Handle the distribution object (not an array)
+        Object.entries(difficultyDistribution).forEach(([difficulty, numQuestions]) => {
             const difficultyQuestions = allQuestions.filter(q => q.difficulty === difficulty);
             const selectedQuestions = this.shuffleArray(difficultyQuestions).slice(0, numQuestions);
             questions.push(...selectedQuestions);

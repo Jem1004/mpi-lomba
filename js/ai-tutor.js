@@ -65,6 +65,46 @@ Format response dalam Bahasa Indonesia yang formal dan edukatif.`;
     }
 
     /**
+     * Generate consistent page header (using main app method if available)
+     */
+    generatePageHeader(title, subtitle = '', showBackButton = true, backAction = null, extraInfo = '') {
+        // Use main app's header generator if available
+        if (window.mpiApp && window.mpiApp.generatePageHeader) {
+            return window.mpiApp.generatePageHeader(title, subtitle, showBackButton, backAction, extraInfo);
+        }
+
+        // Fallback header generation
+        const backButtonText = backAction ? '← Kembali' : '← Kembali';
+        const backClickHandler = backAction || 'window.mpiApp.navigateToMainMenu()';
+
+        return `
+            <header class="page-header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="header-left">
+                            ${showBackButton ? `
+                                <button class="btn-back" onclick="${backClickHandler}">
+                                    <svg viewBox="0 0 24 24" class="back-icon">
+                                        <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                                    </svg>
+                                    ${backButtonText}
+                                </button>
+                            ` : ''}
+                        </div>
+                        <div class="header-center">
+                            <h1 class="page-title">${title}</h1>
+                            ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
+                        </div>
+                        <div class="header-right">
+                            ${extraInfo}
+                        </div>
+                    </div>
+                </div>
+            </header>
+        `;
+    }
+
+    /**
      * Initialize AI Tutor interface
      */
     initialize() {

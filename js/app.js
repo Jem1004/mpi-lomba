@@ -38,8 +38,8 @@ class MPIApp {
         // Initialize event listeners
         this.initEventListeners();
 
-        // Initialize Enhanced Test System
-        this.initializeEnhancedTestSystem();
+        // Initialize Enhanced Systems
+        this.initializeEnhancedSystems();
 
         // Show loading screen
         this.showLoadingScreen();
@@ -95,23 +95,76 @@ class MPIApp {
     }
 
     /**
-     * Initialize Enhanced Test System
+     * Initialize Enhanced Systems (Both Test and Quiz)
      */
-    initializeEnhancedTestSystem() {
-        // Wait for Enhanced Test System to be available
+    initializeEnhancedSystems() {
+        console.log('Initializing Enhanced Systems...');
+
+        // Initialize Enhanced Test System
         if (typeof EnhancedTestSystem !== 'undefined') {
             this.enhancedTestSystem = new EnhancedTestSystem(this);
-            console.log('Enhanced Test System initialized');
+            console.log('✓ Enhanced Test System initialized');
         } else {
-            console.log('Enhanced Test System not yet available, will retry...');
-            // Retry after a short delay
+            console.log('⚠️ Enhanced Test System not yet available, will retry...');
             setTimeout(() => {
                 if (typeof EnhancedTestSystem !== 'undefined') {
                     this.enhancedTestSystem = new EnhancedTestSystem(this);
-                    console.log('Enhanced Test System initialized (retry)');
+                    console.log('✓ Enhanced Test System initialized (retry)');
+                } else {
+                    console.warn('❌ Enhanced Test System failed to initialize');
                 }
             }, 1000);
         }
+
+        // Initialize Enhanced Quiz System
+        if (typeof EnhancedQuizSystem !== 'undefined') {
+            this.enhancedQuizSystem = new EnhancedQuizSystem(this);
+            console.log('✓ Enhanced Quiz System initialized');
+        } else {
+            console.log('⚠️ Enhanced Quiz System not yet available, will retry...');
+            setTimeout(() => {
+                if (typeof EnhancedQuizSystem !== 'undefined') {
+                    this.enhancedQuizSystem = new EnhancedQuizSystem(this);
+                    console.log('✓ Enhanced Quiz System initialized (retry)');
+                } else {
+                    console.warn('❌ Enhanced Quiz System failed to initialize');
+                }
+            }, 1500);
+        }
+    }
+
+    /**
+     * Generate consistent page header
+     */
+    generatePageHeader(title, subtitle = '', showBackButton = true, backAction = null, extraInfo = '') {
+        const backButtonText = backAction ? '← Kembali' : '← Kembali';
+        const backClickHandler = backAction || 'window.mpiApp.navigateToMainMenu()';
+
+        return `
+            <header class="page-header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="header-left">
+                            ${showBackButton ? `
+                                <button class="btn-back" onclick="${backClickHandler}">
+                                    <svg viewBox="0 0 24 24" class="back-icon">
+                                        <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
+                                    </svg>
+                                    ${backButtonText}
+                                </button>
+                            ` : ''}
+                        </div>
+                        <div class="header-center">
+                            <h1 class="page-title">${title}</h1>
+                            ${subtitle ? `<p class="page-subtitle">${subtitle}</p>` : ''}
+                        </div>
+                        <div class="header-right">
+                            ${extraInfo}
+                        </div>
+                    </div>
+                </div>
+            </header>
+        `;
     }
 
     /**
@@ -508,16 +561,10 @@ class MPIApp {
     loadObjectivesPage(container) {
         container.innerHTML = `
             <div class="page objectives-page">
-                <header class="page-header">
-                    <div class="container">
-                        <button class="btn-back">← Kembali</button>
-                        <h1>Tujujuan Pembelajaran</h1>
-                    </div>
-                </header>
+                ${this.generatePageHeader('Tujuan Pembelajaran', 'Kompetensi Dasar Jaringan Komputer')}
                 <main class="page-content">
                     <div class="container">
                         <div class="objectives-intro">
-                            <h2>Kompetensi Dasar Jaringan Komputer</h2>
                             <p class="intro-text">Berikut adalah tujuan pembelajaran yang akan dicapai dalam mata pelajaran Jaringan Dasar untuk SMK TKJT:</p>
                         </div>
 
@@ -729,17 +776,11 @@ class MPIApp {
     loadMaterialsPage(container) {
         container.innerHTML = `
             <div class="page materials-page">
-                <header class="page-header">
-                    <div class="container">
-                        <button class="btn-back">← Kembali</button>
-                        <h1>Materi Pembelajaran</h1>
-                    </div>
-                </header>
+                ${this.generatePageHeader('Materi Pembelajaran', 'Jelajahi Dunia Jaringan Komputer')}
                 <main class="page-content">
                     <div class="container">
                         <!-- Materials Hero Section -->
                         <div class="materials-hero">
-                            <h2>Jelajahi Dunia Jaringan Komputer</h2>
                             <p class="hero-description">
                                 Pelajari konsep dasar hingga lanjut tentang jaringan komputer dengan materi interaktif yang dirancang khusus untuk siswa SMK TKJT.
                             </p>
@@ -1154,14 +1195,7 @@ class MPIApp {
     loadEvaluasiPage(container) {
         container.innerHTML = `
             <div class="page evaluasi-page">
-                <header class="page-header">
-                    <div class="container">
-                        <button class="btn-back" onclick="window.mpiApp.navigateToMainMenu()">← Kembali</button>
-                        <h1>Evaluasi Pembelajaran</h1>
-                        <p class="evaluasi-description">Pilih jenis evaluasi yang ingin Anda ikuti</p>
-                    </div>
-                </header>
-
+                ${this.generatePageHeader('Evaluasi Pembelajaran', 'Pilih jenis evaluasi yang ingin Anda ikuti')}
                 <main class="page-content">
                     <div class="container">
                         <!-- Simple Card Layout -->
@@ -1344,17 +1378,40 @@ class MPIApp {
     }
 
     /**
+     * Normalize question data format for enhanced systems
+     */
+    normalizeQuestionData(questions) {
+        return questions.map(q => ({
+            id: q.id,
+            type: q.type || 'multiple-choice',
+            question: q.pertanyaan || q.question || '',
+            options: q.options || q.jawaban || [],
+            correctAnswer: q.jawaban_benar !== undefined ? q.jawaban_benar : q.correctAnswer,
+            explanation: q.penjelasan || q.explanation || '',
+            points: q.points || 10,
+            difficulty: q.difficulty || 'medium',
+            category: q.category || q.bab || 'general',
+            bab: q.bab // Preserve original bab for categorization
+        }));
+    }
+
+    /**
      * Start latihan (test formatif)
      */
     startLatihan() {
-        console.log('Starting Test Pengetahuan Formatif...');
+        console.log('📚 Starting Test Pengetahuan Formatif...');
 
         // Show loading message
         this.showNotification('Memuat soal latihan...', 'info');
 
         // Load questions from data/soal.json
         fetch('data/soal.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 const formatifQuestions = data.test_pengetahuan || [];
 
@@ -1363,31 +1420,44 @@ class MPIApp {
                     return;
                 }
 
+                console.log(`✅ Loaded ${formatifQuestions.length} practice questions`);
+
+                // Normalize question data for enhanced system compatibility
+                const normalizedQuestions = this.normalizeQuestionData(formatifQuestions);
+
                 if (this.enhancedTestSystem) {
-                    // Start enhanced test system with practice configuration
-                    this.enhancedTestSystem.startTestSession({
-                        mode: 'practice',
-                        category: 'mixed',
-                        enableFeedback: true,
-                        enableExplanations: true,
-                        timeLimit: 0, // No timer for practice
-                        shuffleQuestions: true,
-                        shuffleAnswers: true,
-                        questions: formatifQuestions,
-                        onPracticeComplete: (results) => {
-                            // Update practice progress
-                            this.updatePracticeProgress();
-                            this.showNotification('Latihan selesai! ✅', 'success');
-                        }
-                    });
+                    console.log('🚀 Starting Enhanced Test System...');
+                    try {
+                        // Load questions directly into the system first
+                        this.enhancedTestSystem.questionBank.updateCategoryQuestions('practice', normalizedQuestions);
+
+                        // Start enhanced test system with practice configuration
+                        this.enhancedTestSystem.startTestSession({
+                            category: 'practice',
+                            difficulty: 'mixed',
+                            questionCount: Math.min(20, normalizedQuestions.length), // Limit for practice
+                            timeLimit: 0, // No timer for practice
+                            adaptiveMode: false, // No adaptive for practice
+                            enableHints: true,
+                            enableExplanations: true,
+                            shuffleQuestions: true,
+                            shuffleAnswers: true,
+                            mode: 'practice'
+                        });
+
+                    } catch (error) {
+                        console.error('❌ Enhanced Test System error:', error);
+                        this.showNotification('Gagal memulai enhanced test system', 'error');
+                        this.initializeTest(); // Fallback
+                    }
                 } else {
-                    // Fallback to original test system
-                    this.initializeTest();
+                    console.warn('⚠️ Enhanced Test System not available, using fallback');
+                    this.initializeTest(); // Fallback
                 }
             })
             .catch(error => {
-                console.error('Error loading formatif questions:', error);
-                this.showNotification('Gagal memuat soal latihan', 'error');
+                console.error('❌ Error loading formatif questions:', error);
+                this.showNotification('Gagal memuat soal latihan: ' + error.message, 'error');
             });
     }
 
@@ -1395,10 +1465,10 @@ class MPIApp {
      * Start kuis (ujian sumatif)
      */
     startKuis() {
-        console.log('Starting Kuis Akhir Sumatif...');
+        console.log('🎯 Starting Kuis Akhir Sumatif...');
 
         // Show confirmation dialog
-        const confirmStart = confirm('Apakah Anda siap untuk memulai kuis akhir?\n\n• 30 menit waktu pengerjaan\n• 15 soal pilihan ganda\n• Minimal 70% untuk lulus\n• Satu kesempatan saja\n\nKlik OK untuk melanjutkan.');
+        const confirmStart = confirm('⚠️ UJIAN AKHIR SUMATIF ⚠️\n\nAnda siap untuk memulai kuis akhir?\n\n📋 Ketentuan:\n• 30 menit waktu pengerjaan\n• 15 soal pilihan ganda\n• Minimal 70% untuk lulus\n• Satu kesempatan saja\n\nKlik OK untuk melanjutkan atau Batal untuk kembali.');
 
         if (!confirmStart) {
             return;
@@ -1409,7 +1479,12 @@ class MPIApp {
 
         // Load questions from data/soal.json
         fetch('data/soal.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 const sumatifQuestions = data.quiz_akhir || [];
 
@@ -1418,26 +1493,45 @@ class MPIApp {
                     return;
                 }
 
+                console.log(`✅ Loaded ${sumatifQuestions.length} quiz questions`);
+
+                // Normalize question data for enhanced system compatibility
+                const normalizedQuestions = this.normalizeQuestionData(sumatifQuestions);
+
                 if (this.enhancedQuizSystem) {
-                    // Start enhanced quiz system with exam configuration
-                    this.enhancedQuizSystem.initializeQuiz(sumatifQuestions, {
-                        allowBackNavigation: true,
-                        showImmediateFeedback: false,
-                        timeLimit: 1800, // 30 minutes
-                        passingScore: 70,
-                        shuffleQuestions: true,
-                        shuffleAnswers: true,
-                        studentName: this.studentName,
-                        isSumatif: true
-                    });
+                    console.log('🚀 Starting Enhanced Quiz System...');
+                    try {
+                        // Start enhanced quiz system with exam configuration
+                        this.enhancedQuizSystem.initializeQuiz(normalizedQuestions, {
+                            allowBackNavigation: true,
+                            showImmediateFeedback: false,
+                            timePerQuestion: null, // Overall timer instead of per-question
+                            timeLimit: 1800, // 30 minutes in seconds
+                            passingScore: 70,
+                            shuffleQuestions: true,
+                            shuffleAnswers: true,
+                            category: 'final-quiz',
+                            isSumatif: true
+                        });
+
+                        // Start the quiz after initialization
+                        this.enhancedQuizSystem.startQuiz();
+
+                        console.log('✅ Enhanced Quiz System started successfully');
+
+                    } catch (error) {
+                        console.error('❌ Enhanced Quiz System error:', error);
+                        this.showNotification('Gagal memulai enhanced quiz system', 'error');
+                        this.initializeQuiz(); // Fallback
+                    }
                 } else {
-                    // Fallback to original quiz system
-                    this.initializeQuiz();
+                    console.warn('⚠️ Enhanced Quiz System not available, using fallback');
+                    this.initializeQuiz(); // Fallback
                 }
             })
             .catch(error => {
-                console.error('Error loading sumatif questions:', error);
-                this.showNotification('Gagal memuat soal kuis', 'error');
+                console.error('❌ Error loading sumatif questions:', error);
+                this.showNotification('Gagal memuat soal kuis: ' + error.message, 'error');
             });
     }
 
@@ -5293,6 +5387,8 @@ class MPIApp {
      * Update practice completed count
      */
     updatePracticeProgress() {
+        console.log('📈 Updating practice progress...');
+
         let progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
 
         if (!progress.practiceCompleted) {
@@ -5300,9 +5396,18 @@ class MPIApp {
         }
 
         progress.practiceCompleted += 1;
+        progress.lastPracticeDate = new Date().toISOString();
+
+        // Save to localStorage
+        localStorage.setItem('evaluationProgress', JSON.stringify(progress));
 
         // Update evaluation progress
         this.updateEvaluationProgress();
+
+        // Show notification
+        this.showNotification('Progress latihan tersimpan! ✅', 'success');
+
+        console.log('✅ Practice progress updated:', progress);
     }
 
     /**
@@ -5880,27 +5985,60 @@ class MPIApp {
     /**
      * Show notification message
      */
-    showNotification(message, type = 'error') {
+    showNotification(message, type = 'info', duration = 3000) {
+        console.log(`🔔 Notification [${type}]: ${message}`);
+
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notif => notif.remove());
+
         // Create notification
         const notificationDiv = document.createElement('div');
         notificationDiv.className = `notification ${type}`;
         notificationDiv.innerHTML = `
             <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <span style="font-size: 1.2rem;">
-                    ${type === 'error' ? '⚠️' : type === 'success' ? '✅' : '⚡'}
+                    ${this.getNotificationIcon(type)}
                 </span>
                 <span>${message}</span>
             </div>
+            <button class="notification-close" onclick="this.parentElement.remove()" style="margin-left: 1rem; background: none; border: none; color: inherit; cursor: pointer; font-size: 1.2rem;">×</button>
         `;
 
         document.body.appendChild(notificationDiv);
 
-        // Auto remove after 3 seconds
+        // Animate in
         setTimeout(() => {
-            if (notificationDiv.parentNode) {
-                notificationDiv.parentNode.removeChild(notificationDiv);
-            }
-        }, 3000);
+            notificationDiv.style.opacity = '1';
+            notificationDiv.style.transform = 'translateY(0)';
+        }, 100);
+
+        // Auto remove after duration
+        if (duration > 0) {
+            setTimeout(() => {
+                notificationDiv.style.opacity = '0';
+                notificationDiv.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    if (notificationDiv.parentNode) {
+                        notificationDiv.parentNode.removeChild(notificationDiv);
+                    }
+                }, 300);
+            }, duration);
+        }
+    }
+
+    /**
+     * Get notification icon based on type
+     */
+    getNotificationIcon(type) {
+        const icons = {
+            'success': '✅',
+            'error': '❌',
+            'warning': '⚠️',
+            'info': 'ℹ️',
+            'loading': '⏳'
+        };
+        return icons[type] || icons.info;
     }
 
     /**
