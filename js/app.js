@@ -95,44 +95,66 @@ class MPIApp {
     }
 
     /**
-     * Initialize Enhanced Systems (Both Test and Quiz)
+     * Initialize Enhanced Systems (Using Unified System)
      */
     initializeEnhancedSystems() {
         console.log('Initializing Enhanced Systems...');
 
-        // Initialize Enhanced Test System
-        if (typeof EnhancedTestSystem !== 'undefined') {
-            this.enhancedTestSystem = new EnhancedTestSystem(this);
-            console.log('✓ Enhanced Test System initialized');
-        } else {
-            console.log('⚠️ Enhanced Test System not yet available, will retry...');
-            setTimeout(() => {
-                if (typeof EnhancedTestSystem !== 'undefined') {
-                    this.enhancedTestSystem = new EnhancedTestSystem(this);
-                    console.log('✓ Enhanced Test System initialized (retry)');
-                } else {
-                    console.warn('❌ Enhanced Test System failed to initialize');
-                }
-            }, 1000);
-        }
-
-        // Initialize Enhanced Quiz System
-        if (typeof EnhancedQuizSystem !== 'undefined') {
-            this.enhancedQuizSystem = new EnhancedQuizSystem(this);
-            console.log('✓ Enhanced Quiz System initialized');
-        } else {
-            console.log('⚠️ Enhanced Quiz System not yet available, will retry...');
-            setTimeout(() => {
-                if (typeof EnhancedQuizSystem !== 'undefined') {
-                    this.enhancedQuizSystem = new EnhancedQuizSystem(this);
-                    console.log('✓ Enhanced Quiz System initialized (retry)');
-                } else {
-                    console.warn('❌ Enhanced Quiz System failed to initialize');
-                }
-            }, 1500);
-        }
+        // Initialize Unified Quiz System with improved error handling
+        this.initializeUnifiedQuizSystemWithRetry();
     }
 
+    /**
+     * Initialize Unified Quiz System with retry logic
+     */
+    initializeUnifiedQuizSystemWithRetry() {
+        const tryInitialize = (retryCount = 0) => {
+            try {
+                console.log(`📍 Attempt ${retryCount + 1}: Checking UnifiedQuizSystem and QuestionData...`);
+
+                if (typeof UnifiedQuizSystem !== 'undefined' && window.QuestionData) {
+                    console.log('✅ UnifiedQuizSystem and QuestionData found, creating instance...');
+
+                    this.unifiedQuizSystem = new UnifiedQuizSystem(this);
+
+                    // Make it globally available
+                    window.unifiedQuizSystem = this.unifiedQuizSystem;
+
+                    // Also create backward compatibility references
+                    this.enhancedQuizSystem = this.unifiedQuizSystem;
+                    this.enhancedTestSystem = this.unifiedQuizSystem;
+
+                    console.log('✅ Unified Quiz System initialized successfully');
+                } else {
+                    const missingComponents = [];
+                    if (typeof UnifiedQuizSystem === 'undefined') missingComponents.push('UnifiedQuizSystem');
+                    if (!window.QuestionData) missingComponents.push('QuestionData');
+
+                    throw new Error(`Missing dependencies: ${missingComponents.join(', ')}`);
+                }
+            } catch (error) {
+                console.error(`❌ Unified Quiz System initialization failed (attempt ${retryCount + 1}):`, error);
+
+                if (retryCount < 3) {
+                    console.log(`🔄 Retrying Unified Quiz System initialization in ${1000 * (retryCount + 1)}ms...`);
+                    setTimeout(() => tryInitialize(retryCount + 1), 1000 * (retryCount + 1));
+                } else {
+                    console.error('❌ Unified Quiz System failed to initialize after 3 attempts');
+                    this.unifiedQuizSystem = null;
+                    this.enhancedQuizSystem = null;
+                    this.enhancedTestSystem = null;
+
+                    // Show fallback error to user
+                    this.showNotification('Sistem kuis tidak dapat dimuat. Silakan refresh halaman.', 'error');
+                }
+            }
+        };
+
+        // Start initialization with a short delay to ensure DOM and dependencies are ready
+        setTimeout(() => tryInitialize(), 500);
+    }
+
+  
     /**
      * Generate consistent page header
      */
@@ -1361,6 +1383,7 @@ class MPIApp {
         });
     }
 
+   
     /**
      * Load progress data for evaluation page
      */
@@ -1425,33 +1448,36 @@ class MPIApp {
                 // Normalize question data for enhanced system compatibility
                 const normalizedQuestions = this.normalizeQuestionData(formatifQuestions);
 
-                if (this.enhancedTestSystem) {
-                    console.log('🚀 Starting Enhanced Test System...');
+                if (this.unifiedQuizSystem) {
+                    console.log('🚀 Starting Unified Quiz System for practice...');
                     try {
-                        // Load questions directly into the system first
-                        this.enhancedTestSystem.questionBank.updateCategoryQuestions('practice', normalizedQuestions);
-
-                        // Start enhanced test system with practice configuration
-                        this.enhancedTestSystem.startTestSession({
-                            category: 'practice',
+                        // Start unified quiz system with practice configuration
+                        this.unifiedQuizSystem.startSession('practice', {
+                            category: 'test_pengetahuan',
                             difficulty: 'mixed',
-                            questionCount: Math.min(20, normalizedQuestions.length), // Limit for practice
-                            timeLimit: 0, // No timer for practice
-                            adaptiveMode: false, // No adaptive for practice
+                            maxQuestionsPerSession: Math.min(20, normalizedQuestions.length),
+                            totalTimeLimit: 0, // No timer for practice
+                            allowBackNavigation: true,
+                            showImmediateFeedback: false,
                             enableHints: true,
                             enableExplanations: true,
                             shuffleQuestions: true,
-                            shuffleAnswers: true,
-                            mode: 'practice'
+                            shuffleAnswers: true
+                        }).then(() => {
+                            console.log('✅ Unified quiz system started successfully');
+                        }).catch(error => {
+                            console.error('❌ Unified Quiz System error:', error);
+                            this.showNotification('Gagal memulai sistem kuis', 'error');
+                            this.initializeTest(); // Fallback
                         });
 
                     } catch (error) {
-                        console.error('❌ Enhanced Test System error:', error);
-                        this.showNotification('Gagal memulai enhanced test system', 'error');
+                        console.error('❌ Unified Quiz System error:', error);
+                        this.showNotification('Gagal memulai sistem kuis', 'error');
                         this.initializeTest(); // Fallback
                     }
                 } else {
-                    console.warn('⚠️ Enhanced Test System not available, using fallback');
+                    console.warn('⚠️ Unified Quiz System not available, using fallback');
                     this.initializeTest(); // Fallback
                 }
             })
@@ -1477,62 +1503,50 @@ class MPIApp {
         // Show loading message
         this.showNotification('Memuat soal kuis...', 'info');
 
-        // Load questions from data/soal.json
-        fetch('data/soal.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const sumatifQuestions = data.quiz_akhir || [];
+        // Get questions directly from QuestionData (no fetch needed)
+        try {
+            const sumatifQuestions = window.QuestionData ?
+                window.QuestionData.QuestionUtils.getQuestionsByCategory('quiz_akhir') : [];
 
-                if (sumatifQuestions.length === 0) {
-                    this.showNotification('Soal kuis tidak tersedia', 'error');
-                    return;
-                }
+            if (sumatifQuestions.length === 0) {
+                this.showNotification('Soal kuis tidak tersedia', 'error');
+                return;
+            }
 
-                console.log(`✅ Loaded ${sumatifQuestions.length} quiz questions`);
+            console.log(`✅ Loaded ${sumatifQuestions.length} quiz questions`);
 
-                // Normalize question data for enhanced system compatibility
-                const normalizedQuestions = this.normalizeQuestionData(sumatifQuestions);
+            if (this.unifiedQuizSystem) {
+                console.log('🚀 Starting Unified Quiz System for final quiz...');
+                try {
+                    // Start unified quiz system with exam configuration
+                    this.unifiedQuizSystem.startSession('quiz', {
+                        category: 'quiz_akhir',
+                        difficulty: 'mixed',
+                        maxQuestionsPerSession: Math.min(15, sumatifQuestions.length),
+                        totalTimeLimit: 1800, // 30 minutes
+                        allowBackNavigation: true,
+                        showImmediateFeedback: false,
+                        enableHints: false,
+                        enableExplanations: false,
+                        shuffleQuestions: true,
+                        shuffleAnswers: true
+                    });
 
-                if (this.enhancedQuizSystem) {
-                    console.log('🚀 Starting Enhanced Quiz System...');
-                    try {
-                        // Start enhanced quiz system with exam configuration
-                        this.enhancedQuizSystem.initializeQuiz(normalizedQuestions, {
-                            allowBackNavigation: true,
-                            showImmediateFeedback: false,
-                            timePerQuestion: null, // Overall timer instead of per-question
-                            timeLimit: 1800, // 30 minutes in seconds
-                            passingScore: 70,
-                            shuffleQuestions: true,
-                            shuffleAnswers: true,
-                            category: 'final-quiz',
-                            isSumatif: true
-                        });
+                    console.log('✅ Unified Quiz System started successfully');
 
-                        // Start the quiz after initialization
-                        this.enhancedQuizSystem.startQuiz();
-
-                        console.log('✅ Enhanced Quiz System started successfully');
-
-                    } catch (error) {
-                        console.error('❌ Enhanced Quiz System error:', error);
-                        this.showNotification('Gagal memulai enhanced quiz system', 'error');
-                        this.initializeQuiz(); // Fallback
-                    }
-                } else {
-                    console.warn('⚠️ Enhanced Quiz System not available, using fallback');
+                } catch (error) {
+                    console.error('❌ Unified Quiz System error:', error);
+                    this.showNotification('Gagal memulai sistem kuis', 'error');
                     this.initializeQuiz(); // Fallback
                 }
-            })
-            .catch(error => {
-                console.error('❌ Error loading sumatif questions:', error);
-                this.showNotification('Gagal memuat soal kuis: ' + error.message, 'error');
-            });
+            } else {
+                console.warn('⚠️ Unified Quiz System not available, using fallback');
+                this.initializeQuiz(); // Fallback
+            }
+        } catch (error) {
+            console.error('❌ Error loading quiz questions:', error);
+            this.showNotification('Gagal memuat soal kuis: ' + error.message, 'error');
+        }
     }
 
     /**
@@ -1556,10 +1570,8 @@ class MPIApp {
             </div>
         `;
 
-        // Initialize Enhanced Quiz System after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            this.initializeEnhancedQuiz();
-        }, 100);
+        // Initialize Enhanced Quiz System with proper DOM ready check
+        this.initializeEnhancedQuizWithRetry();
     }
 
     /**
@@ -6068,6 +6080,47 @@ class MPIApp {
     }
 
     /**
+     * Initialize Enhanced Quiz System with retry logic
+     */
+    initializeEnhancedQuizWithRetry() {
+        console.log('Initializing Enhanced Quiz System with retry logic...');
+        this.initializeEnhancedQuizWithDelay(300);
+    }
+
+    /**
+     * Initialize Enhanced Quiz System with delay and retry
+     */
+    initializeEnhancedQuizWithDelay(delay, retryCount = 0) {
+        setTimeout(() => {
+            // Check if DOM is ready
+            const quizContent = document.getElementById('quizContent');
+            const contentPages = document.getElementById('contentPages');
+
+            console.log(`DOM check (attempt ${retryCount + 1}):`, {
+                quizContentReady: !!quizContent,
+                contentPagesReady: !!contentPages,
+                enhancedQuizSystemReady: !!this.enhancedQuizSystem
+            });
+
+            if (quizContent && contentPages && this.enhancedQuizSystem) {
+                // DOM and systems are ready, initialize quiz
+                console.log('✅ DOM and systems ready, starting Enhanced Quiz');
+                this.startEnhancedQuiz();
+            } else {
+                // Not ready yet, retry if we haven't exceeded max attempts
+                if (retryCount < 5) {
+                    console.log(`⚠️ Not ready yet, retrying in ${delay * 2}ms...`);
+                    this.initializeEnhancedQuizWithDelay(delay * 2, retryCount + 1);
+                } else {
+                    console.error('❌ Failed to initialize Enhanced Quiz after 5 attempts');
+                    // Fallback to original quiz system
+                    this.initializeOriginalQuiz();
+                }
+            }
+        }, delay);
+    }
+
+    /**
      * Initialize Enhanced Quiz System
      */
     initializeEnhancedQuiz() {
@@ -6702,14 +6755,14 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing MPI App...');
     window.mpiApp = new MPIApp();
 
-    // Initialize Enhanced Quiz System after app is ready
+    // Initialize Unified Quiz System after app is ready
     setTimeout(() => {
-        if (window.mpiApp && typeof EnhancedQuizSystem !== 'undefined') {
-            window.mpiApp.enhancedQuizSystem = new EnhancedQuizSystem(window.mpiApp);
-            console.log('Enhanced Quiz System integrated with main app');
-            console.log('Enhanced Quiz System available:', window.mpiApp.enhancedQuizSystem);
+        if (window.mpiApp && window.unifiedQuizSystem) {
+            window.mpiApp.unifiedQuizSystem = window.unifiedQuizSystem;
+            console.log('Unified Quiz System integrated with main app');
+            console.log('Unified Quiz System available:', window.mpiApp.unifiedQuizSystem);
         } else {
-            console.warn('Enhanced Quiz System not available, will use fallback');
+            console.warn('Unified Quiz System not available, will use fallback');
         }
     }, 1500);
 });

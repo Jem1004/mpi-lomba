@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/test.css">
     <link rel="stylesheet" href="css/enhanced-test.css">
     <link rel="stylesheet" href="css/enhanced-quiz.css">
-
+    
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
@@ -155,7 +155,7 @@
                         <div class="card-badge new">AI Powered</div>
                     </div>
 
-                    <!-- Menu 7: Tentang Pengembang -->
+                    <!-- Menu 6: Tentang Pengembang -->
                     <div class="menu-card" data-page="about">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24" class="icon">
@@ -190,10 +190,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Main Application Script -->
+    <!-- Data Layer (must be loaded first) -->
+    <script src="js/quiz-data.js"></script>
+
+    <!-- Core Application -->
     <script src="js/app.js"></script>
     <script src="js/ai-tutor.js"></script>
-    <script src="js/enhanced-test-system.js"></script>
-    <script src="js/enhanced-quiz-system.js"></script>
+
+    <!-- Unified Quiz System (replaces both enhanced systems) -->
+    <script src="js/unified-quiz-system.js"></script>
+
+    <!-- Legacy Debug Script (optional) -->
     <script src="js/quiz-debug.js"></script>
 </body>
 </html>

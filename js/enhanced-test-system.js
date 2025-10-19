@@ -34,7 +34,10 @@ class EnhancedTestSystem {
     async initializeQuestionBank() {
         console.log('📚 Initializing Enhanced Question Bank...');
 
-        // Add empty categories that will be populated dynamically
+        // Load external questions and add to practice category
+        await this.loadExternalQuestions();
+
+        // Add practice category with external questions
         this.questionBank.addCategory('practice', {
             title: 'Latihan Formatif',
             description: 'Test pengetahuan untuk latihan tanpa tekanan',
@@ -266,9 +269,99 @@ class EnhancedTestSystem {
     }
 
     /**
+     * Load external questions from JSON file
+     */
+    async loadExternalQuestions() {
+        try {
+            console.log('📂 Loading external questions from soal.json...');
+            const response = await fetch('data/soal.json');
+            if (!response.ok) {
+                throw new Error(`Failed to load soal.json: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('📋 External data loaded:', data);
+
+            // Process test_pengetahuan questions
+            if (data.test_pengetahuan && Array.isArray(data.test_pengetahuan)) {
+                const practiceQuestions = data.test_pengetahuan.map(q => this.normalizeQuestionData(q, 'test_pengetahuan'));
+
+                // Add practice questions to the practice category
+                this.questionBank.addCategory('practice', {
+                    title: 'Latihan Formatif',
+                    description: 'Test pengetahuan untuk latihan tanpa tekanan',
+                    difficulty: 'mixed',
+                    questions: practiceQuestions
+                });
+
+                console.log(`✅ Loaded ${practiceQuestions.length} practice questions from external file`);
+            }
+
+            // Process quiz_akhir questions if they exist
+            if (data.quiz_akhir && Array.isArray(data.quiz_akhir)) {
+                const quizQuestions = data.quiz_akhir.map(q => this.normalizeQuestionData(q, 'quiz_akhir'));
+
+                this.questionBank.addCategory('quiz-akhir', {
+                    title: 'Quiz Akhir',
+                    description: 'Evaluasi akhir pembelajaran',
+                    difficulty: 'mixed',
+                    questions: quizQuestions
+                });
+
+                console.log(`✅ Loaded ${quizQuestions.length} quiz questions from external file`);
+            }
+
+            // Process soal_komprehensif questions if they exist
+            if (data.soal_komprehensif && Array.isArray(data.soal_komprehensif)) {
+                const comprehensiveQuestions = data.soal_komprehensif.map(q => this.normalizeQuestionData(q, 'soal_komprehensif'));
+
+                this.questionBank.addCategory('komprehensif', {
+                    title: 'Soal Komprehensif',
+                    description: 'Tes komprehensif jaringan komputer',
+                    difficulty: 'advanced',
+                    questions: comprehensiveQuestions
+                });
+
+                console.log(`✅ Loaded ${comprehensiveQuestions.length} comprehensive questions from external file`);
+            }
+
+        } catch (error) {
+            console.error('❌ Error loading external questions:', error);
+            console.log('⚠️ Using built-in questions as fallback');
+        }
+    }
+
+    /**
+     * Normalize question data from external JSON to internal format
+     */
+    normalizeQuestionData(question, category) {
+        // Handle different data structures and ensure compatibility
+        const normalized = {
+            id: question.id || `external_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+            type: question.type || 'multiple-choice',
+            pertanyaan: question.pertanyaan || question.question || 'No question text',
+            question: question.pertanyaan || question.question || 'No question text', // Keep both for compatibility
+            options: question.options || [],
+            correctAnswer: question.jawaban_benar !== undefined ? question.jawaban_benar :
+                         question.correctAnswer !== undefined ? question.correctAnswer : 0,
+            jawaban_benar: question.jawaban_benar !== undefined ? question.jawaban_benar :
+                         question.correctAnswer !== undefined ? question.correctAnswer : 0, // Keep both for compatibility
+            explanation: question.penjelasan || question.explanation || 'No explanation available',
+            difficulty: question.difficulty || 'medium',
+            points: question.points || 10,
+            category: category,
+            tags: question.tags || [],
+            bab: question.bab || ''
+        };
+
+        console.log('Normalized question:', normalized);
+        return normalized;
+    }
+
+    /**
      * Start comprehensive test session
      */
-    startTestSession(options = {}) {
+    async startTestSession(options = {}) {
         const testConfig = {
             category: options.category || 'mixed',
             difficulty: options.difficulty || 'mixed',
@@ -281,7 +374,7 @@ class EnhancedTestSystem {
         };
 
         // Generate test questions
-        const questions = this.generateTestQuestions(testConfig);
+        const questions = await this.generateTestQuestions(testConfig);
 
         // Create the test interface in the DOM
         this.createTestInterface(testConfig, questions);
@@ -314,63 +407,144 @@ class EnhancedTestSystem {
         }
 
         const isPractice = config.mode === 'practice';
+        const title = isPractice ? 'Latihan Formatif' : 'Test Komprehensif';
+        const subtitle = config.category === 'practice' ? 'Latihan soal untuk meningkatkan pemahaman' : 'Evaluasi pengetahuan jaringan komputer';
+
+        const timerInfo = config.timeLimit > 0 ? `
+            <div class="quiz-timer" id="testTimer">${this.formatTime(config.timeLimit)}</div>
+        ` : `
+            <div class="quiz-timer unlimited">Tanpa Batas Waktu</div>
+        `;
 
         contentPages.innerHTML = `
-            <div class="page enhanced-test-page">
-                ${this.generateConsistentHeader(config, isPractice)}
+            <div class="page" data-page="test">
+                ${this.generatePageHeader(title, subtitle, true, 'window.enhancedTestSystem.exitTest()', timerInfo)}
 
-                <main class="test-content">
+                <div class="page-content">
                     <div class="container">
-                        <div id="questionContainer" class="question-container">
-                            <!-- Questions will be rendered here -->
+                        <div class="enhanced-quiz-container">
+                            <!-- Quiz Header -->
+                            <div class="quiz-header">
+                                <div class="quiz-info">
+                                    <div class="quiz-title">${title} - ${config.category}</div>
+                                    <div class="quiz-meta">
+                                        <span class="question-count">
+                                            Soal <span id="currentQuestionNumber">1</span> dari <span id="totalQuestions">${questions.length}</span>
+                                        </span>
+                                        <div class="quiz-timer" id="testTimer">
+                                            ${config.timeLimit > 0 ? this.formatTime(config.timeLimit) : 'Tanpa Batas Waktu'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="quiz-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="quizProgressFill" style="width: 0%"></div>
+                                    </div>
+                                    <span class="progress-text" id="quizProgressText">0%</span>
+                                </div>
+                            </div>
+
+                            <!-- Question Indicators -->
+                            <div class="question-indicators" id="questionIndicators">
+                                ${this.generateQuestionIndicators()}
+                            </div>
+
+                            <!-- Question Container -->
+                            <div class="question-container" id="questionContainer">
+                                <!-- Question will be rendered here -->
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="quiz-navigation">
+                                <button class="btn btn-secondary" id="btnPrevQuestion" onclick="window.enhancedTestSystem.testEngine.previousQuestion()" disabled>
+                                    ← Sebelumnya
+                                </button>
+
+                                <div class="navigation-info">
+                                    <span id="navigationStatus">Pilih jawaban untuk melanjutkan</span>
+                                </div>
+
+                                <button class="btn btn-primary" id="btnNextQuestion" onclick="window.enhancedTestSystem.testEngine.nextQuestion()" disabled>
+                                    Selanjutnya →
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="quiz-actions">
+                                <button class="btn btn-outline" onclick="window.enhancedTestSystem.clearCurrentAnswer()">
+                                    Hapus Jawaban
+                                </button>
+                                <button class="btn btn-success" id="btnSubmitTest" onclick="window.enhancedTestSystem.submitTest()" style="display: none;">
+                                    Selesai & Lihat Hasil
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </main>
-
-                <div class="test-sidebar">
-                    <div class="question-overview">
-                        <h3>Ringkasan Soal</h3>
-                        <div class="overview-stats">
-                            <div class="stat-item">
-                                <span class="stat-label">Total Soal</span>
-                                <span class="stat-value" id="totalQuestions">${questions.length}</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Dijawab</span>
-                                <span class="stat-value" id="answeredQuestions">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Skor Sementara</span>
-                                <span class="stat-value" id="currentScore">0</span>
-                            </div>
-                        </div>
-                        <div class="question-grid" id="questionGrid">
-                            <!-- Question indicators will be rendered here -->
-                        </div>
-                    </div>
-
-                    ${config.enableHints ? `
-                        <div class="test-help">
-                            <h3>Bantuan</h3>
-                            <div class="help-content">
-                                <div class="help-item">
-                                    <span class="help-icon">💡</span>
-                                    <span>Baca soal dengan teliti</span>
-                                </div>
-                                <div class="help-item">
-                                    <span class="help-icon">🎯</span>
-                                    <span>Pilih jawaban terbaik</span>
-                                </div>
-                                <div class="help-item">
-                                    <span class="help-icon">⏰</span>
-                                    <span>${config.timeLimit > 0 ? 'Kelola waktu dengan baik' : 'Kerjakan dengan santai'}</span>
-                                </div>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
             </div>
         `;
+
+        // Initialize question indicators
+        this.updateIndicators();
+    }
+
+    /**
+     * Update question indicators
+     */
+    updateIndicators() {
+        const questionIndicators = document.getElementById('questionIndicators');
+        if (questionIndicators && this.testEngine && this.testEngine.state.questions) {
+            questionIndicators.innerHTML = this.generateQuestionIndicators();
+        }
+    }
+
+    /**
+     * Generate question indicators for the test interface
+     */
+    generateQuestionIndicators() {
+        if (!this.testEngine || !this.testEngine.state.questions) {
+            return '<div class="no-questions">No questions available</div>';
+        }
+
+        return this.testEngine.state.questions.map((_, index) => {
+            const isAnswered = this.testEngine.state.answers[index] !== null;
+            const isCurrent = index === this.testEngine.state.currentQuestionIndex;
+
+            // Check if answer is correct (for answered questions)
+            let isCorrect = null;
+            if (isAnswered && this.testEngine.state.questions[index]) {
+                const question = this.testEngine.state.questions[index];
+                isCorrect = this.testEngine.state.answers[index] === question.correctAnswer;
+            }
+
+            let className = 'indicator';
+            if (isCurrent) className += ' current';
+            else if (isAnswered) {
+                className += isCorrect ? ' correct' : ' incorrect';
+            }
+
+            return `<div class="${className}" data-index="${index}" onclick="window.enhancedTestSystem.testEngine.goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+    }
+
+    /**
+     * Clear current answer
+     */
+    clearCurrentAnswer() {
+        if (this.testEngine && this.testEngine.state.questions.length > 0) {
+            const currentIndex = this.testEngine.state.currentQuestionIndex;
+            this.testEngine.state.answers[currentIndex] = null;
+            this.testEngine.renderCurrentQuestion();
+        }
+    }
+
+    /**
+     * Submit test
+     */
+    submitTest() {
+        if (this.testEngine) {
+            this.testEngine.completeTest();
+        }
     }
 
     /**
@@ -477,12 +651,31 @@ class EnhancedTestSystem {
      * Exit test and return to evaluasi page
      */
     exitTest() {
-        if (confirm('Apakah Anda yakin ingin keluar dari test? Progress yang telah dicapai akan hilang.')) {
-            if (this.app && this.app.loadEvaluasiPage) {
-                this.app.loadEvaluasiPage(document.getElementById('contentPages'));
-            } else {
-                // Fallback: try to navigate back
-                window.history.back();
+        // Use main app's confirm dialog if available
+        if (this.app && this.app.showConfirmDialog) {
+            this.app.showConfirmDialog(
+                'Keluar dari Test',
+                'Apakah Anda yakin ingin keluar dari test? Progress yang telah dicapai akan hilang.',
+                'Batal',
+                'Keluar',
+                () => {
+                    if (this.app && this.app.loadEvaluasiPage) {
+                        this.app.loadEvaluasiPage(document.getElementById('contentPages'));
+                    } else {
+                        // Fallback: try to navigate back
+                        window.history.back();
+                    }
+                }
+            );
+        } else {
+            // Fallback to standard confirm
+            if (confirm('Apakah Anda yakin ingin keluar dari test? Progress yang telah dicapai akan hilang.')) {
+                if (this.app && this.app.loadEvaluasiPage) {
+                    this.app.loadEvaluasiPage(document.getElementById('contentPages'));
+                } else {
+                    // Fallback: try to navigate back
+                    window.history.back();
+                }
             }
         }
     }
@@ -490,9 +683,12 @@ class EnhancedTestSystem {
     /**
      * Generate test questions based on configuration
      */
-    generateTestQuestions(config) {
+    async generateTestQuestions(config) {
         console.log('🔍 Generating test questions with config:', config);
         let questions = [];
+
+        // Ensure external questions are loaded
+        await this.loadExternalQuestions();
 
         // Special handling for practice category - check if external questions are loaded
         if (config.category === 'practice') {
@@ -742,137 +938,88 @@ class EnhancedTestSystem {
         const isPractice = this.testEngine.config.mode === 'practice';
         const passed = analytics.score >= this.config.passingScore;
 
-        const title = passed ? 'Selamat! Anda Lulus' : 'Belum Lulus';
+        const title = passed ? '🎉 Selamat! Anda Lulus' : '💪 Belum Lulus, Coba Lagi!';
         const subtitle = isPractice ? 'Hasil Latihan Formatif' : 'Hasil Test Komprehensif';
         const resultIcon = passed ? '🏆' : '📚';
         const extraInfo = `<div class="result-icon ${passed ? 'passed' : 'failed'}">${resultIcon}</div>`;
 
         contentPages.innerHTML = `
-            <div class="page test-results-page">
+            <div class="page" data-page="test-results">
                 ${this.generatePageHeader(title, subtitle, true, 'window.enhancedTestSystem.exitTest()', extraInfo)}
 
-                <main class="results-content">
+                <div class="page-content">
                     <div class="container">
-                        <div class="results-grid">
-                            <!-- Score Card -->
-                            <div class="result-card score-card">
-                                <h3>Skor Akhir</h3>
-                                <div class="score-display ${passed ? 'excellent' : 'need-improvement'}">
-                                    <span class="score-number">${analytics.score}%</span>
-                                    <span class="score-label">${this.getScoreLabel(analytics.score)}</span>
-                                </div>
-                                <div class="score-breakdown">
-                                    <div class="breakdown-item">
-                                        <span>Jawaban Benar:</span>
-                                        <span class="correct">${results.correctAnswers}/${results.totalQuestions}</span>
+                        <div class="quiz-results-container">
+                            <div class="results-header">
+                                <div class="score-display ${passed ? 'passed' : 'failed'}">
+                                    <div class="score-circle">
+                                        <span class="score-value">${analytics.score}%</span>
                                     </div>
-                                    <div class="breakdown-item">
-                                        <span>Waktu Pengerjaan:</span>
-                                        <span>${this.formatTime(results.timeSpent)}</span>
+                                    <h2>${passed ? '🎉 Selamat! Anda Lulus' : '💪 Belum Lulus, Coba Lagi!'}</h2>
+                                    <p>${passed ? 'Prestasi yang sangat baik!' : 'Terus belajar dan coba lagi.'}</p>
+                                </div>
+                            </div>
+
+                            <div class="results-stats">
+                                <div class="stat-grid">
+                                    <div class="stat-item">
+                                        <div class="stat-value">${results.correctAnswers}</div>
+                                        <div class="stat-label">Jawaban Benar</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${results.totalQuestions}</div>
+                                        <div class="stat-label">Total Soal</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${Math.round(results.timeSpent / 60)}:${(results.timeSpent % 60).toString().padStart(2, '0')}</div>
+                                        <div class="stat-label">Waktu Pengerjaan</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${analytics.score}%</div>
+                                        <div class="stat-label">Skor Akhir</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Performance Analysis -->
-                            <div class="result-card performance-card">
-                                <h3>Analisis Performa</h3>
-                                <div class="performance-stats">
-                                    <div class="stat-row">
-                                        <span class="stat-label">Rata-rata Waktu per Soal:</span>
-                                        <span class="stat-value">${analytics.averageTimePerQuestion} detik</span>
-                                    </div>
-                                    <div class="stat-row">
-                                        <span class="stat-label">Jawaban Benar Beruntun:</span>
-                                        <span class="stat-value">${analytics.correctStreak} soal</span>
-                                    </div>
-                                </div>
-                                ${analytics.recommendations && analytics.recommendations.length > 0 ? `
-                                    <div class="recommendations">
-                                        <h4>Rekomendasi:</h4>
-                                        <ul>
-                                            ${analytics.recommendations.map(rec => `
-                                                <li class="recommendation ${rec.priority}">${rec.message}</li>
-                                            `).join('')}
-                                        </ul>
-                                    </div>
-                                ` : ''}
-                            </div>
-
-                            <!-- Question Review -->
-                            <div class="result-card review-card">
-                                <h3>Review Jawaban</h3>
-                                <div class="review-grid">
-                                    ${results.questions.map((question, index) => {
-                                        const isCorrect = results.answers[index] === question.correctAnswer;
-                                        return `
-                                            <div class="review-item ${isCorrect ? 'correct' : 'incorrect'}"
-                                                 onclick="window.enhancedTestSystem.reviewQuestion(${index})">
-                                                <span class="question-number">${index + 1}</span>
-                                                <span class="result-indicator">${isCorrect ? '✓' : '✗'}</span>
+                            ${analytics.recommendations && analytics.recommendations.length > 0 ? `
+                                <div class="recommendations">
+                                    <h3>Rekomendasi Pembelajaran</h3>
+                                    ${analytics.recommendations.map(rec => `
+                                        <div class="recommendation-item ${rec.priority}">
+                                            <div class="recommendation-icon">${rec.priority === 'high' ? '⚠️' : rec.priority === 'medium' ? '💡' : '✅'}</div>
+                                            <div class="recommendation-content">
+                                                <h4>${rec.type === 'study-more' ? 'Perlu Belajar Lebih Giat' : rec.type === 'practice-more' ? 'Latihan Lebih Banyak' : 'Siap untuk Tingkat Lanjut'}</h4>
+                                                <p>${rec.message}</p>
                                             </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            </div>
-                        </div>
-
-                        ${this.testEngine.config.enableExplanations ? `
-                            <div class="achievements-section">
-                                <h3>Pencapaian Anda</h3>
-                                <div class="achievements-list">
-                                    ${this.getAchievementsForScore(analytics).map(achievement => `
-                                        <div class="achievement ${achievement.earned ? 'earned' : 'locked'}">
-                                            <div class="achievement-icon">${achievement.icon}</div>
-                                            <div class="achievement-info">
-                                                <h4>${achievement.title}</h4>
-                                                <p>${achievement.description}</p>
-                                            </div>
-                                            ${achievement.earned ? '<div class="achievement-badge">✓</div>' : '<div class="achievement-locked">🔒</div>'}
                                         </div>
                                     `).join('')}
                                 </div>
+                            ` : ''}
+
+                            <div class="results-actions">
+                                ${!isPractice && !passed ? `
+                                    <button class="btn btn-primary" onclick="window.enhancedTestSystem.retaketest()">
+                                        Coba Lagi
+                                    </button>
+                                ` : ''}
+
+                                <button class="btn btn-secondary" onclick="window.enhancedTestSystem.reviewAnswers()">
+                                    Lihat Jawaban
+                                </button>
+
+                                ${passed && !isPractice ? `
+                                    <button class="btn btn-success" onclick="window.enhancedTestSystem.downloadCertificate()">
+                                        Unduh Sertifikat
+                                    </button>
+                                ` : ''}
+
+                                <button class="btn btn-outline" onclick="window.enhancedTestSystem.exitTest()">
+                                    Kembali ke Menu
+                                </button>
                             </div>
-                        ` : ''}
-                    </div>
-                </main>
-
-                <footer class="results-actions">
-                    <div class="container">
-                        <div class="action-buttons">
-                            ${!isPractice && !passed ? `
-                                <button class="btn btn-primary" onclick="window.enhancedTestSystem.retaketest()">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
-                                    </svg>
-                                    Ulangi Test
-                                </button>
-                            ` : ''}
-
-                            <button class="btn btn-secondary" onclick="window.enhancedTestSystem.reviewAnswers()">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
-                                </svg>
-                                Review Jawaban
-                            </button>
-
-                            ${passed && !isPractice ? `
-                                <button class="btn btn-success" onclick="window.enhancedTestSystem.downloadCertificate()">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M4,6H2V20A2,2 0 0,0 4,22H18V20H4M18,7H15V13H13V7H10V13H8V7H5V13A2,2 0 0,0 7,15H19A2,2 0 0,0 21,13V7H18Z"/>
-                                    </svg>
-                                    Unduh Sertifikat
-                                </button>
-                            ` : ''}
-
-                            <button class="btn btn-outline" onclick="window.enhancedTestSystem.exitTest()">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M20,11V13H8L13.5,18.5L12.08,17.08L7.5,12.5L12.08,7.92L13.5,9.34L8,13H20Z"/>
-                                </svg>
-                                Kembali ke Menu
-                            </button>
                         </div>
                     </div>
-                </footer>
+                </div>
             </div>
         `;
     }
@@ -1245,6 +1392,12 @@ class TestEngine {
     answerQuestion(answerIndex) {
         if (this.state.isCompleted) return;
 
+        // Validate answer index
+        if (typeof answerIndex !== 'number' || answerIndex < 0) {
+            console.error('❌ Invalid answer index:', answerIndex);
+            return;
+        }
+
         // Comprehensive validation before accessing question
         if (!this.state.questions || !Array.isArray(this.state.questions)) {
             console.error('❌ No questions available in test state');
@@ -1254,12 +1407,6 @@ class TestEngine {
         if (this.state.currentQuestionIndex < 0 || this.state.currentQuestionIndex >= this.state.questions.length) {
             console.error('❌ Invalid question index:', this.state.currentQuestionIndex);
             console.error('Available questions:', this.state.questions.length);
-            console.error('Current state:', {
-                currentIndex: this.state.currentQuestionIndex,
-                totalQuestions: this.state.questions.length,
-                isCompleted: this.state.isCompleted,
-                isRunning: this.state.isRunning
-            });
             return;
         }
 
@@ -1268,46 +1415,26 @@ class TestEngine {
         // Additional validation for question object
         if (!currentQuestion || typeof currentQuestion !== 'object') {
             console.error('❌ Invalid question object at index:', this.state.currentQuestionIndex);
-            console.error('Question data:', currentQuestion);
             return;
         }
 
-        // Debug: Log question structure to identify the issue
-        console.log('Current Question:', currentQuestion);
-        console.log('Answer Index:', answerIndex);
-        console.log('Current Question Index:', this.state.currentQuestionIndex);
-        console.log('Total Questions:', this.state.questions.length);
-
-        // Handle case where correctAnswer might be undefined
-        if (currentQuestion.correctAnswer === undefined || currentQuestion.correctAnswer === null) {
-            console.error('❌ Question missing correctAnswer property:', currentQuestion);
-            // Try to fallback to other possible property names
-            const fallbackCorrectAnswer = currentQuestion.jawaban_benar ||
-                                        currentQuestion.answer ||
-                                        currentQuestion.correct;
-            if (fallbackCorrectAnswer !== undefined) {
-                currentQuestion.correctAnswer = fallbackCorrectAnswer;
-                console.log('✅ Fixed correctAnswer using fallback:', fallbackCorrectAnswer);
-            } else {
-                console.error('❌ Cannot determine correct answer for question:', currentQuestion);
-                return;
-            }
-        }
-
-        // Validate answer index
-        if (typeof answerIndex !== 'number' || answerIndex < 0) {
-            console.error('❌ Invalid answer index:', answerIndex);
-            return;
+        // Normalize correct answer from various data structures
+        const normalizedCorrectAnswer = this.normalizeCorrectAnswer(currentQuestion);
+        if (normalizedCorrectAnswer !== null) {
+            currentQuestion.correctAnswer = normalizedCorrectAnswer;
         }
 
         const isCorrect = answerIndex === currentQuestion.correctAnswer;
         const timeSpent = this.calculateTimeSpent();
 
-        // Update state
+        // Store answer
         this.state.answers[this.state.currentQuestionIndex] = answerIndex;
         if (isCorrect) {
             this.state.score += currentQuestion.points || 10;
         }
+
+        // Update UI immediately
+        this.updateAnswerUI(answerIndex);
 
         // Trigger callback
         if (this.callbacks.onQuestionAnswered) {
@@ -1319,11 +1446,60 @@ class TestEngine {
             );
         }
 
-        // Move to next question or complete test
-        if (this.state.currentQuestionIndex < this.state.questions.length - 1) {
-            this.nextQuestion();
-        } else {
-            this.completeTest();
+        // Update progress and navigation
+        this.updateProgress();
+        this.updateIndicators();
+
+        // Auto-navigate to next question
+        setTimeout(() => {
+            if (this.state.currentQuestionIndex < this.state.questions.length - 1) {
+                this.nextQuestion();
+            } else {
+                // Show submit button on last question
+                this.updateProgress();
+            }
+        }, 300);
+    }
+
+    /**
+     * Update answer UI without race condition
+     */
+    updateAnswerUI(answerIndex) {
+        try {
+            // Clear all selections first
+            document.querySelectorAll('.option-card').forEach((option) => {
+                option.classList.remove('selected');
+                const checkMark = option.querySelector('.option-selected-mark');
+                if (checkMark) checkMark.remove();
+            });
+
+            // Add selected state to the chosen option
+            let selectedOption;
+            if (typeof answerIndex === 'boolean') {
+                selectedOption = document.querySelector(`.option-card[data-value="${answerIndex}"]`);
+            } else {
+                selectedOption = document.querySelector(`.option-card[data-index="${answerIndex}"]`);
+            }
+
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                // Ensure we don't add duplicate check marks
+                if (!selectedOption.querySelector('.option-selected-mark')) {
+                    selectedOption.innerHTML += '<div class="option-selected-mark">✓</div>';
+                }
+                console.log('UI updated for selected option:', selectedOption);
+            }
+        } catch (error) {
+            console.error('Error updating answer UI:', error);
+        }
+    }
+
+    /**
+     * Update indicators in the EnhancedTestSystem
+     */
+    updateIndicators() {
+        if (window.enhancedTestSystem) {
+            window.enhancedTestSystem.updateIndicators();
         }
     }
 
@@ -1400,93 +1576,120 @@ class TestEngine {
             return;
         }
 
-        let questionHTML = this.generateQuestionHTML(question);
+        // Get user answer for this question
+        const userAnswer = this.state.answers[this.state.currentQuestionIndex];
+        const questionNumber = this.state.currentQuestionIndex + 1;
 
-        questionContainer.innerHTML = `
-            <div class="question-header">
-                <div class="question-progress">
-                    <span>Soal ${this.state.currentQuestionIndex + 1} dari ${this.state.questions.length}</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${((this.state.currentQuestionIndex + 1) / this.state.questions.length) * 100}%"></div>
-                    </div>
-                </div>
-                <div class="question-timer">
-                    <span id="testTimer">${this.formatTime(this.state.timeRemaining)}</span>
-                </div>
-            </div>
-
-            <div class="question-content">
-                <h3 class="question-text">${question.pertanyaan || question.question}</h3>
-                ${this.generateAnswerOptions(question)}
-            </div>
-
-            <div class="question-navigation">
-                <button class="btn btn-secondary" onclick="window.enhancedTestSystem.testEngine.previousQuestion()"
-                        ${this.state.currentQuestionIndex === 0 ? 'disabled' : ''}>
-                    ← Sebelumnya
-                </button>
-
-                <div class="question-indicators">
-                    ${this.generateQuestionIndicators()}
+        // Generate question HTML with same structure as quiz system
+        let questionHTML = `
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-number">Soal ${questionNumber}</span>
+                    <span class="question-points">${question.points || 10} poin</span>
                 </div>
 
-                <button class="btn btn-primary" onclick="window.enhancedTestSystem.testEngine.nextQuestion()"
-                        ${this.state.currentQuestionIndex === this.state.questions.length - 1 ? 'disabled' : ''}>
-                    Selanjutnya →
-                </button>
+                <div class="question-text">
+                    <h3>${question.pertanyaan || question.question}</h3>
+                </div>
+
+                <div class="answer-section">
+        `;
+
+        switch (question.type || 'multiple-choice') {
+            case 'multiple-choice':
+                questionHTML += this.generateMultipleChoiceHTML(question, userAnswer);
+                break;
+            case 'true-false':
+                questionHTML += this.generateTrueFalseHTML(question, userAnswer);
+                break;
+            case 'fill-blank':
+                questionHTML += this.generateFillBlankHTML(question, userAnswer);
+                break;
+            default:
+                questionHTML += this.generateMultipleChoiceHTML(question, userAnswer);
+        }
+
+        questionHTML += `
+                </div>
             </div>
         `;
 
-        // Highlight current question indicator
-        const indicators = questionContainer.querySelectorAll('.question-indicator');
-        if (indicators[this.state.currentQuestionIndex]) {
-            indicators[this.state.currentQuestionIndex].classList.add('current');
-        }
+        // Update DOM
+        questionContainer.innerHTML = questionHTML;
 
-        // Update sidebar question grid and stats
-        this.updateSidebar();
+        // Update progress indicators and navigation
+        this.updateProgress();
     }
 
     /**
-     * Update sidebar question grid and stats
+     * Update progress indicators and navigation
      */
-    updateSidebar() {
-        // Update stats
-        const answeredElement = document.getElementById('answeredQuestions');
-        const scoreElement = document.getElementById('currentScore');
-
-        if (answeredElement) {
-            const answeredCount = this.state.answers.filter(answer => answer !== null).length;
-            answeredElement.textContent = answeredCount;
+    updateProgress() {
+        // Update current question number
+        const currentQuestionElement = document.getElementById('currentQuestionNumber');
+        if (currentQuestionElement) {
+            currentQuestionElement.textContent = this.state.currentQuestionIndex + 1;
         }
 
-        if (scoreElement) {
-            scoreElement.textContent = this.state.score;
+        // Update progress text
+        const progressTextElement = document.getElementById('quizProgressText');
+        if (progressTextElement) {
+            const progress = Math.round(((this.state.currentQuestionIndex + 1) / this.state.questions.length) * 100);
+            progressTextElement.textContent = `${progress}%`;
         }
 
-        // Update question grid
-        const questionGrid = document.getElementById('questionGrid');
-        if (questionGrid) {
-            questionGrid.innerHTML = this.generateQuestionGrid();
+        // Update progress bar
+        const progressBar = document.getElementById('quizProgressFill');
+        if (progressBar) {
+            const progress = ((this.state.currentQuestionIndex + 1) / this.state.questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
         }
-    }
 
-    /**
-     * Generate question grid for sidebar
-     */
-    generateQuestionGrid() {
-        return this.state.questions.map((_, index) => {
-            const isAnswered = this.state.answers[index] !== null;
-            const isCurrent = index === this.state.currentQuestionIndex;
+        // Update question indicators
+        const questionIndicators = document.getElementById('questionIndicators');
+        if (questionIndicators) {
+            questionIndicators.innerHTML = this.generateQuestionIndicators();
+        }
 
-            return `
-                <div class="grid-question ${isAnswered ? 'answered' : ''} ${isCurrent ? 'current' : ''}"
-                     onclick="window.enhancedTestSystem.testEngine.goToQuestion(${index})"
-                     title="Soal ${index + 1}${isAnswered ? ' (Sudah dijawab)' : ''}">
-                    ${index + 1}
-                </div>
-            `;
-        }).join('');
+        // Update navigation status
+        const navigationStatus = document.getElementById('navigationStatus');
+        if (navigationStatus) {
+            const currentAnswer = this.state.answers[this.state.currentQuestionIndex];
+            if (currentAnswer !== null) {
+                navigationStatus.textContent = 'Jawaban tersimpan';
+            } else {
+                navigationStatus.textContent = 'Pilih jawaban untuk melanjutkan';
+            }
+        }
+
+        // Update navigation buttons
+        const prevButton = document.getElementById('btnPrevQuestion');
+        const nextButton = document.getElementById('btnNextQuestion');
+        const submitButton = document.getElementById('btnSubmitTest');
+
+        const isLastQuestion = this.state.currentQuestionIndex === this.state.questions.length - 1;
+        const hasAnswer = this.state.answers[this.state.currentQuestionIndex] !== null;
+        const isFirstQuestion = this.state.currentQuestionIndex === 0;
+
+        // Previous button
+        if (prevButton) {
+            prevButton.disabled = isFirstQuestion;
+        }
+
+        // Next/Submit button
+        if (nextButton && submitButton) {
+            if (isLastQuestion) {
+                // On last question, show submit button
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'block';
+                submitButton.disabled = !hasAnswer;
+            } else {
+                // On other questions, show next button
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+                nextButton.disabled = !hasAnswer;
+            }
+        }
     }
 
     generateQuestionHTML(question) {
@@ -1518,28 +1721,100 @@ class TestEngine {
         return html;
     }
 
-    generateAnswerOptions(question) {
-        let optionsHTML = '<div class="answer-options">';
+    generateMultipleChoiceHTML(question, currentAnswer) {
+        const options = question.options || question.jawaban || [];
 
-        // Handle both Indonesian and English property names
-        const options = question.options || question.jawaban;
+        return `
+            <div class="options-grid">
+                ${options.map((option, index) => {
+                    const isSelected = currentAnswer === index;
+                    const letter = String.fromCharCode(65 + index); // A, B, C, D...
 
-        if (options && Array.isArray(options)) {
-            options.forEach((option, index) => {
-                optionsHTML += `
-                    <div class="answer-option" onclick="window.enhancedTestSystem.testEngine.answerQuestion(${index})">
-                        <span class="option-label">${String.fromCharCode(65 + index)}.</span>
-                        <span class="option-text">${option}</span>
-                    </div>
-                `;
-            });
-        } else {
-            console.warn('⚠️ No options found for question:', question);
-            optionsHTML += '<p class="error">No options available for this question</p>';
+                    return `
+                        <div class="option-card ${isSelected ? 'selected' : ''}"
+                             data-index="${index}"
+                             onclick="window.enhancedTestSystem.testEngine.answerQuestion(${index})">
+                            <div class="option-label">${letter}</div>
+                            <div class="option-text">${option}</div>
+                            ${isSelected ? '<div class="option-selected-mark">✓</div>' : ''}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    generateTrueFalseHTML(question, currentAnswer) {
+        const isSelected = currentAnswer !== null;
+        const selectedValue = currentAnswer === true ? 'Benar' : 'Salah';
+
+        return `
+            <div class="true-false-options">
+                <div class="option-card large ${currentAnswer === true ? 'selected' : ''}"
+                     data-value="true"
+                     onclick="window.enhancedTestSystem.testEngine.answerQuestion(true)">
+                    <div class="option-icon">✓</div>
+                    <div class="option-text">Benar</div>
+                    ${currentAnswer === true ? '<div class="option-selected-mark">✓</div>' : ''}
+                </div>
+
+                <div class="option-card large ${currentAnswer === false ? 'selected' : ''}"
+                     data-value="false"
+                     onclick="window.enhancedTestSystem.testEngine.answerQuestion(false)">
+                    <div class="option-icon">✗</div>
+                    <div class="option-text">Salah</div>
+                    ${currentAnswer === false ? '<div class="option-selected-mark">✓</div>' : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    generateFillBlankHTML(question, currentAnswer) {
+        return `
+            <div class="fill-blank-container">
+                <div class="input-group">
+                    <input type="text"
+                           id="fillBlankInput"
+                           class="form-input"
+                           placeholder="Ketik jawaban Anda di sini..."
+                           value="${currentAnswer || ''}"
+                           onkeyup="window.enhancedTestSystem.testEngine.handleFillBlankInput(event)">
+                    <button class="btn btn-primary" onclick="window.enhancedTestSystem.testEngine.submitFillBlank()">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    handleFillBlankInput(event) {
+        const input = event.target;
+        const value = input.value.trim();
+
+        // Enable/disable next button based on input
+        const nextBtn = document.getElementById('btnNextQuestion');
+        if (nextBtn) {
+            nextBtn.disabled = !value;
         }
 
-        optionsHTML += '</div>';
-        return optionsHTML;
+        // Update navigation status
+        const navigationStatus = document.getElementById('navigationStatus');
+        if (navigationStatus) {
+            navigationStatus.textContent = value ? 'Jawaban tersimpan' : 'Pilih jawaban untuk melanjutkan';
+        }
+    }
+
+    submitFillBlank() {
+        const input = document.getElementById('fillBlankInput');
+        if (!input) return;
+
+        const value = input.value.trim();
+        if (value) {
+            // For fill blank questions, we'll store the text value
+            this.state.answers[this.state.currentQuestionIndex] = value;
+            this.updateProgress();
+            this.updateIndicators();
+        }
     }
 
     generateMultipleChoiceHTML(question) {
@@ -1631,12 +1906,20 @@ class TestEngine {
             const isAnswered = this.state.answers[index] !== null;
             const isCurrent = index === this.state.currentQuestionIndex;
 
-            return `
-                <div class="question-indicator ${isAnswered ? 'answered' : ''} ${isCurrent ? 'current' : ''}"
-                     onclick="window.enhancedTestSystem.testEngine.goToQuestion(${index})">
-                    ${index + 1}
-                </div>
-            `;
+            // Check if answer is correct (for answered questions)
+            let isCorrect = null;
+            if (isAnswered && this.state.questions[index]) {
+                const question = this.state.questions[index];
+                isCorrect = this.state.answers[index] === question.correctAnswer;
+            }
+
+            let className = 'indicator';
+            if (isCurrent) className += ' current';
+            else if (isAnswered) {
+                className += isCorrect ? ' correct' : ' incorrect';
+            }
+
+            return `<div class="${className}" data-index="${index}" onclick="window.enhancedTestSystem.testEngine.goToQuestion(${index})">${index + 1}</div>`;
         }).join('');
     }
 
@@ -1670,25 +1953,66 @@ class TestEngine {
     }
 
     completeTest() {
-        this.state.isCompleted = true;
-        this.state.endTime = new Date();
-        this.stopTimer();
+        try {
+            console.log('Completing test...');
 
-        const results = {
-            score: Math.round((this.state.score / this.getMaxPossibleScore()) * 100),
-            correctAnswers: this.state.answers.filter((answer, index) => {
-                const question = this.state.questions[index];
-                return answer === question.correctAnswer;
-            }).length,
-            totalQuestions: this.state.questions.length,
-            timeSpent: this.calculateTotalTimeSpent(),
-            answers: this.state.answers,
-            questions: this.state.questions,
-            state: this.state
-        };
+            this.state.isCompleted = true;
+            this.state.endTime = new Date();
+            this.stopTimer();
 
-        if (this.callbacks.onTestCompleted) {
-            this.callbacks.onTestCompleted(results);
+            // Validate state before completion
+            if (!this.state.questions || !Array.isArray(this.state.questions)) {
+                throw new Error('Invalid questions array for test completion');
+            }
+
+            if (!this.state.answers || !Array.isArray(this.state.answers)) {
+                throw new Error('Invalid answers array for test completion');
+            }
+
+            const results = {
+                score: Math.round((this.state.score / this.getMaxPossibleScore()) * 100),
+                correctAnswers: this.state.answers.filter((answer, _index) => {
+                    const question = this.state.questions[_index];
+                    if (!question) {
+                        console.warn(`Question at index ${_index} is missing`);
+                        return false;
+                    }
+                    return answer === question.correctAnswer;
+                }).length,
+                totalQuestions: this.state.questions.length,
+                timeSpent: this.calculateTotalTimeSpent(),
+                answers: this.state.answers,
+                questions: this.state.questions,
+                state: this.state
+            };
+
+            console.log('Test completed with results:', results);
+
+            if (this.callbacks.onTestCompleted) {
+                try {
+                    this.callbacks.onTestCompleted(results);
+                } catch (error) {
+                    console.error('Error in test completed callback:', error);
+                    // Don't fail the completion if callback fails
+                }
+            }
+        } catch (error) {
+            console.error('Error in completeTest:', error);
+            // Try to complete with minimal results
+            const fallbackResults = {
+                score: 0,
+                correctAnswers: 0,
+                totalQuestions: this.state.questions ? this.state.questions.length : 0,
+                timeSpent: this.calculateTotalTimeSpent(),
+                answers: this.state.answers || [],
+                questions: this.state.questions || [],
+                state: this.state,
+                error: error.message
+            };
+
+            if (this.callbacks.onTestCompleted) {
+                this.callbacks.onTestCompleted(fallbackResults);
+            }
         }
     }
 
@@ -1736,6 +2060,25 @@ class TestEngine {
 
     getState() {
         return { ...this.state };
+    }
+
+    /**
+     * Normalize correct answer from various data structures
+     */
+    normalizeCorrectAnswer(question) {
+        // Try different property names in order of preference
+        const correctAnswer = question.jawaban_benar ||
+                            question.correctAnswer ||
+                            question.correct ||
+                            question.answer ||
+                            question.jawaban;
+
+        if (correctAnswer === undefined || correctAnswer === null) {
+            console.warn('Question missing correct answer:', question);
+            return null;
+        }
+
+        return correctAnswer;
     }
 }
 
@@ -1820,8 +2163,8 @@ class TestAnalytics {
     }
 
     generateQuestionBreakdown() {
-        return this.sessionData.questionAnswers.map((answer, index) => ({
-            questionNumber: index + 1,
+        return this.sessionData.questionAnswers.map((answer, _index) => ({
+            questionNumber: _index + 1,
             isCorrect: answer.isCorrect,
             timeSpent: answer.timeSpent,
             questionId: answer.questionId

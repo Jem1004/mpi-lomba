@@ -321,39 +321,55 @@ class EnhancedQuizSystem {
      * Render current question
      */
     renderCurrentQuestion() {
-        console.log('Rendering question:', this.quizState.currentQuestionIndex);
-        console.log('Total questions:', this.quizState.questions.length);
-        console.log('Current question:', this.quizState.questions[this.quizState.currentQuestionIndex]);
-
-        const question = this.quizState.questions[this.quizState.currentQuestionIndex];
-        if (!question) {
-            console.error('No question found at index:', this.quizState.currentQuestionIndex);
-            this.showQuizError('Soal tidak ditemukan. Silakan coba lagi.');
-            return;
-        }
-
-        const container = document.getElementById('questionContainer');
-        if (!container) {
-            console.error('Question container not found');
-            this.showQuizError('Container soal tidak ditemukan. Silakan refresh halaman.');
-            return;
-        }
-
-        const currentAnswer = this.quizState.answers[this.quizState.currentQuestionIndex];
-
         try {
-            container.innerHTML = this.generateQuestionHTML(question, currentAnswer);
-            console.log('Question HTML generated successfully');
+            console.log('Rendering question:', this.quizState.currentQuestionIndex);
+            console.log('Total questions:', this.quizState.questions.length);
 
-            // Update navigation and progress
-            this.updateNavigation();
-            this.updateProgress();
-            this.updateIndicators();
+            // Validate state before rendering
+            if (!this.validateQuizState()) {
+                throw new Error('Invalid quiz state for rendering');
+            }
+
+            const question = this.quizState.questions[this.quizState.currentQuestionIndex];
+            if (!question) {
+                throw new Error(`No question found at index: ${this.quizState.currentQuestionIndex}`);
+            }
+
+            const container = document.getElementById('questionContainer');
+            if (!container) {
+                throw new Error('Question container not found in DOM');
+            }
+
+            const currentAnswer = this.quizState.answers[this.quizState.currentQuestionIndex];
+
+            // Generate question HTML with error handling
+            let questionHTML;
+            try {
+                questionHTML = this.generateQuestionHTML(question, currentAnswer);
+                console.log('Question HTML generated successfully');
+            } catch (error) {
+                console.error('Error generating question HTML:', error);
+                throw new Error('Failed to generate question HTML');
+            }
+
+            // Update DOM
+            container.innerHTML = questionHTML;
+
+            // Update navigation and progress with error handling
+            try {
+                this.updateNavigation();
+                this.updateProgress();
+                this.updateIndicators();
+            } catch (error) {
+                console.error('Error updating UI components:', error);
+                // Don't fail the render if UI updates fail
+            }
 
             console.log('Question rendered successfully:', this.quizState.currentQuestionIndex + 1);
+
         } catch (error) {
-            console.error('Error rendering question:', error);
-            this.showQuizError('Error rendering question: ' + error.message);
+            console.error('Error in renderCurrentQuestion:', error);
+            this.showQuizError(`Gagal menampilkan soal: ${error.message}`);
         }
     }
 
@@ -511,37 +527,92 @@ class EnhancedQuizSystem {
      * Select answer for current question
      */
     selectAnswer(answerIndex) {
-        const question = this.quizState.questions[this.quizState.currentQuestionIndex];
-        const isBoolean = typeof answerIndex === 'boolean';
+        try {
+            // Validate current state
+            if (this.quizState.currentQuestionIndex < 0 ||
+                this.quizState.currentQuestionIndex >= this.quizState.questions.length) {
+                throw new Error('Invalid question index');
+            }
 
-        // Store answer
-        this.quizState.answers[this.quizState.currentQuestionIndex] = answerIndex;
+            // Validate answer
+            if (answerIndex === null || answerIndex === undefined) {
+                throw new Error('Invalid answer value');
+            }
 
-        // Update UI
-        document.querySelectorAll('.option-card').forEach((option, index) => {
-            option.classList.remove('selected');
-            const checkMark = option.querySelector('.option-selected-mark');
-            if (checkMark) checkMark.remove();
-        });
+            const question = this.quizState.questions[this.quizState.currentQuestionIndex];
+            const isBoolean = typeof answerIndex === 'boolean';
 
-        // Add selected state
-        let selectedOption;
-        if (isBoolean) {
-            selectedOption = document.querySelector(`.option-card[data-value="${answerIndex}"]`);
-        } else {
-            selectedOption = document.querySelector(`.option-card[data-index="${answerIndex}"]`);
+            console.log('selectAnswer called:', {
+                answerIndex,
+                isBoolean,
+                currentIndex: this.quizState.currentQuestionIndex,
+                question: question.pertanyaan || question.question
+            });
+
+            // Store answer immediately with validation
+            this.quizState.answers[this.quizState.currentQuestionIndex] = answerIndex;
+
+            // Verify answer was stored correctly
+            if (this.quizState.answers[this.quizState.currentQuestionIndex] !== answerIndex) {
+                throw new Error('Answer failed to save');
+            }
+
+            console.log('Answer saved successfully:', {
+                savedAnswer: this.quizState.answers[this.quizState.currentQuestionIndex],
+                expectedAnswer: answerIndex
+            });
+
+            // Use requestAnimationFrame to prevent race condition
+            requestAnimationFrame(() => {
+                // Update UI after ensuring answer is saved
+                this.updateAnswerUI(answerIndex, isBoolean);
+
+                // Update navigation after UI is complete
+                this.updateNavigation();
+                this.updateIndicators();
+
+                console.log('UI and navigation updated successfully');
+            });
+
+        } catch (error) {
+            console.error('Error in selectAnswer:', error);
+            this.showQuizError('Gagal menyimpan jawaban. Silakan coba lagi.');
         }
+    }
 
-        if (selectedOption) {
-            selectedOption.classList.add('selected');
-            selectedOption.innerHTML += '<div class="option-selected-mark">✓</div>';
+    /**
+     * Update answer UI without race condition
+     */
+    updateAnswerUI(answerIndex, isBoolean) {
+        try {
+            // Clear all selections first
+            document.querySelectorAll('.option-card').forEach((option) => {
+                option.classList.remove('selected');
+                const checkMark = option.querySelector('.option-selected-mark');
+                if (checkMark) checkMark.remove();
+            });
+
+            // Add selected state to the chosen option
+            let selectedOption;
+            if (isBoolean) {
+                selectedOption = document.querySelector(`.option-card[data-value="${answerIndex}"]`);
+            } else {
+                selectedOption = document.querySelector(`.option-card[data-index="${answerIndex}"]`);
+            }
+
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                // Ensure we don't add duplicate check marks
+                if (!selectedOption.querySelector('.option-selected-mark')) {
+                    selectedOption.innerHTML += '<div class="option-selected-mark">✓</div>';
+                }
+                console.log('UI updated for selected option:', selectedOption);
+            } else {
+                console.warn('Selected option not found:', { answerIndex, isBoolean });
+            }
+        } catch (error) {
+            console.error('Error updating answer UI:', error);
         }
-
-        // Update navigation
-        this.updateNavigation();
-        this.updateIndicators();
-
-        console.log('Answer selected:', answerIndex, 'for question:', this.quizState.currentQuestionIndex);
     }
 
     /**
@@ -565,20 +636,39 @@ class EnhancedQuizSystem {
         const isLastQuestion = this.quizState.currentQuestionIndex === this.quizState.questions.length - 1;
         const hasAnswer = this.quizState.answers[this.quizState.currentQuestionIndex] !== null;
 
-        if (isLastQuestion) {
-            // Show submit button on last question
+        console.log('nextQuestion called:', {
+            isLastQuestion,
+            hasAnswer,
+            currentIndex: this.quizState.currentQuestionIndex,
+            totalQuestions: this.quizState.questions.length
+        });
+
+        if (isLastQuestion && hasAnswer) {
+            // Only show submit button if on last question AND has answered
             const submitBtn = document.getElementById('btnSubmitQuiz');
             const nextBtn = document.getElementById('btnNextQuestion');
 
             if (submitBtn && nextBtn) {
                 nextBtn.style.display = 'none';
                 submitBtn.style.display = 'block';
+                submitBtn.disabled = false; // Enable submit button when answer is provided
+                console.log('Showing submit button on last question with answer');
             }
-        } else if (this.quizState.currentQuestionIndex < this.quizState.questions.length - 1) {
+        } else if (!isLastQuestion && hasAnswer) {
+            // Only navigate if not last question AND has answered
             this.quizState.currentQuestionIndex++;
             this.renderCurrentQuestion();
-
             console.log('Navigated to next question:', this.quizState.currentQuestionIndex + 1);
+        } else {
+            // Cannot navigate - show warning
+            console.log('Cannot navigate - requirements not met:', {
+                isLastQuestion,
+                hasAnswer,
+                currentIndex: this.quizState.currentQuestionIndex
+            });
+
+            // Update status to guide user
+            this.updateNavigationStatus('Pilih jawaban untuk melanjutkan');
         }
     }
 
@@ -619,21 +709,32 @@ class EnhancedQuizSystem {
         const hasAnswer = this.quizState.answers[this.quizState.currentQuestionIndex] !== null;
         const isFirstQuestion = this.quizState.currentQuestionIndex === 0;
 
+        console.log('updateNavigation called:', {
+            isLastQuestion,
+            hasAnswer,
+            isFirstQuestion,
+            currentIndex: this.quizState.currentQuestionIndex
+        });
+
         // Previous button
         if (prevBtn) {
             prevBtn.disabled = isFirstQuestion || !this.config.allowBackNavigation;
         }
 
-        // Next/Submit button
+        // Next/Submit button - FIXED LOGIC
         if (nextBtn && submitBtn) {
             if (isLastQuestion) {
+                // On last question, show submit button
                 nextBtn.style.display = 'none';
                 submitBtn.style.display = 'block';
-                submitBtn.disabled = !hasAnswer;
+                submitBtn.disabled = !hasAnswer; // Enable only if answer is provided
+                console.log('Last question - submit button enabled:', !submitBtn.disabled);
             } else {
+                // On other questions, show next button
                 nextBtn.style.display = 'block';
                 submitBtn.style.display = 'none';
-                nextBtn.disabled = !hasAnswer;
+                nextBtn.disabled = !hasAnswer; // Enable only if answer is provided
+                console.log('Not last question - next button enabled:', !nextBtn.disabled);
             }
         }
 
@@ -742,26 +843,92 @@ class EnhancedQuizSystem {
      * Submit quiz
      */
     submitQuiz() {
-        if (this.quizState.isQuizCompleted) return;
+        try {
+            if (this.quizState.isQuizCompleted) {
+                console.warn('Quiz already completed');
+                return;
+            }
 
-        // Stop timer
-        if (this.quizState.timerInterval) {
-            clearInterval(this.quizState.timerInterval);
+            // Validate quiz state before submission
+            if (!this.validateQuizState()) {
+                throw new Error('Invalid quiz state for submission');
+            }
+
+            // Stop timer
+            if (this.quizState.timerInterval) {
+                clearInterval(this.quizState.timerInterval);
+            }
+
+            this.quizState.isQuizCompleted = true;
+            this.quizState.endTime = new Date();
+
+            // Calculate score with error handling
+            try {
+                this.calculateScore();
+            } catch (error) {
+                console.error('Error calculating score:', error);
+                // Set default score if calculation fails
+                this.quizState.score = 0;
+                this.quizState.correctAnswers = 0;
+            }
+
+            // Show results with error handling
+            try {
+                this.showQuizResults();
+            } catch (error) {
+                console.error('Error showing results:', error);
+                this.showQuizError('Gagal menampilkan hasil kuis. Silakan coba lagi.');
+                return;
+            }
+
+            // Save to user data with error handling
+            try {
+                this.saveQuizResults();
+            } catch (error) {
+                console.error('Error saving quiz results:', error);
+                // Don't fail the submission if save fails
+            }
+
+            console.log('Quiz submitted with score:', this.quizState.score);
+        } catch (error) {
+            console.error('Error in submitQuiz:', error);
+            this.showQuizError('Gagal menyelesaikan kuis. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Validate quiz state
+     */
+    validateQuizState() {
+        const issues = [];
+
+        if (!this.quizState.questions || !Array.isArray(this.quizState.questions)) {
+            issues.push('Questions array is invalid');
         }
 
-        this.quizState.isQuizCompleted = true;
-        this.quizState.endTime = new Date();
+        if (this.quizState.questions.length === 0) {
+            issues.push('No questions available');
+        }
 
-        // Calculate score
-        this.calculateScore();
+        if (!this.quizState.answers || !Array.isArray(this.quizState.answers)) {
+            issues.push('Answers array is invalid');
+        }
 
-        // Show results
-        this.showQuizResults();
+        if (this.quizState.answers.length !== this.quizState.questions.length) {
+            issues.push('Answers and questions length mismatch');
+        }
 
-        // Save to user data
-        this.saveQuizResults();
+        if (this.quizState.currentQuestionIndex < 0 ||
+            this.quizState.currentQuestionIndex >= this.quizState.questions.length) {
+            issues.push('Invalid current question index');
+        }
 
-        console.log('Quiz submitted with score:', this.quizState.score);
+        if (issues.length > 0) {
+            console.error('Quiz state validation failed:', issues);
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -774,22 +941,36 @@ class EnhancedQuizSystem {
 
         this.quizState.questions.forEach((question, index) => {
             const userAnswer = this.quizState.answers[index];
-            const correctAnswer = question.jawaban_benar || question.correctAnswer;
+            const correctAnswer = this.normalizeCorrectAnswer(question);
             const points = question.points || 10;
+
+            console.log(`Scoring question ${index + 1}:`, {
+                userAnswer,
+                correctAnswer,
+                questionType: question.type,
+                points
+            });
 
             totalPoints += points;
 
-            if (userAnswer !== null) {
+            if (userAnswer !== null && correctAnswer !== null) {
                 if (question.type === 'fill-blank') {
                     // For fill blank, check if answer matches (case insensitive)
-                    if (userAnswer.toString().toLowerCase() === correctAnswer.toString().toLowerCase()) {
+                    if (userAnswer.toString().toLowerCase().trim() === correctAnswer.toString().toLowerCase().trim()) {
                         correctCount++;
                         earnedPoints += points;
+                        console.log('Fill blank answer correct');
                     }
                 } else if (userAnswer === correctAnswer) {
                     correctCount++;
                     earnedPoints += points;
+                    console.log('Multiple choice answer correct');
                 }
+            } else {
+                console.log('Question skipped or invalid:', {
+                    userAnswer,
+                    correctAnswer
+                });
             }
         });
 
@@ -798,6 +979,33 @@ class EnhancedQuizSystem {
         this.quizState.score = Math.round((earnedPoints / totalPoints) * 100);
         this.quizState.earnedPoints = earnedPoints;
         this.quizState.totalPoints = totalPoints;
+
+        console.log('Final score calculated:', {
+            correctCount,
+            totalQuestions: this.quizState.totalQuestions,
+            earnedPoints,
+            totalPoints,
+            score: this.quizState.score
+        });
+    }
+
+    /**
+     * Normalize correct answer from various data structures
+     */
+    normalizeCorrectAnswer(question) {
+        // Try different property names in order of preference
+        const correctAnswer = question.jawaban_benar ||
+                            question.correctAnswer ||
+                            question.correct ||
+                            question.answer ||
+                            question.jawaban;
+
+        if (correctAnswer === undefined || correctAnswer === null) {
+            console.warn('Question missing correct answer:', question);
+            return null;
+        }
+
+        return correctAnswer;
     }
 
     /**
