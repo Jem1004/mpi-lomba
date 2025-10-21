@@ -485,16 +485,40 @@ class MPIApp {
      */
     updateCertificateStatus() {
         const certificateStatus = document.getElementById('certificateStatus');
-        const finalScore = this.userData.scores.final;
+        const certificateQuickAction = document.getElementById('certificateQuickAction');
+
+        // QUIZ-ONLY SYSTEM: Check evaluation progress
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        const hasCertificate = progress.certificateUnlocked;
+        const bestScore = progress.bestScore || 0;
 
         if (certificateStatus) {
-            if (finalScore >= 70) {
-                certificateStatus.textContent = 'Available';
+            if (hasCertificate) {
+                // Certificate is unlocked
+                certificateStatus.innerHTML = `
+                    <span class="status-text unlocked">🏆 Tersedia</span>
+                    <div class="status-details">Skor: ${bestScore}%</div>
+                `;
                 certificateStatus.classList.remove('locked');
-                certificateStatus.classList.add('available');
+                certificateStatus.classList.add('unlocked');
+
+                // Hide quick action button since certificate is available
+                if (certificateQuickAction) {
+                    certificateQuickAction.style.display = 'none';
+                }
             } else {
-                certificateStatus.textContent = 'Locked';
+                // Certificate is locked - show quick action
+                certificateStatus.innerHTML = `
+                    <span class="status-text locked">🔒 Terkunci</span>
+                    <div class="status-details">Butuh 70% di kuis</div>
+                `;
+                certificateStatus.classList.remove('unlocked');
                 certificateStatus.classList.add('locked');
+
+                // Show quick action button for easy quiz access
+                if (certificateQuickAction) {
+                    certificateQuickAction.style.display = 'block';
+                }
             }
         }
     }
@@ -1697,13 +1721,29 @@ class MPIApp {
                 </header>
                 <main class="page-content">
                     <div class="about-content">
-                        <div style="text-align: center; padding: 2rem;">
-                            <h2 style="color: var(--color-primary); margin-bottom: 1rem;">Media Pembelajaran Interaktif</h2>
-                            <p style="color: var(--color-light-dimmed); margin-bottom: 1rem;">Jaringan Dasar - SMK TKJT</p>
-                            <p style="color: var(--color-gray); font-size: 0.9rem;">Version 1.0.0</p>
-                            <p style="color: var(--color-gray); font-size: 0.9rem;">© 2024 MPI Development Team</p>
+                        <!-- Developer Profile Section -->
+                        <div class="developer-profile">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <img src="assets/pembuat.JPG" alt="Irawan, S.I.Kom" class="developer-photo">
+                                </div>
+                                <div class="profile-info">
+                                    <h2 class="developer-name">Irawan, S.I.Kom</h2>
+                                    <p class="developer-title">Guru Produktif TKJT</p>
+                                    <p class="developer-institution">SMK Muhammadiyah 1 PPU</p>
+                                </div>
+                            </div>
+
+                            <!-- Simple About Information -->
+                            <div class="simple-about">
+                                <div class="about-section">
+                                    <h3 class="section-title">📚 Tentang Aplikasi</h3>
+                                    <p>Media Pembelajaran Interaktif Jaringan Dasar adalah aplikasi web untuk mendukung pembelajaran mata pelajaran Jaringan Komputer di SMK TKJT.</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+
+                      </div>
                 </main>
             </div>
         `;
@@ -5361,18 +5401,30 @@ class MPIApp {
         // Calculate completion rate (mock calculation - replace with actual logic)
         progress.completionRate = this.calculateCompletionRate();
 
-        // Check if certificate requirements are met
+        // SIMPLIFIED CERTIFICATE SYSTEM - Quiz Only (70% passing score)
         const quizPassed = (progress.bestScore || 0) >= 70;
-        const practiceEnough = progress.practiceCompleted >= 10;
-        const completionEnough = progress.completionRate >= 80;
 
-        // Unlock certificate if all requirements are met
-        if (quizPassed && practiceEnough && completionEnough) {
-            progress.certificateUnlocked = true;
-            progress.certificateDate = new Date().toISOString();
+        // Unlock certificate if quiz requirement is met (QUIZ-ONLY SYSTEM)
+        if (quizPassed) {
+            if (!progress.certificateUnlocked) {
+                progress.certificateUnlocked = true;
+                progress.certificateDate = new Date().toISOString();
 
-            // Show notification
-            this.showNotification('🎉 Selamat! Sertifikat kompetensi Anda telah tersedia!', 'success');
+                // Store certificate data for easy access
+                progress.certificateData = {
+                    id: this.generateCertificateID(),
+                    studentName: this.studentName,
+                    score: progress.bestScore,
+                    completionDate: progress.certificateDate,
+                    verificationCode: this.generateVerificationCode(),
+                    quizOnly: true,
+                    passingScore: 70
+                };
+
+                // Show notification
+                this.showNotification('🎉 Selamat! Sertifikat kompetensi Anda telah tersedia!', 'success');
+                console.log('🏆 Certificate unlocked with quiz-only system:', progress.certificateData);
+            }
         }
 
         // Save updated progress
@@ -5576,15 +5628,279 @@ class MPIApp {
     }
 
     /**
+     * Generate simple certificate page (QUIZ-ONLY SYSTEM)
+     */
+    generateSimpleCertificatePage() {
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        const contentPages = document.getElementById('contentPages');
+
+        if (!contentPages) return;
+
+        const hasCertificate = progress.certificateUnlocked;
+        const bestScore = progress.bestScore || 0;
+        const quizAttempts = progress.quizAttempts || 0;
+        const certificateData = progress.certificateData;
+
+        const certificatePageHTML = `
+        <div class="page" data-page="certificate">
+            ${this.generatePageHeader(
+                'Sertifikat Kompetensi',
+                'Dapatkan sertifikat dengan menyelesaikan kuis (70% passing score)',
+                true
+            )}
+
+            <!-- DEBUG SECTION (remove in production) -->
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-outline" onclick="window.mpiApp.debugCertificateStatus()" style="font-size: 12px; padding: 5px 10px;">
+                    🔍 Debug Certificate Status
+                </button>
+            </div>
+
+            <div class="page-content">
+                <div class="container">
+                    <div class="simple-certificate-container">
+                        ${hasCertificate ? this.renderUnlockedCertificate(certificateData, bestScore) : this.renderLockedCertificate(bestScore, quizAttempts)}
+
+                        <!-- Quiz Access Section -->
+                        <div class="quiz-access-section">
+                            <h3>🎯 Cara Mendapatkan Sertifikat</h3>
+                            <div class="quiz-info-card">
+                                <h4>Kuis Kompetensi Jaringan Dasar</h4>
+                                <ul class="quiz-details">
+                                    <li>📝 15 soal pilihan ganda</li>
+                                    <li>⏱️ Waktu: 15 menit</li>
+                                    <li>🎯 Passing grade: 70%</li>
+                                    <li>🔄 Unlimited attempts</li>
+                                </ul>
+
+                                ${!hasCertificate ? `
+                                    <button class="btn btn-primary btn-large" onclick="window.mpiApp.startCertificateQuiz()">
+                                        🚀 Mulai Kuis Sertifikat Sekarang
+                                    </button>
+                                ` : `
+                                    <div class="congratulations-message">
+                                        <p>🎉 <strong>Selamat!</strong> Anda telah lulus kuis dengan nilai ${bestScore}%</p>
+                                        <p>Sertifikat kompetensi Anda sudah tersedia dan dapat diunduh kapan saja.</p>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+
+                        ${hasCertificate ? `
+                            <!-- Certificate Actions -->
+                            <div class="certificate-actions-section">
+                                <h3>📋 Aksi Sertifikat</h3>
+                                <div class="actions-grid">
+                                    <button class="btn btn-success btn-large" onclick="window.mpiApp.downloadCertificate()">
+                                        📥 Unduh Sertifikat PDF
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="window.mpiApp.viewCertificateDetails()">
+                                        👀 Lihat Detail Sertifikat
+                                    </button>
+                                    <button class="btn btn-outline" onclick="window.mpiApp.shareCertificate()">
+                                        📤 Bagikan Sertifikat
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+
+        contentPages.innerHTML = certificatePageHTML;
+        console.log('✅ Simple certificate page generated');
+    }
+
+    /**
+     * Render unlocked certificate view
+     */
+    renderUnlockedCertificate(certificateData, score) {
+        return `
+        <div class="certificate-card unlocked">
+            <div class="certificate-header">
+                <div class="certificate-icon">🏆</div>
+                <h2>Sertifikat Anda Tersedia!</h2>
+                <p>Selamat atas pencapaian Anda dalam kuis kompetensi jaringan dasar</p>
+            </div>
+
+            <div class="certificate-stats">
+                <div class="stat-card">
+                    <div class="stat-value">${score}%</div>
+                    <div class="stat-label">Nilai Kuis</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${certificateData.id}</div>
+                    <div class="stat-label">No. Sertifikat</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${new Date(certificateData.completionDate).toLocaleDateString('id-ID')}</div>
+                    <div class="stat-label">Tanggal Perolehan</div>
+                </div>
+            </div>
+
+            <div class="certificate-preview">
+                <div class="preview-badge">
+                    <span class="preview-icon">✅</span>
+                    <span class="preview-text">Sertifikat Terverifikasi</span>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    /**
+     * Render locked certificate view
+     */
+    renderLockedCertificate(bestScore, attempts) {
+        return `
+        <div class="certificate-card locked">
+            <div class="certificate-header">
+                <div class="certificate-icon">🔒</div>
+                <h2>Sertifikat Kompetensi</h2>
+                <p>Selesaikan kuis dengan nilai minimal 70% untuk membuka sertifikat</p>
+            </div>
+
+            <div class="progress-indicator">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${Math.min(bestScore, 100)}%"></div>
+                </div>
+                <div class="progress-text">Progress: ${bestScore}% / 70%</div>
+            </div>
+
+            <div class="attempt-info">
+                <p>📊 Percobaan kuis: <strong>${attempts}</strong> kali</p>
+                ${bestScore > 0 ? `<p>💡 Skor terbaik Anda: <strong>${bestScore}%</strong></p>` : '<p>🎯 Mulai kuis untuk melihat progress Anda</p>'}
+            </div>
+
+            ${bestScore >= 60 ? `
+                <div class="close-to-success">
+                    <p>🔥 Hampir berhasil! Tinggal ${70 - bestScore}% lagi untuk mendapatkan sertifikat.</p>
+                </div>
+            ` : ''}
+        </div>
+        `;
+    }
+
+    /**
+     * View certificate details
+     */
+    viewCertificateDetails() {
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        const certificateData = progress.certificateData;
+
+        if (!certificateData) {
+            this.showNotification('Data sertifikat tidak ditemukan', 'error');
+            return;
+        }
+
+        const detailsHTML = `
+        <div class="certificate-details-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        ">
+            <div class="details-content" style="
+                background: var(--color-darker);
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                color: var(--color-light);
+            ">
+                <h2>Detail Sertifikat</h2>
+                <div class="certificate-info-grid">
+                    <div class="info-item">
+                        <label>Nama Siswa:</label>
+                        <span>${certificateData.studentName}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>No. Sertifikat:</label>
+                        <span>${certificateData.id}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Skor:</label>
+                        <span>${certificateData.score}%</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Tanggal:</label>
+                        <span>${new Date(certificateData.completionDate).toLocaleDateString('id-ID')}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Kode Verifikasi:</label>
+                        <span>${certificateData.verificationCode}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Program:</label>
+                        <span>Jaringan Dasar - SMK TKJT</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="window.mpiApp.downloadCertificate(); document.querySelector('.certificate-details-modal').remove();">
+                        📥 Unduh PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="document.querySelector('.certificate-details-modal').remove();">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', detailsHTML);
+    }
+
+    /**
+     * Share certificate
+     */
+    shareCertificate() {
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        const certificateData = progress.certificateData;
+
+        if (!certificateData) {
+            this.showNotification('Sertifikat belum tersedia', 'error');
+            return;
+        }
+
+        const shareText = `🏆 Saya telah mendapatkan Sertifikat Kompetensi Jaringan Dasar dengan nilai ${certificateData.score}%!`;
+        const shareURL = window.location.href;
+
+        if (navigator.share) {
+            navigator.share({
+                title: 'Sertifikat Kompetensi Jaringan Dasar',
+                text: shareText,
+                url: shareURL
+            }).catch(err => console.log('Error sharing:', err));
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(`${shareText} ${shareURL}`).then(() => {
+                this.showNotification('Tautan sertifikat disalin ke clipboard!', 'success');
+            }).catch(() => {
+                this.showNotification('Gagal membagikan sertifikat', 'error');
+            });
+        }
+    }
+
+    /**
      * Initialize certificate page
      */
     initializeCertificate() {
-        console.log('Certificate page initialized');
+        console.log('Certificate page initialized (QUIZ-ONLY SYSTEM)');
 
         // Load user progress and certificate data
         this.loadCertificateStatus();
-        this.updateCertificateRequirements();
-        this.generateCertificatePreview();
+        this.generateSimpleCertificatePage();
     }
 
     /**
@@ -5981,6 +6297,209 @@ class MPIApp {
      */
     initializeAbout() {
         console.log('About page initialized');
+    }
+
+    /**
+     * Generate unique certificate ID
+     */
+    generateCertificateID() {
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substr(2, 5);
+        return `CERT-${timestamp}-${random}`.toUpperCase();
+    }
+
+    /**
+     * Generate verification code for certificate
+     */
+    generateVerificationCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 8; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    /**
+     * Debug certificate status
+     */
+    debugCertificateStatus() {
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        console.log('🔍 CERTIFICATE DEBUG INFO:');
+        console.log('Progress Data:', progress);
+        console.log('Certificate Unlocked:', progress.certificateUnlocked);
+        console.log('Best Score:', progress.bestScore);
+        console.log('Certificate Data:', progress.certificateData);
+
+        // Also check if certificate should be unlocked based on best score
+        if (progress.bestScore >= 70 && !progress.certificateUnlocked) {
+            console.log('🚨 ISSUE FOUND: Score >= 70% but certificate not unlocked!');
+            console.log('🔧 Auto-fixing certificate...');
+            this.updateEvaluationProgress();
+        }
+
+        this.showNotification(`Certificate Status: ${progress.certificateUnlocked ? 'Unlocked' : 'Locked'} (Score: ${progress.bestScore || 0}%)`, 'info');
+    }
+
+    /**
+     * Start certificate quiz directly
+     */
+    startCertificateQuiz() {
+        console.log('🚀 Starting certificate quiz...');
+
+        // Check if user already has certificate
+        const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+        if (progress.certificateUnlocked) {
+            this.showNotification('Anda sudah memiliki sertifikat!', 'info');
+            this.showPage('certificate');
+            return;
+        }
+
+        // Start quiz with certificate mode
+        if (window.unifiedQuizSystem) {
+            window.unifiedQuizSystem.startSession('quiz', {
+                category: 'certificate_quiz',
+                maxQuestionsPerSession: 15,
+                totalTimeLimit: 900, // 15 minutes
+                passingScore: 70,
+                certificateMode: true,
+                allowBackNavigation: false,
+                showImmediateFeedback: false
+            });
+        } else {
+            this.showNotification('Sistem kuis belum siap. Silakan coba lagi.', 'error');
+        }
+    }
+
+    /**
+     * Generate and download certificate
+     */
+    async downloadCertificate() {
+        try {
+            const progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+
+            if (!progress.certificateUnlocked || !progress.certificateData) {
+                this.showNotification('Sertifikat belum tersedia!', 'error');
+                return;
+            }
+
+            const certificate = progress.certificateData;
+
+            // Generate certificate HTML
+            const certificateHTML = this.generateCertificateHTML(certificate);
+
+            // Create temporary div for certificate
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = certificateHTML;
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            document.body.appendChild(tempDiv);
+
+            // Generate PDF using html2canvas and jsPDF
+            const canvas = await html2canvas(tempDiv.querySelector('.certificate-template'), {
+                scale: 2,
+                useCORS: true,
+                logging: false
+            });
+
+            // Clean up
+            document.body.removeChild(tempDiv);
+
+            // Create PDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('landscape', 'mm', 'a4');
+            const imgData = canvas.toDataURL('image/png');
+            pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+
+            // Download PDF
+            const fileName = `Sertifikat_${certificate.studentName}_${certificate.id}.pdf`;
+            pdf.save(fileName);
+
+            this.showNotification('📥 Sertifikat berhasil diunduh!', 'success');
+
+        } catch (error) {
+            console.error('Error downloading certificate:', error);
+            this.showNotification('Gagal mengunduh sertifikat. Silakan coba lagi.', 'error');
+        }
+    }
+
+    /**
+     * Generate certificate HTML template
+     */
+    generateCertificateHTML(data) {
+        return `
+        <div class="certificate-template simple" style="width: 1123px; height: 794px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; font-family: 'Poppins', sans-serif; color: #333;">
+            <!-- Background Pattern -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"none\"/><circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"rgba(255,255,255,0.1)\" stroke-width=\"2\" fill=\"none\"/></svg>'); opacity: 0.3;"></div>
+
+            <!-- Main Content -->
+            <div style="position: relative; z-index: 2; padding: 60px; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+
+                <!-- Header -->
+                <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🏫</div>
+                    <h1 style="font-size: 36px; font-weight: 700; color: #2c3e50; margin: 0; text-transform: uppercase;">SERTIFIKAT KOMPETENSI</h1>
+                    <h2 style="font-size: 24px; font-weight: 600; color: #34495e; margin: 10px 0;">Jaringan Dasar</h2>
+                    <p style="font-size: 16px; color: #7f8c8d; margin: 0;">Media Pembelajaran Interaktif - SMK TKJT</p>
+                </div>
+
+                <!-- Body -->
+                <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 40px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <p style="font-size: 18px; color: #555; margin-bottom: 20px;">Diberikan kepada:</p>
+                    <h3 style="font-size: 32px; font-weight: 700; color: #2c3e50; margin: 0 0 30px 0; text-transform: uppercase; border-bottom: 3px solid #3498db; padding-bottom: 15px; display: inline-block;">${data.studentName}</h3>
+
+                    <p style="font-size: 18px; color: #555; margin-bottom: 20px;">Atas keberhasilan menyelesaikan kuis kompetensi dengan nilai:</p>
+
+                    <div style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 15px; padding: 20px; margin: 20px 0; display: inline-block;">
+                        <div style="font-size: 48px; font-weight: 700; margin: 0;">${data.score}%</div>
+                        <div style="font-size: 16px; margin: 5px 0 0 0;">NILAI KOMPETENSI</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">
+                        <div style="background: #ecf0f1; border-radius: 10px; padding: 15px;">
+                            <div style="font-size: 14px; color: #7f8c8d;">Program</div>
+                            <div style="font-size: 16px; font-weight: 600; color: #2c3e50;">Jaringan Dasar</div>
+                        </div>
+                        <div style="background: #ecf0f1; border-radius: 10px; padding: 15px;">
+                            <div style="font-size: 14px; color: #7f8c8d;">Tanggal</div>
+                            <div style="font-size: 16px; font-weight: 600; color: #2c3e50;">${new Date(data.completionDate).toLocaleDateString('id-ID')}</div>
+                        </div>
+                        <div style="background: #ecf0f1; border-radius: 10px; padding: 15px;">
+                            <div style="font-size: 14px; color: #7f8c8d;">Standar Kelulusan</div>
+                            <div style="font-size: 16px; font-weight: 600; color: #2c3e50;">70%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left;">
+                        <div>
+                            <div style="font-size: 14px; color: #7f8c8d; margin-bottom: 20px;">No. Sertifikat: <strong>${data.id}</strong></div>
+                            <div style="font-size: 14px; color: #7f8c8d;">Kode Verifikasi: <strong>${data.verificationCode}</strong></div>
+                            <div style="font-size: 12px; color: #95a5a6; margin-top: 5px;">Verifikasi online: mpi-learning.sch.id/verify/${data.verificationCode}</div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: center;">
+                            <div>
+                                <p style="font-size: 14px; color: #555; margin: 0 0 30px 0;">Kepala Sekolah</p>
+                                <div style="border-bottom: 2px solid #34495e; width: 150px; margin: 0 auto;"></div>
+                                <p style="font-size: 14px; font-weight: 600; color: #2c3e50; margin: 10px 0 0 0;">Dr. Budi Santoso, M.Pd</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 14px; color: #555; margin: 0 0 30px 0;">Kepala Program TKJ</p>
+                                <div style="border-bottom: 2px solid #34495e; width: 150px; margin: 0 auto;"></div>
+                                <p style="font-size: 14px; font-weight: 600; color: #2c3e50; margin: 10px 0 0 0;">Ahmad Wijaya, S.T</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Border Frame -->
+            <div style="position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px; border: 5px solid rgba(255,255,255,0.3); border-radius: 15px; pointer-events: none;"></div>
+        </div>
+        `;
     }
 
     /**

@@ -131,7 +131,7 @@
                         <div class="card-badge">Comprehensive</div>
                     </div>
 
-                    <!-- Menu 5: Sertifikat -->
+                    <!-- Menu 5: Sertifikat (QUIZ-ONLY SYSTEM) -->
                     <div class="menu-card" data-page="certificate">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24" class="icon">
@@ -139,8 +139,15 @@
                             </svg>
                         </div>
                         <h3 class="card-title">Sertifikat</h3>
-                        <p class="card-description">Unduh sertifikat pencapaian Anda</p>
-                        <div class="card-status" id="certificateStatus">Locked</div>
+                        <p class="card-description">Dapatkan sertifikat dengan menyelesaikan kuis (70% passing score)</p>
+                        <div class="card-status" id="certificateStatus">
+                            <span class="status-text">🔒 Terkunci</span>
+                        </div>
+                        <div class="card-quick-action" id="certificateQuickAction" style="display: none;">
+                            <button class="btn btn-small btn-primary" onclick="window.mpiApp.startCertificateQuiz()">
+                                🎯 Mulai Kuis Sertifikat
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Menu 6: AI Tutor Virtual -->

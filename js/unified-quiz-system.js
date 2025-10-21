@@ -901,6 +901,30 @@ class UnifiedQuizSystem {
             // Save results
             this.saveResults();
 
+            // ULTRA-SIMPLIFIED CERTIFICATE: Any quiz with 70%+ gets certificate!
+            if (state.score >= 70) {
+                console.log('🏆 QUIZ PASSED! Generating certificate immediately...');
+                console.log('📊 Quiz Details:', {
+                    score: state.score,
+                    correctAnswers: state.correctAnswers,
+                    totalQuestions: state.totalQuestions,
+                    timeSpent: Math.floor((state.endTime - state.startTime) / 1000)
+                });
+
+                // Generate certificate immediately
+                this.triggerCertificateGeneration(state);
+
+                // Also update certificate status in main menu
+                setTimeout(() => {
+                    if (this.app && this.app.updateCertificateStatus) {
+                        this.app.updateCertificateStatus();
+                        console.log('🔄 Certificate status updated in main menu');
+                    }
+                }, 500);
+            } else {
+                console.log('📚 Quiz score below 70%, no certificate generated. Score:', state.score);
+            }
+
             console.log('✅ Session submitted with score:', state.score);
 
         } catch (error) {
@@ -961,7 +985,7 @@ class UnifiedQuizSystem {
     showResults() {
         const state = this.currentSession.state;
         const config = this.currentSession.config;
-        const passed = state.score >= this.defaultConfig.passingScore;
+        const passed = state.score >= 70; // FIXED: Always use 70% for certificate eligibility
 
         const contentPages = document.getElementById('contentPages');
         if (!contentPages) return;
@@ -1016,10 +1040,19 @@ class UnifiedQuizSystem {
                                     Coba Lagi
                                 </button>
                                 ${passed ? `
-                                    <button class="btn btn-success" onclick="window.unifiedQuizSystem.generateCertificate()">
-                                        Unduh Sertifikat
+                                    <button class="btn btn-success" onclick="window.mpiApp.downloadCertificate()">
+                                        🏆 Unduh Sertifikat
                                     </button>
-                                ` : ''}
+                                    <button class="btn btn-primary" onclick="window.mpiApp.showPage('certificate')">
+                                        👀 Lihat Sertifikat
+                                    </button>
+                                ` : `
+                                    <div class="certificate-hint">
+                                        <p>📝 <strong>Dapatkan Sertifikat!</strong></p>
+                                        <p>Capai nilai 70% atau lebih untuk membuka sertifikat kompetensi.</p>
+                                        <p>Selisih Anda: <strong>${70 - state.score}%</strong> lagi!</p>
+                                    </div>
+                                `}
                                 <button class="btn btn-outline" onclick="window.unifiedQuizSystem.backToMenu()">
                                     Kembali ke Menu
                                 </button>
@@ -1101,10 +1134,191 @@ class UnifiedQuizSystem {
     }
 
     /**
-     * Generate certificate (placeholder)
+     * Trigger certificate generation for quiz-only system
+     */
+    triggerCertificateGeneration(state) {
+        try {
+            console.log('🎓 DIRECT CERTIFICATE GENERATION - Score:', state.score);
+
+            // DIRECT CERTIFICATE GENERATION - No complex logic!
+            let progress = JSON.parse(localStorage.getItem('evaluationProgress') || '{}');
+
+            // Check if certificate already exists for this score
+            if (!progress.certificateUnlocked || (progress.bestScore || 0) < state.score) {
+                // Generate certificate data immediately
+                progress.certificateUnlocked = true;
+                progress.certificateDate = new Date().toISOString();
+                progress.bestScore = state.score;
+                progress.certificateData = {
+                    id: this.generateSimpleCertificateID(),
+                    studentName: this.app ? this.app.studentName || 'Student' : 'Student',
+                    score: state.score,
+                    completionDate: progress.certificateDate,
+                    verificationCode: this.generateSimpleVerificationCode(),
+                    quizOnly: true,
+                    passingScore: 70,
+                    correctAnswers: state.correctAnswers,
+                    totalQuestions: state.totalQuestions
+                };
+
+                // Save immediately
+                localStorage.setItem('evaluationProgress', JSON.stringify(progress));
+
+                // Update certificate status in main menu
+                if (this.app && this.app.updateCertificateStatus) {
+                    this.app.updateCertificateStatus();
+                }
+
+                console.log('✅ CERTIFICATE GENERATED IMMEDIATELY:', progress.certificateData);
+
+                // Show celebration modal
+                this.showCertificateCelebration(state);
+            } else {
+                console.log('ℹ️ Certificate already exists with score', progress.bestScore);
+                // Still show celebration for consistency
+                this.showCertificateCelebration(state);
+            }
+
+        } catch (error) {
+            console.error('❌ Error in direct certificate generation:', error);
+            this.showError('Gagal memproses sertifikat. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Generate simple certificate ID
+     */
+    generateSimpleCertificateID() {
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substr(2, 5);
+        return `CERT-${timestamp}-${random}`.toUpperCase();
+    }
+
+    /**
+     * Generate simple verification code
+     */
+    generateSimpleVerificationCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 8; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    /**
+     * Show certificate celebration modal
+     */
+    showCertificateCelebration(state) {
+        const celebrationHTML = `
+        <div class="certificate-celebration-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        ">
+            <div class="celebration-content" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 500px;
+                text-align: center;
+                color: white;
+                animation: celebrationBounce 0.6s ease-out;
+            ">
+                <div class="celebration-icon" style="font-size: 72px; margin-bottom: 20px;">🎉🏆🎊</div>
+                <h1 style="font-size: 32px; margin: 0 0 20px 0;">Selamat! Anda Lulus!</h1>
+                <p style="font-size: 18px; margin: 0 0 30px 0;">Sertifikat Kompetensi Jaringan Dasar telah dibuka</p>
+
+                <div class="score-display" style="
+                    background: rgba(255,255,255,0.2);
+                    border-radius: 15px;
+                    padding: 20px;
+                    margin: 20px 0;
+                ">
+                    <div style="font-size: 48px; font-weight: 700; margin: 0;">${state.score}%</div>
+                    <div style="font-size: 16px; margin: 5px 0 0 0;">Nilai Anda</div>
+                </div>
+
+                <p style="margin: 0 0 30px 0;">Anda menjawab ${state.correctAnswers} dari ${state.totalQuestions} soal dengan benar</p>
+
+                <div class="celebration-actions" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-success btn-large" onclick="
+                        window.mpiApp.downloadCertificate();
+                        document.querySelector('.certificate-celebration-modal').remove();
+                    " style="
+                        background: #27ae60;
+                        color: white;
+                        border: none;
+                        padding: 15px 30px;
+                        border-radius: 10px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        📥 Unduh Sertifikat Sekarang
+                    </button>
+                    <button class="btn btn-secondary" onclick="
+                        window.mpiApp.showPage('certificate');
+                        document.querySelector('.certificate-celebration-modal').remove();
+                    " style="
+                        background: #34495e;
+                        color: white;
+                        border: none;
+                        padding: 15px 30px;
+                        border-radius: 10px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        👀 Lihat Sertifikat
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <style>
+        @keyframes celebrationBounce {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        </style>
+        `;
+
+        // Add to body
+        document.body.insertAdjacentHTML('beforeend', celebrationHTML);
+
+        // Auto-remove after 10 seconds if user doesn't interact
+        setTimeout(() => {
+            const modal = document.querySelector('.certificate-celebration-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }, 10000);
+
+        console.log('🎊 Certificate celebration modal shown');
+    }
+
+    /**
+     * Generate certificate (for compatibility with existing systems)
      */
     generateCertificate() {
-        this.app.showNotification('Fitur unduh sertifikat akan segera tersedia', 'info');
+        // Delegate to app's downloadCertificate method
+        if (this.app && this.app.downloadCertificate) {
+            this.app.downloadCertificate();
+        } else {
+            this.showNotification('Sertifikat belum tersedia. Selesaikan kuis dengan nilai minimal 70% terlebih dahulu.', 'info');
+        }
     }
 
     /**
